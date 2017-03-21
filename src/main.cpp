@@ -11,9 +11,11 @@
  * Created on 19 March 2017, 16:39
  */
 #include "misc/node_factory.h"
-#include "graphs/basic_graph.h"
-#include "graphs/dnn_graph.h"
+#include "graphs/basic_graph_settings.h"
+#include "graphs/dnn_graph_settings.h"
 #include "nodes/basic_node.h"
+#include "messages/message.h"
+#include "messages/forward_propagation_message.h"
 
 #include <map>
 #include <vector>
@@ -65,9 +67,14 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    auto basic_graph = make_shared<BasicGraph>();
-    auto dnn_graph = make_shared<DNNGraph>();
-    auto node = NodeFactory::createInstance("Basic",dnn_graph);
+    Logging::m_logLevel = 5;
+    
+    auto basic_graph = make_shared<BasicGraphSettings>();
+    auto node = NodeFactory::createInstance("Basic",basic_graph);
+    auto msg = make_shared<ForwardPropagationMessage>();
+    msg->dispatchTo(node);
+    msg->dispatchFrom(node);
+    
     
     return 0;
 }

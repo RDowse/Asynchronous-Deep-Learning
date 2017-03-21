@@ -1,11 +1,15 @@
 
+#ifndef LOGGING_H
+#define LOGGING_H
+
 #include <stdexcept>
 #include <stdarg.h> 
 #include <cstdio>
 
 class Logging{
-public: 
+public:
     static int m_logLevel;
+    
     static void log(int level, const char *msg, ...)
     {
         if(level <= m_logLevel){
@@ -42,3 +46,5 @@ public:
         
     }
 };
+
+#endif

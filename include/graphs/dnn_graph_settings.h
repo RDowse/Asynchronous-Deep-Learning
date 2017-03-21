@@ -5,18 +5,18 @@
  */
 
 /* 
- * File:   basic_graph.h
+ * File:   dnn_graph_settings.h
  * Author: ryan
  *
- * Created on 19 March 2017, 20:32
+ * Created on 19 March 2017, 16:50
  */
 
-#ifndef BASIC_GRAPH_H
-#define BASIC_GRAPH_H
+#ifndef DNN_GRAPH_SETTINGS_H
+#define DNN_GRAPH_SETTINGS_H
 
-#include "graphs/graph.h"
+#include "graphs/graph_settings.h"
 
-class BasicGraph: public Graph{
+class DNNGraphSettings: public GraphSettings{
 public:
     // Various global settings for all nodes in the graph.
     struct GraphType{ 
@@ -31,10 +31,10 @@ public:
         
     };
     
-    BasicGraph(){}
+    DNNGraphSettings(){}
     
     void info(){}
 };
 
-#endif /* BASIC_GRAPH_H */
+#endif /* DNN_GRAPH_H */
 

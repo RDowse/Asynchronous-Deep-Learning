@@ -14,16 +14,19 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <string>
-#include <vector>
+#include "nodes/node.h"
 
-// Generic message
+#include <memory>
+
+using namespace std;
+
+// Abstract message
 class Message{
 public:
-    std::string type;
-    int src;    // Probably not needed. Msgs just passed onto the next node.
-    int dst;
-    std::vector<float> data; // set data size that must be unpacked
+    // send message to node
+    virtual bool dispatchTo(shared_ptr<Node> handler)=0;
+    // prepare message sent from node
+    virtual bool dispatchFrom(shared_ptr<Node> handler)=0;
 };
 
 #endif /* MESSAGE_H */

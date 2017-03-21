@@ -14,17 +14,15 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include "messages/message.h"
-
 #include <memory>
 
+using namespace std;
+
+class Message;
 class Node;
 
 class Edge{
-    typedef std::shared_ptr<Node> NodePtr;
-    typedef std::shared_ptr<Message> MsgPtr;
-    typedef int channel_type; // TODO update type
-    
+    typedef int channel_type; 
     unsigned delay;
     channel_type channel;
 public:
@@ -34,12 +32,12 @@ public:
         inflight
     };
 
-    MsgPtr msg;
-    NodePtr dst;
-    NodePtr src;
+    shared_ptr<Message> msg;
+    shared_ptr<Node> dst;
+    shared_ptr<Node> src;
     MessageStatus msgStatus;
     
-    Edge(NodePtr dst, NodePtr src, unsigned delay, channel_type channel) :
+    Edge(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay, channel_type channel) :
     dst(dst), src(src), delay(delay), channel(channel) {
     }
 

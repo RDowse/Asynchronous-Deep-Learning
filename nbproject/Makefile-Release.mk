@@ -39,7 +39,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/basic_node.o \
 	${OBJECTDIR}/src/nodes/dnn_node.o \
-	${OBJECTDIR}/src/nodes/node.o
+	${OBJECTDIR}/src/nodes/node.o \
+	${OBJECTDIR}/src/tools/logging.o
 
 
 # C Compiler Flags
@@ -90,6 +91,11 @@ ${OBJECTDIR}/src/nodes/node.o: src/nodes/node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node.o src/nodes/node.cpp
+
+${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/tools
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
 
 # Subprojects
 .build-subprojects:

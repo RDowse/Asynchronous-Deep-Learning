@@ -18,9 +18,9 @@
 #define BASICNODE_H
 
 #include "nodes/node.h"
-#include "graphs/graph.h"
 #include "misc/node_factory.h"
-#include "graphs/basic_graph.h"
+#include "graphs/graph_settings.h"
+#include "graphs/basic_graph_settings.h"
 
 #include <string>
 #include <cassert>
@@ -28,46 +28,41 @@
 #include <exception>
 #include <memory>
 
+using namespace std;
+
 class BasicNode : public Node{
     static NodeRegister<BasicNode> m_reg;
     static std::string m_type;
-    std::shared_ptr<BasicGraph> m_graph; // global settings for graph
+    shared_ptr<BasicGraphSettings> m_graphSettings; // global settings for graph
 public:
     int seenCount = 0;
-    std::shared_ptr<Message> m_msg;
-    BasicNode(shared_ptr<Graph> graph): Node(graph){
+    BasicNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         // Downcast 
         // This is done so the same map can be used for all nodes.
         try{
-            if(m_graph = std::dynamic_pointer_cast<BasicGraph>(graph)){
-                std::cout << "cast was fine";
-            } else {
-                std::cout << "bad cast";
-            }
+            if(m_graphSettings = std::dynamic_pointer_cast<BasicGraphSettings>(graphSettings)){
+                
+            } else {std::cerr << "Bad cast for " << m_type << " node\n";}
         } catch (exception& e){
             printf("%s does not belong to graph type %s",m_type.c_str(),"TODO");
         }
     }
     virtual ~BasicNode(){}
     void onInit(){}
-    bool readyToSend(){
-        return (seenCount==incomingEdges.size()) && (m_msg != NULL);
+    bool readyToSend(){}
+    
+    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {
+        std::cout << "Sending forward msg\n";
     }
-    void onRecv(std::shared_ptr<Message>& msg){
-        seenCount++;
-        m_msg = msg;
+    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {
+        std::cout << "Sending backward msg\n";
     }
-    bool onSend(std::shared_ptr<Message>& msg){
-         // check node is ready to send
-        assert(readyToSend());
-        
-        // update state
-        seenCount = 0;
-        
-        // copy message
-        msg = m_msg;
-        
-        return true;       
+    
+    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override {
+        std::cout << "Receiving forward msg\n";
+    }
+    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {
+        std::cout << "Receiving backward msg\n";
     }
 };
 

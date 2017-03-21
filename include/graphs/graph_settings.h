@@ -11,12 +11,12 @@
  * Created on 19 March 2017, 20:27
  */
 
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef GRAPH_SETTINGS_H
+#define GRAPH_SETTINGS_H
 
-class Graph{
+class GraphSettings{
 public:
-    Graph(){}
+    GraphSettings(){}
     virtual void info()=0;
 };
 

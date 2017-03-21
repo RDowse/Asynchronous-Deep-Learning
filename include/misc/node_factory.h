@@ -15,8 +15,10 @@
 #define NODEFACTORY_H
 
 #include "nodes/node.h"
+#include "tools/Logging.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <iostream>
 
@@ -24,18 +26,21 @@ using namespace std;
 
 class NodeFactory{    
 public:
-    typedef std::map<string, Node*(*)(shared_ptr<Graph>) > map_type;
-
-    static Node * createInstance(string const& type, shared_ptr<Graph> graph) { // add some struct for parameter settings
+    typedef shared_ptr<Node>(*construction_func)(shared_ptr<GraphSettings>);
+    typedef std::map<string,construction_func> map_type;
+    
+    // create an instance of the object name
+    static shared_ptr<Node> createInstance(string const& type, shared_ptr<GraphSettings> graphSettings) { // add some struct for parameter settings
         map_type::iterator it = getMap()->find(type);
         if (it == getMap()->end()){
             fprintf(stderr, "Error: %s is not registered.\n",type.c_str());
             return 0; // not registered
         }
         printf("Creating instance: %s\n",type.c_str());
-        return it->second(graph);
+        return it->second(graphSettings);
     }
 protected:
+    // stores currently registered node type constructors
     static map_type * m_map;
     
     static map_type * getMap() {
@@ -51,7 +56,7 @@ class NodeRegister: public NodeFactory{
 public:
     NodeRegister(const string& s) {
         printf("Registering: %s\n", s.c_str());
-        getMap()->insert(std::pair<string,Node*(*)(shared_ptr<Graph>)>(s, &createT<T>));
+        getMap()->insert(std::pair<string,construction_func>(s, &createT<T>));
     }
 };
 #endif /* NODEFACTORY_H */

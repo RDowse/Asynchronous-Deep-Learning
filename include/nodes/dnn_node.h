@@ -15,28 +15,33 @@
 #define DNN_NODE_H
 
 #include "nodes/node.h"
-#include "graphs/graph.h"
+#include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
-#include "graphs/dnn_graph.h"
+#include "graphs/dnn_graph_settings.h"
 
 #include <string>
 #include <cassert>
 #include <cstdio>
 #include <exception>
 #include <memory>
+#include <typeinfo>
+
+using namespace std;
 
 class DNNNode: public Node{
     static NodeRegister<DNNNode> m_reg;
     static std::string m_type;
-    std::shared_ptr<DNNGraph> m_graph;
+    shared_ptr<DNNGraphSettings> m_graph;
 public:
     int seenCount = 0;
-    std::shared_ptr<Message> m_msg;
-    DNNNode(shared_ptr<Graph> graph): Node(graph){
+    shared_ptr<Message> m_msg;
+    DNNNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
             // This is done so the same map can be used for all nodes.
-            m_graph = std::static_pointer_cast<DNNGraph>(graph);
+            if(m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings)){
+                
+            } else {std::cerr << "Bad cast for " << m_type << " node";}
         } catch (exception& e){
             printf("%s does not belong to graph type %s",m_type.c_str(),"TODO");
         }
@@ -46,13 +51,12 @@ public:
     bool readyToSend(){
         return (seenCount==incomingEdges.size()) && (m_msg != NULL);
     }
-    void onRecv(std::shared_ptr<Message>& msg){
-        seenCount++;
-        m_msg = msg;
-    }
-    bool onSend(std::shared_ptr<Message>& msg){
-        return true;       
-    }
+
+    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}
+    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
+    
+    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override {}
+    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {}
 };
 
 #endif /* DNN_NODE_H */
