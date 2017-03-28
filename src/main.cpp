@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
 
     Logging::m_logLevel = 5;
     
-    DNNGraph dnngraph(1,10,5,2);
+    DNNGraph dnngraph(3,10,5,5);
     //dnngraph.printGraph("w/test.graph");
     dnngraph.printGraphviz("w/test.dot");
     /*

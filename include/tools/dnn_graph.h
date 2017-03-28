@@ -32,15 +32,16 @@ using namespace std;
 
 class DNNGraph{
     struct Edge{
-        int src;
-        int dst;
+        Node* src;
+        Node* dst;
         int delay;
-        Edge(int src, int dst, int delay):src(src),dst(dst),delay(delay){}
+        Edge(Node* src, Node* dst, int delay):src(src),dst(dst),delay(delay){}
     };
     vector<Node*> nodes;
     vector<Edge*> edges;
     int nHLayers=0, nHidden=0, nInput=0, nOutput=0;
     int clusterCount = 0;
+    float thickness = 0.2;
 public:    
     DNNGraph(int nHLayers, int nHidden, int nInput, int nOutput)
         :nHLayers(nHLayers),nHidden(nHidden),nInput(nInput),nOutput(nOutput)
@@ -49,7 +50,7 @@ public:
         
         vector<Node*> prev_layer;
         vector<Node*> curr_layer;
-        
+        //InputNode ai(settings);
         // Input nodes
         for(int i = 0; i < nInput; ++i){
             prev_layer.push_back(new InputNode(settings));
@@ -65,7 +66,7 @@ public:
             for(int j = 0; j < prev_layer.size(); ++j){
                 for(int k = 0; k < curr_layer.size(); ++k){
                     edges.push_back(
-                        new Edge(prev_layer[j]->getId(),curr_layer[k]->getId(),1)
+                        new Edge(prev_layer[j],curr_layer[k],1)
                     );
                 }
             }
@@ -83,7 +84,7 @@ public:
         for(int j = 0; j < prev_layer.size(); ++j){
             for(int k = 0; k < curr_layer.size(); ++k){
                 edges.push_back(
-                    new Edge(prev_layer[j]->getId(),curr_layer[k]->getId(),1)
+                    new Edge(prev_layer[j],curr_layer[k],1)
                 );
             }
         }
@@ -125,17 +126,21 @@ public:
             fprintf(file,"digraph G {\n");
             fprintf(file,"rankdir=LR\n");
             fprintf(file,"splines=line\n");
-            fprintf(file,"node [fixedsize=true, label=""];\n");
+            fprintf(file,"node [fixedsize=true, label=\"\"];\n");
             // Input nodes
-            printCluster(file,index,index+nInput,nodes[index]->getType(),"blue4");
+            printGraphvizCluster(file,index,
+                    index+nInput,nodes[index]->getType(),"blue4");
             index = nInput;
             // Hidden nodes
             for(int i = 0; i < nHLayers; ++i)
-                printCluster(file,index+i*nHidden,index+(i+1)*nHidden,nodes[index]->getType(),"red2");
+                printGraphvizCluster(file,index+i*nHidden,
+                        index+(i+1)*nHidden,nodes[index]->getType(),"red2");
             index += nHidden*nHLayers;
             // Output nodes
-            printCluster(file,index,index+nOutput,nodes[index]->getType(),"seagreen2");
+            printGraphvizCluster(file,index,
+                    index+nOutput,nodes[index]->getType(),"seagreen2");
             fprintf(file,"\n");
+            printGraphvizConnections(file);
             fprintf(file,"}");
         } else {
             std::cout<< "Error opening file: %s" << path;
@@ -173,7 +178,7 @@ private:
         file<<"EndNodes\n";
     }
     
-    void printCluster(FILE* file, int start, int end, string prefix, string color){
+    void printGraphvizCluster(FILE* file, int start, int end, string prefix, string color){
         fprintf(file,"subgraph cluster_%d{\n",clusterCount++);
         fprintf(file,"    color=%s\n","white");
         fprintf(file,"    node [style=solid,color=%s,shape=circle];\n    ",color.c_str());
@@ -183,9 +188,10 @@ private:
         fprintf(file,"    label = \"%s layer\";\n}\n",prefix.c_str());
     }
     
-    void printConnections(FILE* file){
+    void printGraphvizConnections(FILE* file){
         for(auto e: edges){
-            //fprintf(file,
+            fprintf(file,"%s%d -> %s%d [penwidth=%f]\n",e->src->getType().c_str(),e->src->getId(),
+                            e->dst->getType().c_str(),e->dst->getId(),thickness);
         }
     }
 };
