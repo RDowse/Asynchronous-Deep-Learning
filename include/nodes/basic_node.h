@@ -48,8 +48,8 @@ public:
         }
     }
     virtual ~BasicNode(){}
-    void onInit(){}
-    bool readyToSend(){}
+    string getType() override {return BasicNode::m_type;}
+    bool readyToSend() override {}
     
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {
         std::cout << "Sending forward msg\n";

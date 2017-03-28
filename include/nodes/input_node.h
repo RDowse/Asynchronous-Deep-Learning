@@ -5,14 +5,14 @@
  */
 
 /* 
- * File:   dnn_node.h
+ * File:   input_node.h
  * Author: ryan
  *
- * Created on 20 March 2017, 23:50
+ * Created on 23 March 2017, 23:36
  */
 
-#ifndef DNN_NODE_H
-#define DNN_NODE_H
+#ifndef INPUT_NODE_H
+#define INPUT_NODE_H
 
 #include "nodes/node.h"
 #include "graphs/graph_settings.h"
@@ -28,14 +28,14 @@
 
 using namespace std;
 
-class DNNNode: public Node{
-    static NodeRegister<DNNNode> m_reg;
+class InputNode: public Node{
+    static NodeRegister<InputNode> m_reg;
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph;
 public:
     int seenCount = 0;
     shared_ptr<Message> m_msg;
-    DNNNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
+    InputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
             // This is done so the same map can be used for all nodes.
@@ -46,11 +46,9 @@ public:
             printf("%s does not belong to graph type %s",m_type.c_str(),"TODO");
         }
     }
-    virtual ~DNNNode(){}
-    string getType() override {return DNNNode::m_type;}
-    bool readyToSend() override {
-        return (seenCount==incomingEdges.size()) && (m_msg != NULL);
-    }
+    virtual ~InputNode(){}
+    string getType() override {return InputNode::m_type;}
+    bool readyToSend() override {}
 
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}
     bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
@@ -59,5 +57,5 @@ public:
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {}
 };
 
-#endif /* DNN_NODE_H */
+#endif /* INPUT_NODE_H */
 

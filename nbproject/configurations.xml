@@ -6,17 +6,21 @@
                    projectFiles="true">
       <itemPath>include/messages/BackwardMessage.h</itemPath>
       <itemPath>include/messages/ForwardMessage.h</itemPath>
-      <itemPath>include/tools/Logging.h</itemPath>
-      <itemPath>include/Simulator.h</itemPath>
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
+      <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
       <itemPath>include/nodes/dnn_node.h</itemPath>
       <itemPath>include/misc/edge.h</itemPath>
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
+      <itemPath>include/tools/graph_exporter.h</itemPath>
       <itemPath>include/graphs/graph_settings.h</itemPath>
+      <itemPath>include/nodes/input_node.h</itemPath>
+      <itemPath>include/tools/logging.h</itemPath>
       <itemPath>include/messages/message.h</itemPath>
       <itemPath>include/nodes/node.h</itemPath>
+      <itemPath>include/nodes/output_node.h</itemPath>
+      <itemPath>include/simulator.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -27,10 +31,12 @@
                    projectFiles="true">
       <itemPath>src/nodes/basic_node.cpp</itemPath>
       <itemPath>src/nodes/dnn_node.cpp</itemPath>
+      <itemPath>src/nodes/input_node.cpp</itemPath>
       <itemPath>src/tools/logging.cpp</itemPath>
       <itemPath>src/main.cpp</itemPath>
       <itemPath>src/nodes/node.cpp</itemPath>
       <itemPath>src/misc/node_factory.cpp</itemPath>
+      <itemPath>src/nodes/output_node.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -60,8 +66,6 @@
           </incDir>
         </ccTool>
       </compileType>
-      <item path="include/Simulator.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/graphs/basic_graph_settings.h"
             ex="false"
             tool="3"
@@ -94,9 +98,19 @@
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tools/Logging.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/graph_exporter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -106,7 +120,11 @@
       </item>
       <item path="src/nodes/dnn_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -131,8 +149,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="include/Simulator.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/graphs/basic_graph_settings.h"
             ex="false"
             tool="3"
@@ -165,9 +181,19 @@
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tools/Logging.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/graph_exporter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -177,7 +203,11 @@
       </item>
       <item path="src/nodes/dnn_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
       </item>

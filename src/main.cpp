@@ -17,6 +17,8 @@
 #include "messages/message.h"
 #include "messages/forward_propagation_message.h"
 
+#include "tools/dnn_graph.h"
+
 #include <map>
 #include <vector>
 #include <iostream>
@@ -69,12 +71,16 @@ int main(int argc, char** argv) {
 
     Logging::m_logLevel = 5;
     
+    DNNGraph dnngraph(1,10,5,2);
+    //dnngraph.printGraph("w/test.graph");
+    dnngraph.printGraphviz("w/test.dot");
+    /*
     auto basic_graph = make_shared<BasicGraphSettings>();
     auto node = NodeFactory::createInstance("Basic",basic_graph);
     auto msg = make_shared<ForwardPropagationMessage>();
     msg->dispatchTo(node);
     msg->dispatchFrom(node);
-    
+    */
     
     return 0;
 }

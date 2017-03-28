@@ -5,14 +5,14 @@
  */
 
 /* 
- * File:   dnn_node.h
+ * File:   output_node.h
  * Author: ryan
  *
- * Created on 20 March 2017, 23:50
+ * Created on 23 March 2017, 23:54
  */
 
-#ifndef DNN_NODE_H
-#define DNN_NODE_H
+#ifndef OUTPUT_NODE_H
+#define OUTPUT_NODE_H
 
 #include "nodes/node.h"
 #include "graphs/graph_settings.h"
@@ -28,14 +28,14 @@
 
 using namespace std;
 
-class DNNNode: public Node{
-    static NodeRegister<DNNNode> m_reg;
+class OutputNode: public Node{
+    static NodeRegister<OutputNode> m_reg;
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph;
 public:
     int seenCount = 0;
     shared_ptr<Message> m_msg;
-    DNNNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
+    OutputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
             // This is done so the same map can be used for all nodes.
@@ -46,8 +46,8 @@ public:
             printf("%s does not belong to graph type %s",m_type.c_str(),"TODO");
         }
     }
-    virtual ~DNNNode(){}
-    string getType() override {return DNNNode::m_type;}
+    virtual ~OutputNode(){}
+    string getType() override{return OutputNode::m_type;}
     bool readyToSend() override {
         return (seenCount==incomingEdges.size()) && (m_msg != NULL);
     }
@@ -59,5 +59,6 @@ public:
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {}
 };
 
-#endif /* DNN_NODE_H */
+
+#endif /* OUTPUT_NODE_H */
 

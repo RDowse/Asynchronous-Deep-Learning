@@ -45,7 +45,7 @@ public:
     int getId() const{
         return m_id;
     }
-    virtual void onInit()=0;
+    virtual string getType()=0;
     virtual bool readyToSend()=0;
     
     virtual bool onSend(shared_ptr<ForwardPropagationMessage> msg)=0;

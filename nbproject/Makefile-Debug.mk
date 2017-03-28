@@ -39,7 +39,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/basic_node.o \
 	${OBJECTDIR}/src/nodes/dnn_node.o \
+	${OBJECTDIR}/src/nodes/input_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
+	${OBJECTDIR}/src/nodes/output_node.o \
 	${OBJECTDIR}/src/tools/logging.o
 
 
@@ -87,10 +89,20 @@ ${OBJECTDIR}/src/nodes/dnn_node.o: src/nodes/dnn_node.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/dnn_node.o src/nodes/dnn_node.cpp
 
+${OBJECTDIR}/src/nodes/input_node.o: src/nodes/input_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node.o src/nodes/input_node.cpp
+
 ${OBJECTDIR}/src/nodes/node.o: src/nodes/node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node.o src/nodes/node.cpp
+
+${OBJECTDIR}/src/nodes/output_node.o: src/nodes/output_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node.o src/nodes/output_node.cpp
 
 ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools

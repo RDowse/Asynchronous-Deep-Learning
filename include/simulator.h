@@ -14,8 +14,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-//#include "graph/Graph.h"
-#include "tools/Logging.h"
+#include "tools/logging.h"
 
 #include <cassert>
 #include <fstream>

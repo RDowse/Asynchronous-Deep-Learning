@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
-#include "tools/logging.h"
+#include "nodes/input_node.h"
 
-int Logging::m_logLevel = 5;
+std::string InputNode::m_type = "Input";
+NodeRegister<InputNode> InputNode::m_reg(InputNode::m_type);

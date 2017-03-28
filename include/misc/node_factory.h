@@ -15,7 +15,7 @@
 #define NODEFACTORY_H
 
 #include "nodes/node.h"
-#include "tools/Logging.h"
+#include "tools/logging.h"
 
 #include <map>
 #include <memory>
