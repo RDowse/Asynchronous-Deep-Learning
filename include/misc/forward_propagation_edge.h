@@ -25,6 +25,8 @@ public:
     shared_ptr<ForwardPropagationMessage> msg; 
     ForwardPropagationEdge(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay) :
     Edge(dst,src,delay) {}
+    
+    std::string getType() const{return ForwardPropagationEdge::m_type;}
 };
 
 #endif /* FORWARD_PROPAGATION_EDGE_H */

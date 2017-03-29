@@ -65,7 +65,7 @@ private:
         Logging::log(3, "  edge %u -> %u : deliver", e->src->getId(), e->dst->getId());
         //m_stats.edgeDeliverSteps++;
              
-        e->dst->onRecv(e->msg);
+        //e->dst->onRecv(e->msg);
         e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
         
         return true;
@@ -136,11 +136,11 @@ public:
         Logging::m_logLevel = m_logLevel;
     }
         
-    void addEdge(int src, int dst, int delay, int channel){
-        auto e = make_shared<Edge>(m_nodes[src],m_nodes[dst],delay,0);
-        m_nodes[src]->outgoingEdges.push_back(e);
-        m_nodes[dst]->incomingEdges.push_back(e);
-        m_edges.push_back(e);
+    void addEdge(int src, int dst, int delay){
+//        auto e = make_shared<Edge>(m_nodes[src],m_nodes[dst],delay,0);
+//        m_nodes[src]->outgoingEdges.push_back(e);
+//        m_nodes[dst]->incomingEdges.push_back(e);
+//        m_edges.push_back(e);
     }
 
     void addNode(shared_ptr<Node> node){

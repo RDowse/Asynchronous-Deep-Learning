@@ -25,6 +25,8 @@ public:
     shared_ptr<BackwardPropagationMessage> msg; 
     BackwardPropagationEdge(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay):
     Edge(dst,src,delay) {}
+    
+    std::string getType() const{return BackwardPropagationEdge::m_type;}
 };
 
 

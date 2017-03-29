@@ -21,6 +21,10 @@
 #include "nodes/input_node.h"
 #include "nodes/output_node.h"
 
+#include "misc/edge.h"
+#include "misc/backward_propagation_edge.h"
+#include "misc/forward_propagation_edge.h"
+
 #include <algorithm>
 #include <vector>
 #include <memory>
@@ -31,14 +35,14 @@
 using namespace std;
 
 class DNNGraph{
-    struct Edge{
-        Node* src;
-        Node* dst;
-        int delay;
-        Edge(Node* src, Node* dst, int delay):src(src),dst(dst),delay(delay){}
-    };
-    vector<Node*> nodes;
-    vector<Edge*> edges;
+//    struct Edge{
+//        Node* src;
+//        Node* dst;
+//        int delay;
+//        Edge(Node* src, Node* dst, int delay):src(src),dst(dst),delay(delay){}
+//    };
+    vector<shared_ptr<Node>> nodes;
+    vector<shared_ptr<Edge>> edges;
     int nHLayers=0, nHidden=0, nInput=0, nOutput=0;
     int clusterCount = 0;
     float thickness = 0.2;
@@ -48,24 +52,27 @@ public:
     {
         auto settings = make_shared<DNNGraphSettings>();
         
-        vector<Node*> prev_layer;
-        vector<Node*> curr_layer;
+        vector<shared_ptr<Node>> prev_layer;
+        vector<shared_ptr<Node>> curr_layer;
         // Input nodes
         for(int i = 0; i < nInput; ++i){
-            prev_layer.push_back(new InputNode(settings));
+            prev_layer.push_back(make_shared<InputNode>(settings));
         }
         
         // Hidden nodes
         for(int i = 0; i < nHLayers; ++i){
             // Layer
             for(int j = 0; j < nHidden; ++j){
-                curr_layer.push_back(new DNNNode(settings));    
+                curr_layer.push_back(make_shared<DNNNode>(settings));    
             }
             // Connect Edges
             for(int j = 0; j < prev_layer.size(); ++j){
                 for(int k = 0; k < curr_layer.size(); ++k){
                     edges.push_back(
-                        new Edge(prev_layer[j],curr_layer[k],1)
+                        make_shared<ForwardPropagationEdge>(prev_layer[j],curr_layer[k],1)
+                    );
+                    edges.push_back(
+                        make_shared<BackwardPropagationEdge>(curr_layer[k],prev_layer[j],1)
                     );
                 }
             }
@@ -77,13 +84,16 @@ public:
         
         // Output nodes
         for(int i = 0; i < nOutput; ++i){
-            curr_layer.push_back(new OutputNode(settings));
+            curr_layer.push_back(make_shared<OutputNode>(settings));
         }
         // Connect Edges
         for(int j = 0; j < prev_layer.size(); ++j){
             for(int k = 0; k < curr_layer.size(); ++k){
                 edges.push_back(
-                    new Edge(prev_layer[j],curr_layer[k],1)
+                    make_shared<ForwardPropagationEdge>(prev_layer[j],curr_layer[k],1)
+                );
+                edges.push_back(
+                    make_shared<BackwardPropagationEdge>(curr_layer[k],prev_layer[j],1)
                 );
             }
         }
@@ -94,14 +104,14 @@ public:
     }
     
     ~DNNGraph(){
-        for (auto& i: nodes){
-          delete (i);
-        } 
-        nodes.clear();
-        for (auto& i: edges){
-          delete (i);
-        } 
-        edges.clear();
+//        for (auto& i: nodes){
+//          delete (i);
+//        } 
+//        nodes.clear();
+//        for (auto& i: edges){
+//          delete (i);
+//        } 
+//        edges.clear();
     }
     
     void printGraph(const string& path){
@@ -125,7 +135,7 @@ public:
             
             file<<"BeginEdges\n";
             for(auto e: edges){
-            file<<" "<<e->src->getId()<<" "<<e->dst->getId()<<" "<<e->delay<<"\n";
+            file<<e->getType()<<" "<<e->src->getId()<<" "<<e->dst->getId()<<" "<<e->getDelay()<<"\n";
             }
             file<<"EndEdges\n";
         } else {
