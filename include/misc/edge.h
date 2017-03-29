@@ -21,10 +21,8 @@ using namespace std;
 class Message;
 class Node;
 
-class Edge{
-    typedef int channel_type; 
+class Edge{ 
     unsigned delay;
-    channel_type channel;
 public:
     enum MessageStatus{
         empty,
@@ -32,23 +30,23 @@ public:
         inflight
     };
 
-    shared_ptr<Message> msg;
     shared_ptr<Node> dst;
     shared_ptr<Node> src;
     MessageStatus msgStatus;
     
-    Edge(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay, channel_type channel) :
-    dst(dst), src(src), delay(delay), channel(channel) {
+    Edge(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay) :
+    dst(dst), src(src), delay(delay){
     }
 
     unsigned getDelay()const {
         return delay;
     }
-
-    unsigned getChannel()const {
-        return channel;
-    } 
 };
 
+namespace edge{
+template<typename T> 
+shared_ptr<Edge> createT(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay)
+{ return make_shared<T>(dst,src,delay); }
+}
 #endif /* EDGE_H */
 

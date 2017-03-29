@@ -65,7 +65,7 @@ private:
         Logging::log(3, "  edge %u -> %u : deliver", e->src->getId(), e->dst->getId());
         //m_stats.edgeDeliverSteps++;
              
-        //e->dst->onRecv(e->msg);
+        e->dst->onRecv(e->msg);
         e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
         
         return true;

@@ -20,10 +20,6 @@
 #include "misc/edge.h"
 #include "graphs/graph_settings.h"
 
-// Message types
-//#include "messages/forward_propagation_message.h"
-//#include "messages/backward_propagation_message.h"
-
 #include <memory>
 #include <vector>
 

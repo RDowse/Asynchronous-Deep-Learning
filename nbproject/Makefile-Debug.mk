@@ -36,6 +36,9 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/misc/backward_propagation_edge.o \
+	${OBJECTDIR}/src/misc/edge_factory.o \
+	${OBJECTDIR}/src/misc/forward_propagation_edge.o \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/basic_node.o \
 	${OBJECTDIR}/src/nodes/dnn_node.o \
@@ -73,6 +76,21 @@ ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
+
+${OBJECTDIR}/src/misc/backward_propagation_edge.o: src/misc/backward_propagation_edge.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/misc
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/backward_propagation_edge.o src/misc/backward_propagation_edge.cpp
+
+${OBJECTDIR}/src/misc/edge_factory.o: src/misc/edge_factory.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/misc
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/edge_factory.o src/misc/edge_factory.cpp
+
+${OBJECTDIR}/src/misc/forward_propagation_edge.o: src/misc/forward_propagation_edge.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/misc
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/forward_propagation_edge.o src/misc/forward_propagation_edge.cpp
 
 ${OBJECTDIR}/src/misc/node_factory.o: src/misc/node_factory.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/misc

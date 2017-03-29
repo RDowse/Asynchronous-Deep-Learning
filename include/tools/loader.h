@@ -108,7 +108,7 @@ private:
                 err<<"At line "<<lineNumber<<" : Couldn't read edge";
                 throw std::runtime_error(err.str());              
             }  
-            sim.addEdge(srcIndex,dstIndex,delay,0);
+            sim.addEdge(srcIndex,dstIndex,delay);
         }
         expect(lineNumber,src,"EndEdges");
     }
