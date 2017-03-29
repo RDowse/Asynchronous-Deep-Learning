@@ -4,19 +4,13 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>include/messages/BackwardMessage.h</itemPath>
-      <itemPath>include/messages/ForwardMessage.h</itemPath>
-      <itemPath>include/misc/backward_propagation.h</itemPath>
-      <itemPath>include/misc/backward_propagation_edge.h</itemPath>
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
       <itemPath>include/nodes/dnn_node.h</itemPath>
       <itemPath>include/misc/edge.h</itemPath>
-      <itemPath>include/misc/forward_propagation_edge.h</itemPath>
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
-      <itemPath>include/tools/graph_exporter.h</itemPath>
       <itemPath>include/graphs/graph_settings.h</itemPath>
       <itemPath>include/nodes/input_node.h</itemPath>
       <itemPath>include/tools/loader.h</itemPath>
@@ -33,11 +27,8 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>src/misc/backward_propagation_edge.cpp</itemPath>
       <itemPath>src/nodes/basic_node.cpp</itemPath>
       <itemPath>src/nodes/dnn_node.cpp</itemPath>
-      <itemPath>src/misc/edge_factory.cpp</itemPath>
-      <itemPath>src/misc/forward_propagation_edge.cpp</itemPath>
       <itemPath>src/nodes/input_node.cpp</itemPath>
       <itemPath>src/tools/logging.cpp</itemPath>
       <itemPath>src/main.cpp</itemPath>
@@ -85,10 +76,6 @@
       </item>
       <item path="include/graphs/graph_settings.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/messages/BackwardMessage.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/messages/ForwardMessage.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/messages/backward_propagation_message.h"
             ex="false"
             tool="3"
@@ -101,22 +88,7 @@
       </item>
       <item path="include/messages/message.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/misc/backward_propagation.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/misc/backward_propagation_edge.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/misc/forward_propagation_edge.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -130,25 +102,11 @@
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tools/graph_exporter.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/tools/loader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/misc/backward_propagation_edge.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/misc/edge_factory.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/misc/forward_propagation_edge.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -197,10 +155,6 @@
       </item>
       <item path="include/graphs/graph_settings.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/messages/BackwardMessage.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/messages/ForwardMessage.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/messages/backward_propagation_message.h"
             ex="false"
             tool="3"
@@ -213,22 +167,7 @@
       </item>
       <item path="include/messages/message.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/misc/backward_propagation.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/misc/backward_propagation_edge.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/misc/forward_propagation_edge.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -242,25 +181,11 @@
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tools/graph_exporter.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/tools/loader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/misc/backward_propagation_edge.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/misc/edge_factory.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/misc/forward_propagation_edge.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -15,7 +15,6 @@
 #define SIMULATOR_H
 
 #include "tools/logging.h"
-#include "misc/edge_factory.h"
 #include "messages/message.h"
 
 #include <cassert>
@@ -140,8 +139,8 @@ public:
         Logging::m_logLevel = m_logLevel;
     }
         
-    void addEdge(string type, int src, int dst, int delay){
-        shared_ptr<Edge> e = EdgeFactory::createInstance(type,m_nodes[src],m_nodes[dst],delay);
+    void addEdge(int src, int dst, int delay){
+        auto e = make_shared<Edge>(m_nodes[src],m_nodes[dst],delay);
         m_nodes[src]->outgoingEdges.push_back(e);
         m_nodes[dst]->incomingEdges.push_back(e);
         m_edges.push_back(e);

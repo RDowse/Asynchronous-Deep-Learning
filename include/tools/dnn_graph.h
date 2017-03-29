@@ -22,8 +22,6 @@
 #include "nodes/output_node.h"
 
 #include "misc/edge.h"
-#include "misc/backward_propagation_edge.h"
-#include "misc/forward_propagation_edge.h"
 
 #include <algorithm>
 #include <vector>
@@ -69,10 +67,10 @@ public:
             for(int j = 0; j < prev_layer.size(); ++j){
                 for(int k = 0; k < curr_layer.size(); ++k){
                     edges.push_back(
-                        make_shared<ForwardPropagationEdge>(prev_layer[j],curr_layer[k],1)
+                        make_shared<Edge>(prev_layer[j],curr_layer[k],1)
                     );
                     edges.push_back(
-                        make_shared<BackwardPropagationEdge>(curr_layer[k],prev_layer[j],1)
+                        make_shared<Edge>(curr_layer[k],prev_layer[j],1)
                     );
                 }
             }
@@ -90,10 +88,10 @@ public:
         for(int j = 0; j < prev_layer.size(); ++j){
             for(int k = 0; k < curr_layer.size(); ++k){
                 edges.push_back(
-                    make_shared<ForwardPropagationEdge>(prev_layer[j],curr_layer[k],1)
+                    make_shared<Edge>(prev_layer[j],curr_layer[k],1)
                 );
                 edges.push_back(
-                    make_shared<BackwardPropagationEdge>(curr_layer[k],prev_layer[j],1)
+                    make_shared<Edge>(curr_layer[k],prev_layer[j],1)
                 );
             }
         }
@@ -103,16 +101,7 @@ public:
         nodes.insert(nodes.end(),curr_layer.begin(),curr_layer.end());
     }
     
-    ~DNNGraph(){
-//        for (auto& i: nodes){
-//          delete (i);
-//        } 
-//        nodes.clear();
-//        for (auto& i: edges){
-//          delete (i);
-//        } 
-//        edges.clear();
-    }
+    ~DNNGraph(){}
     
     void printGraph(const string& path){
         ofstream file;
@@ -135,7 +124,7 @@ public:
             
             file<<"BeginEdges\n";
             for(auto e: edges){
-            file<<e->getType()<<" "<<e->src->getId()<<" "<<e->dst->getId()<<" "<<e->getDelay()<<"\n";
+            file<<e->src->getId()<<" "<<e->dst->getId()<<" "<<e->getDelay()<<"\n";
             }
             file<<"EndEdges\n";
         } else {
