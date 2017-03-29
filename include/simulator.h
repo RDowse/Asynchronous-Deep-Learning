@@ -15,6 +15,8 @@
 #define SIMULATOR_H
 
 #include "tools/logging.h"
+#include "misc/edge_factory.h"
+#include "messages/message.h"
 
 #include <cassert>
 #include <fstream>
@@ -48,6 +50,8 @@ private:
     int m_step;
     int m_logLevel;
     
+    //std::map<string,function> m_cmd_map;
+    
     bool step_edge(unsigned index, std::shared_ptr<Edge>& e){
         if(e->msgStatus == 0){
             Logging::log(4, "  edge %u -> %u : empty", e->src->getId(), e->dst->getId());
@@ -64,8 +68,7 @@ private:
        
         Logging::log(3, "  edge %u -> %u : deliver", e->src->getId(), e->dst->getId());
         //m_stats.edgeDeliverSteps++;
-             
-        //e->dst->onRecv(e->msg);
+        e->msg->dispatchTo(e->dst);
         e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
         
         return true;
@@ -92,10 +95,11 @@ private:
         Logging::log(3, "  node %u : send", index);
         //m_stats.nodeSendSteps++;
         
-        //auto message = std::make_shared<Message>();
+        auto msg = std::make_shared<ForwardPropagationMessage>();
         
         // Get the device to send the message
         //n->onSend(message);
+        msg->dispatchFrom(n);
         
         // Copy message to edge
         for(unsigned i=0; i < n->outgoingEdges.size(); i++){
@@ -136,18 +140,18 @@ public:
         Logging::m_logLevel = m_logLevel;
     }
         
-    void addEdge(int src, int dst, int delay){
-//        auto e = make_shared<Edge>(m_nodes[src],m_nodes[dst],delay,0);
-//        m_nodes[src]->outgoingEdges.push_back(e);
-//        m_nodes[dst]->incomingEdges.push_back(e);
-//        m_edges.push_back(e);
+    void addEdge(string type, int src, int dst, int delay){
+        shared_ptr<Edge> e = EdgeFactory::createInstance(type,m_nodes[src],m_nodes[dst],delay);
+        m_nodes[src]->outgoingEdges.push_back(e);
+        m_nodes[dst]->incomingEdges.push_back(e);
+        m_edges.push_back(e);
     }
 
     void addNode(shared_ptr<Node> node){
         m_nodes.push_back(node);
     }
         
-    void run(){
+    void run(string command){
         Logging::log(1, "begin run");
         
         bool active=true;

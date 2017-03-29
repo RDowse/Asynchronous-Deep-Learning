@@ -104,11 +104,12 @@ private:
         expect(lineNumber,src,"BeginEdges");
         for(int i = 0; i < nEdges; ++i){
             int srcIndex, dstIndex, delay;
-            if(!(stringstream(nextline(lineNumber,src))>>srcIndex>>dstIndex>>delay)){
+            string type;
+            if(!(stringstream(nextline(lineNumber,src))>>type>>srcIndex>>dstIndex>>delay)){
                 err<<"At line "<<lineNumber<<" : Couldn't read edge";
                 throw std::runtime_error(err.str());              
             }  
-            sim.addEdge(srcIndex,dstIndex,delay);
+            sim.addEdge(type,srcIndex,dstIndex,delay);
         }
         expect(lineNumber,src,"EndEdges");
     }

@@ -29,7 +29,7 @@ public:
         ready,    
         inflight
     };
-
+    shared_ptr<Message> msg;
     shared_ptr<Node> dst;
     shared_ptr<Node> src;
     MessageStatus msgStatus;
@@ -42,7 +42,8 @@ public:
         return delay;
     }
     
-    virtual string getType()const =0;
+    //virtual string getType()const =0;
+    string getType()const{return"";}
 };
 
 namespace edge{

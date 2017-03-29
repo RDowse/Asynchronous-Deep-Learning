@@ -76,9 +76,9 @@ int main(int argc, char** argv) {
     dnngraph.printGraph("w/test.graph");
     dnngraph.printGraphviz("w/test.dot");
     std::ostream *stats=&std::cout;
-//    Simulator sim(2,*stats);
-//    Loader::load("w/test.graph",sim);
-    
+    Simulator sim(2,*stats);
+    Loader::load("w/test.graph",sim);
+    sim.run("predict");
 
     /*
     auto basic_graph = make_shared<BasicGraphSettings>();
