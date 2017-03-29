@@ -17,6 +17,7 @@
 #include "messages/message.h"
 #include "messages/forward_propagation_message.h"
 
+#include "tools/loader.h"
 #include "tools/dnn_graph.h"
 
 #include <map>
@@ -72,8 +73,13 @@ int main(int argc, char** argv) {
     Logging::m_logLevel = 5;
     
     DNNGraph dnngraph(3,10,5,5);
-    //dnngraph.printGraph("w/test.graph");
-    dnngraph.printGraphviz("w/test.dot");
+    dnngraph.printGraph("w/test.graph");
+    
+    std::ostream *stats=&std::cout;
+    Simulator sim(2,*stats);
+    Loader::load("w/test.graph",sim);
+    
+    //dnngraph.printGraphviz("w/test.dot");
     /*
     auto basic_graph = make_shared<BasicGraphSettings>();
     auto node = NodeFactory::createInstance("Basic",basic_graph);

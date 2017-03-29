@@ -50,7 +50,6 @@ public:
         
         vector<Node*> prev_layer;
         vector<Node*> curr_layer;
-        //InputNode ai(settings);
         // Input nodes
         for(int i = 0; i < nInput; ++i){
             prev_layer.push_back(new InputNode(settings));
@@ -109,9 +108,26 @@ public:
         ofstream file;
         file.open(path);
         if(file.is_open()){
-            printGraphHeader(file);
-            printGraphNodes(file);
-            printGraphEdges(file);
+            file<<"POETSGraph\n";
+            file<<"DNN"<<"\n";      // TYPE
+            
+            file<<"BeginHeader\n";
+            file<<"0"<<"\n";        // PARAMETER COUNT
+            file<<"NULL"<<"\n";     // PARAMETERS
+            file<<nodes.size()<<" "<<edges.size()<<"\n";
+            file<<"EndHeader\n";   
+            
+            file<<"BeginNodes\n";
+            for(auto n: nodes){
+                file<<n->getType()<<" "<<n->getId()<<"\n";
+            }
+            file<<"EndNodes\n";
+            
+            file<<"BeginEdges\n";
+            for(auto e: edges){
+            file<<" "<<e->src->getId()<<" "<<e->dst->getId()<<" "<<e->delay<<"\n";
+            }
+            file<<"EndEdges\n";
         } else {
             std::cout<< "Error opening file: %s" << path;
         }
@@ -127,15 +143,18 @@ public:
             fprintf(file,"rankdir=LR\n");
             fprintf(file,"splines=line\n");
             fprintf(file,"node [fixedsize=true, label=\"\"];\n");
+            
             // Input nodes
             printGraphvizCluster(file,index,
                     index+nInput,nodes[index]->getType(),"blue4");
             index = nInput;
+            
             // Hidden nodes
             for(int i = 0; i < nHLayers; ++i)
                 printGraphvizCluster(file,index+i*nHidden,
                         index+(i+1)*nHidden,nodes[index]->getType(),"red2");
             index += nHidden*nHLayers;
+            
             // Output nodes
             printGraphvizCluster(file,index,
                     index+nOutput,nodes[index]->getType(),"seagreen2");
@@ -149,35 +168,6 @@ public:
     }
  
 private:
-    void printGraphHeader(ofstream& file){
-        file<<"POETSGraph\nBeginHeader\n";
-        // TYPE
-        file<<"DNN"<<"\n";
-        // PARAMETER COUNT
-        file<<"0"<<"\n";
-        // PARAMETERS
-        file<<"NULL"<<"\n";
-        // NODES AND EDGES COUNT
-        file<<nodes.size()<<" "<<edges.size()<<"\n";
-        file<<"EndHeader\n";            
-    }
-    
-    void printGraphNodes(ofstream& file){
-        file<<"BeginNodes\n";
-        for(auto n: nodes){
-            file<<n->getType()<<" "<<n->getId()<<"\n";
-        }
-        file<<"EndNodes\n";
-    }
-    
-    void printGraphEdges(ofstream& file){
-        file<<"BeginEdges\n";
-        for(auto e: edges){
-            file<<" "<<e->src<<" "<<e->dst<<" "<<e->delay<<"\n";
-        }
-        file<<"EndNodes\n";
-    }
-    
     void printGraphvizCluster(FILE* file, int start, int end, string prefix, string color){
         fprintf(file,"subgraph cluster_%d{\n",clusterCount++);
         fprintf(file,"    color=%s\n","white");

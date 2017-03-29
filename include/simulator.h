@@ -23,10 +23,12 @@
 #include <cstdio>
 #include <stdarg.h> 
 
+using namespace std;
+
 class Simulator{
 private:
-    std::vector<std::shared_ptr<Edge>> m_edges;
-    std::vector<std::shared_ptr<Node>> m_nodes;
+    std::vector<shared_ptr<Edge>> m_edges;
+    std::vector<shared_ptr<Node>> m_nodes;
     
     struct stats
     {
@@ -63,7 +65,7 @@ private:
         Logging::log(3, "  edge %u -> %u : deliver", e->src->getId(), e->dst->getId());
         //m_stats.edgeDeliverSteps++;
              
-        e->dst->onRecv(e->msg);
+        //e->dst->onRecv(e->msg);
         e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
         
         return true;
@@ -90,17 +92,17 @@ private:
         Logging::log(3, "  node %u : send", index);
         //m_stats.nodeSendSteps++;
         
-        auto message = std::make_shared<Message>();
+        //auto message = std::make_shared<Message>();
         
         // Get the device to send the message
-        n->onSend(message);
+        //n->onSend(message);
         
         // Copy message to edge
         for(unsigned i=0; i < n->outgoingEdges.size(); i++){
             assert( 0 == n->outgoingEdges[i]->msgStatus );
-            n->outgoingEdges[i]->msg = message; // Copy message into channel
-            n->outgoingEdges[i]->msgStatus = 
-                static_cast<Edge::MessageStatus>(1 + n->outgoingEdges[i]->getDelay()); // How long until it is ready?
+            //n->outgoingEdges[i]->msg = message; // Copy message into channel
+            //n->outgoingEdges[i]->msgStatus = 
+            //    static_cast<Edge::MessageStatus>(1 + n->outgoingEdges[i]->getDelay()); // How long until it is ready?
         }
         
         return true;
@@ -131,15 +133,18 @@ public:
         m_logLevel(logLevel),
         m_step(0),
         m_statsDst(stats){
-            Logging::m_logLevel = m_logLevel;
+        Logging::m_logLevel = m_logLevel;
     }
         
-    void addEdge(){
-
+    void addEdge(int src, int dst, int delay, int channel){
+        auto e = make_shared<Edge>(m_nodes[src],m_nodes[dst],delay,0);
+        m_nodes[src]->outgoingEdges.push_back(e);
+        m_nodes[dst]->incomingEdges.push_back(e);
+        m_edges.push_back(e);
     }
 
-    void addNode(){
-
+    void addNode(shared_ptr<Node> node){
+        m_nodes.push_back(node);
     }
         
     void run(){
