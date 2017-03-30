@@ -52,6 +52,8 @@ public:
         return (seenCount==incomingEdges.size()) && (m_msg != NULL);
     }
 
+    void setup() override{}
+    
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}
     bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
     

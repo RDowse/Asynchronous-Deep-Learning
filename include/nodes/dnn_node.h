@@ -35,6 +35,8 @@ class DNNNode: public Node{
 public:
     int seenCount = 0;
     shared_ptr<Message> m_msg;
+    vector<float> weights;
+    
     DNNNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
@@ -50,6 +52,10 @@ public:
     string getType() override {return DNNNode::m_type;}
     bool readyToSend() override {
         return (seenCount==incomingEdges.size()) && (m_msg != NULL);
+    }
+    
+    void setup() override{
+        weights = vector<float>(outgoingEdges.size(),1);
     }
 
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}

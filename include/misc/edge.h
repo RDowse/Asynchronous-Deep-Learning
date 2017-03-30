@@ -41,9 +41,6 @@ public:
     unsigned getDelay()const {
         return delay;
     }
-    
-    //virtual string getType()const =0;
-    string getType()const{return"";}
 };
 
 namespace edge{

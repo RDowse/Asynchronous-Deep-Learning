@@ -44,6 +44,8 @@ public:
     virtual string getType()=0;
     virtual bool readyToSend()=0;
     
+    virtual void setup()=0;
+    
     virtual bool onSend(shared_ptr<ForwardPropagationMessage> msg)=0;
     virtual bool onSend(shared_ptr<BackwardPropagationMessage> msg)=0;
     

@@ -51,6 +51,8 @@ public:
     string getType() override {return BasicNode::m_type;}
     bool readyToSend() override {}
     
+    void setup() override{}
+    
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {
         std::cout << "Sending forward msg\n";
     }

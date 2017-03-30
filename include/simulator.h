@@ -50,6 +50,7 @@ private:
     int m_logLevel;
     
     //std::map<string,function> m_cmd_map;
+    string m_command;
     
     bool step_edge(unsigned index, std::shared_ptr<Edge>& e){
         if(e->msgStatus == 0){
@@ -93,9 +94,9 @@ private:
         
         Logging::log(3, "  node %u : send", index);
         //m_stats.nodeSendSteps++;
-        
+             
         auto msg = std::make_shared<ForwardPropagationMessage>();
-        
+
         // Get the device to send the message
         //n->onSend(message);
         msg->dispatchFrom(n);
@@ -149,9 +150,17 @@ public:
     void addNode(shared_ptr<Node> node){
         m_nodes.push_back(node);
     }
+    
+    void setup(){
+        for(auto n: m_nodes){
+            n->setup();
+        }
+    }
         
     void run(string command){
         Logging::log(1, "begin run");
+        
+        m_command = command;
         
         bool active=true;
         

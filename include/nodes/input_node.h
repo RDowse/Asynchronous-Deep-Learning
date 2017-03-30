@@ -50,6 +50,8 @@ public:
     string getType() override {return InputNode::m_type;}
     bool readyToSend() override {}
 
+    void setup() override{}
+    
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}
     bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
     
