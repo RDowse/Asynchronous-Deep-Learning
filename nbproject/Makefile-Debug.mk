@@ -36,6 +36,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/main.o \
+	${OBJECTDIR}/src/messages/backward_propagation_message.o \
+	${OBJECTDIR}/src/messages/forward_propagation_message.o \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/basic_node.o \
 	${OBJECTDIR}/src/nodes/dnn_node.o \
@@ -73,6 +75,16 @@ ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
+
+${OBJECTDIR}/src/messages/backward_propagation_message.o: src/messages/backward_propagation_message.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/messages
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/backward_propagation_message.o src/messages/backward_propagation_message.cpp
+
+${OBJECTDIR}/src/messages/forward_propagation_message.o: src/messages/forward_propagation_message.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/messages
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message.o src/messages/forward_propagation_message.cpp
 
 ${OBJECTDIR}/src/misc/node_factory.o: src/misc/node_factory.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/misc

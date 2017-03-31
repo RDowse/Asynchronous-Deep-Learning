@@ -21,13 +21,9 @@ class BackwardPropagationMessage: public Message,
 {
 public:
     // send message to node
-    bool dispatchTo(shared_ptr<Node> handler) override{
-        handler->onRecv(shared_from_this());
-    }
+    bool dispatchTo(shared_ptr<Node> handler) override;
     // prepare message sent from node
-    bool dispatchFrom(shared_ptr<Node> handler) override{
-        handler->onSend(shared_from_this());
-    }
+    bool dispatchFrom(shared_ptr<Node> handler) override;
 };
 
 #endif /* BACKWARD_PROPAGATION_MESSAGE_H */

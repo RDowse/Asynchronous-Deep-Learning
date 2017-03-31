@@ -16,6 +16,7 @@
 
 #include "tools/logging.h"
 #include "messages/message.h"
+#include "graphs/graph_settings.h"
 
 #include <cassert>
 #include <fstream>
@@ -28,6 +29,7 @@ using namespace std;
 
 class Simulator{
 private:
+    shared_ptr<GraphSettings> settings; 
     std::vector<shared_ptr<Edge>> m_edges;
     std::vector<shared_ptr<Node>> m_nodes;
     
@@ -94,20 +96,19 @@ private:
         
         Logging::log(3, "  node %u : send", index);
         //m_stats.nodeSendSteps++;
-             
+                
         auto msg = std::make_shared<ForwardPropagationMessage>();
-
         // Get the device to send the message
         //n->onSend(message);
         msg->dispatchFrom(n);
         
-        // Copy message to edge
-        for(unsigned i=0; i < n->outgoingEdges.size(); i++){
-            assert( 0 == n->outgoingEdges[i]->msgStatus );
-            //n->outgoingEdges[i]->msg = message; // Copy message into channel
-            //n->outgoingEdges[i]->msgStatus = 
-            //    static_cast<Edge::MessageStatus>(1 + n->outgoingEdges[i]->getDelay()); // How long until it is ready?
-        }
+        // Copy message to edge, send out different messages
+//        for(unsigned i=0; i < n->outgoingEdges.size(); i++){
+//            assert( 0 == n->outgoingEdges[i]->msgStatus );
+//            //n->outgoingEdges[i]->msg = message; // Copy message into channel
+//            //n->outgoingEdges[i]->msgStatus = 
+//            //    static_cast<Edge::MessageStatus>(1 + n->outgoingEdges[i]->getDelay()); // How long until it is ready?
+//        }
         
         return true;
     }

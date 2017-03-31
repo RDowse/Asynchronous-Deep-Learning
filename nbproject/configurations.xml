@@ -27,8 +27,10 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
       <itemPath>src/nodes/basic_node.cpp</itemPath>
       <itemPath>src/nodes/dnn_node.cpp</itemPath>
+      <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
       <itemPath>src/nodes/input_node.cpp</itemPath>
       <itemPath>src/tools/logging.cpp</itemPath>
       <itemPath>src/main.cpp</itemPath>
@@ -108,6 +110,16 @@
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/messages/backward_propagation_message.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/messages/forward_propagation_message.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/basic_node.cpp" ex="false" tool="1" flavor2="0">
@@ -186,6 +198,16 @@
       <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/messages/backward_propagation_message.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/messages/forward_propagation_message.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>

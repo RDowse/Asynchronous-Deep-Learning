@@ -14,9 +14,9 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include "nodes/node.h"
-
 #include <memory>
+
+class Node;
 
 using namespace std;
 
@@ -30,4 +30,3 @@ public:
 };
 
 #endif /* MESSAGE_H */
-

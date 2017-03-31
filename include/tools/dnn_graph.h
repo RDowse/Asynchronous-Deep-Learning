@@ -33,12 +33,6 @@
 using namespace std;
 
 class DNNGraph{
-//    struct Edge{
-//        Node* src;
-//        Node* dst;
-//        int delay;
-//        Edge(Node* src, Node* dst, int delay):src(src),dst(dst),delay(delay){}
-//    };
     vector<shared_ptr<Node>> nodes;
     vector<shared_ptr<Edge>> edges;
     int nHLayers=0, nHidden=0, nInput=0, nOutput=0;

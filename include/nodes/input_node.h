@@ -52,7 +52,7 @@ public:
 
     void setup() override{}
     
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}
+    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
     bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
     
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override {}

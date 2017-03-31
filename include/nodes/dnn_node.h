@@ -31,12 +31,18 @@ using namespace std;
 class DNNNode: public Node{
     static NodeRegister<DNNNode> m_reg;
     static std::string m_type;
+    
     shared_ptr<DNNGraphSettings> m_graph;
-public:
-    int seenCount = 0;
-    shared_ptr<Message> m_msg;
+    vector<shared_ptr<Edge>> forwardEdges;
+    vector<shared_ptr<Edge>> backwardEdges;
     vector<float> weights;
     
+    float value = 0;
+    int seenCount = 0;
+    int seenCountForward = 0;
+    int seenCountBackward = 0;
+    shared_ptr<Message> m_msg;
+public:
     DNNNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
@@ -51,18 +57,28 @@ public:
     virtual ~DNNNode(){}
     string getType() override {return DNNNode::m_type;}
     bool readyToSend() override {
-        return (seenCount==incomingEdges.size()) && (m_msg != NULL);
+        return (seenCountForward==forwardEdges.size() ||
+                seenCountBackward==backwardEdges.size()) 
+                && (m_msg != NULL);
     }
     
     void setup() override{
+        for(auto& e: outgoingEdges){
+            if(e->dst->getId() > m_id){
+                forwardEdges.push_back(e);
+            } else {
+                backwardEdges.push_back(e);
+            }
+        }
+        
         weights = vector<float>(outgoingEdges.size(),1);
     }
 
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
+    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
+    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override {}
-    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {}
+    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
+    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
 };
 
 #endif /* DNN_NODE_H */

@@ -43,9 +43,12 @@ public:
     }
     virtual string getType()=0;
     virtual bool readyToSend()=0;
-    
     virtual void setup()=0;
     
+    /*
+     *  design is not particularly scalable since all nodes must know about all
+     * message types. Opt to change for dynamic casting.
+     */
     virtual bool onSend(shared_ptr<ForwardPropagationMessage> msg)=0;
     virtual bool onSend(shared_ptr<BackwardPropagationMessage> msg)=0;
     

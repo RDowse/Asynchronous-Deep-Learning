@@ -42,11 +42,4 @@ public:
         return delay;
     }
 };
-
-namespace edge{
-template<typename T> 
-shared_ptr<Edge> createT(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay)
-{ return make_shared<T>(dst,src,delay); }
-}
 #endif /* EDGE_H */
-
