@@ -10,15 +10,19 @@
  *
  * Created on 19 March 2017, 16:39
  */
-#include "misc/node_factory.h"
 #include "graphs/basic_graph_settings.h"
 #include "graphs/dnn_graph_settings.h"
 #include "nodes/basic_node.h"
 #include "messages/message.h"
 #include "messages/forward_propagation_message.h"
 
+#include "misc/node_factory.h"
+#include "misc/data.h"
+
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"
+
+#include "mnist/mnist_reader.hpp"
 
 #include <map>
 #include <vector>
@@ -73,22 +77,30 @@ int main(int argc, char** argv) {
     Logging::m_logLevel = 5;
     std::ostream *stats=&std::cout;
     
-    DNNGraph dnngraph(1,4,5,5);
-    dnngraph.printGraph("w/test.graph");
-    dnngraph.printGraphviz("w/test.dot");
-    
-    Simulator sim(2,*stats);
-    Loader::load("w/test.graph",sim);
-    sim.run("predict");
+//    DNNGraph dnngraph(1,4,5,5);
+//    dnngraph.printGraph("w/test.graph");
+//    dnngraph.printGraphviz("w/test.dot");
+//    
+//    Simulator sim(2,*stats);
+//    Loader::load("w/test.graph",sim);
+//    sim.run("predict");
 
-    /*
-    auto basic_graph = make_shared<BasicGraphSettings>();
-    auto node = NodeFactory::createInstance("Basic",basic_graph);
-    auto msg = make_shared<ForwardPropagationMessage>();
-    msg->dispatchTo(node);
-    msg->dispatchFrom(node);
-    */
+    //Data<int,vector<int>> data;
+    //DataLoader::load(data,"data/mnist_train.csv");
     
+//    vector<vector<double>> v;
+//    load_mnist::ReadMNIST(10000,784,v);
+//    for(auto i: v[0]){
+//        cout << i << " ";
+//    }
+    
+    auto dataset = mnist::read_dataset<std::vector, std::vector, uint8_t, uint8_t>();
+    for(int i = 0; i<dataset.training_labels.size(); ++i){   
+        cout << int(dataset.training_labels[i]) << " ";
+    }
+//    for(int i = 0; i<dataset.training_images[0].size(); ++i){
+//        cout << int(dataset.training_images[0][i]) << " ";
+//    }
     return 0;
 }
 

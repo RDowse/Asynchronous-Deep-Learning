@@ -6,6 +6,8 @@
                    projectFiles="true">
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
+      <itemPath>include/misc/data.h</itemPath>
+      <itemPath>include/tools/data_loader.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
       <itemPath>include/nodes/dnn_node.h</itemPath>
@@ -13,6 +15,7 @@
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
       <itemPath>include/graphs/graph_settings.h</itemPath>
       <itemPath>include/nodes/input_node.h</itemPath>
+      <itemPath>include/tools/load_mnist.h</itemPath>
       <itemPath>include/tools/loader.h</itemPath>
       <itemPath>include/tools/logging.h</itemPath>
       <itemPath>include/messages/message.h</itemPath>
@@ -63,6 +66,7 @@
           <standard>8</standard>
           <incDir>
             <pElem>include</pElem>
+            <pElem>mnist/include</pElem>
           </incDir>
         </ccTool>
       </compileType>
@@ -90,6 +94,8 @@
       </item>
       <item path="include/messages/message.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/data.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
@@ -102,7 +108,11 @@
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/load_mnist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/loader.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -179,6 +189,8 @@
       </item>
       <item path="include/messages/message.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/data.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
@@ -191,7 +203,11 @@
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/load_mnist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/loader.h" ex="false" tool="3" flavor2="0">
       </item>

@@ -74,52 +74,52 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/asynchronous-deep-learning: ${OBJECTF
 ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
 
 ${OBJECTDIR}/src/messages/backward_propagation_message.o: src/messages/backward_propagation_message.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/messages
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/backward_propagation_message.o src/messages/backward_propagation_message.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/backward_propagation_message.o src/messages/backward_propagation_message.cpp
 
 ${OBJECTDIR}/src/messages/forward_propagation_message.o: src/messages/forward_propagation_message.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/messages
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message.o src/messages/forward_propagation_message.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message.o src/messages/forward_propagation_message.cpp
 
 ${OBJECTDIR}/src/misc/node_factory.o: src/misc/node_factory.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/misc
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/node_factory.o src/misc/node_factory.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/node_factory.o src/misc/node_factory.cpp
 
 ${OBJECTDIR}/src/nodes/basic_node.o: src/nodes/basic_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/basic_node.o src/nodes/basic_node.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/basic_node.o src/nodes/basic_node.cpp
 
 ${OBJECTDIR}/src/nodes/dnn_node.o: src/nodes/dnn_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/dnn_node.o src/nodes/dnn_node.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/dnn_node.o src/nodes/dnn_node.cpp
 
 ${OBJECTDIR}/src/nodes/input_node.o: src/nodes/input_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node.o src/nodes/input_node.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node.o src/nodes/input_node.cpp
 
 ${OBJECTDIR}/src/nodes/node.o: src/nodes/node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node.o src/nodes/node.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node.o src/nodes/node.cpp
 
 ${OBJECTDIR}/src/nodes/output_node.o: src/nodes/output_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node.o src/nodes/output_node.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node.o src/nodes/output_node.cpp
 
 ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
 
 # Subprojects
 .build-subprojects:
