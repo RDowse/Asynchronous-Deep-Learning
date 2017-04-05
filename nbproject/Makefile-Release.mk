@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/messages/forward_propagation_message.o \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/basic_node.o \
+	${OBJECTDIR}/src/nodes/bias_node.o \
 	${OBJECTDIR}/src/nodes/dnn_node.o \
 	${OBJECTDIR}/src/nodes/input_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
@@ -95,6 +96,11 @@ ${OBJECTDIR}/src/nodes/basic_node.o: src/nodes/basic_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/basic_node.o src/nodes/basic_node.cpp
+
+${OBJECTDIR}/src/nodes/bias_node.o: src/nodes/bias_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node.o src/nodes/bias_node.cpp
 
 ${OBJECTDIR}/src/nodes/dnn_node.o: src/nodes/dnn_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes

@@ -1,3 +1,4 @@
+*.csv#
 .gitignore.save
 .dep.inc
 build/

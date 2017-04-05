@@ -18,11 +18,13 @@
 
 #include "misc/node_factory.h"
 #include "misc/data.h"
+#include "misc/data_wrapper.h"
 
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"
 
 #include "mnist/mnist_reader.hpp"
+#include "tools/math.h"
 
 #include <map>
 #include <vector>
@@ -48,6 +50,50 @@ void usage(){
 void registerFlags(std::map<std::string, FlagFunction>& func_map){
     func_map["-s"] = &save;
     func_map["-r"] = &run;
+}
+
+void simulate(const string& path){
+    printf("Staring sim...\n");
+    Logging::m_logLevel = 5;
+    std::ostream *stats=&std::cout;
+    ifstream file;
+    file.open(path);
+    if(file.is_open()){
+        int lineNumber = 0, nNodes = 0, nEdges = 0;
+        string type = Loader::readType(lineNumber,file);
+        Loader::readHeader(lineNumber,file,nNodes,nEdges);
+        Simulator sim(2,nNodes,nEdges,*stats);
+        Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
+        printf("Loaded graph to sim\n");
+        
+        // Sim
+        printf("Loading data\n");
+        MNISTDatasetWrapper data(mnist::read_dataset<std::vector, std::vector, uint8_t, uint8_t>());
+        printf("Data size: %ld\n",data.getData()[0].size());
+        
+        vector<int> removedIndex; // remove redundant columns of pixels.
+        math::removeConstantCols(data.getData(),removedIndex);
+        
+        vector<float> weights;
+        Loader::loadWeights("weights.csv", weights);
+        
+        for(auto w: weights){
+            cout << w << endl;
+        }
+        
+        sim.loadInput(data.getData()[0]);
+        // End sim
+    } else {
+        printf("Unable to open file %s\n",path.c_str());
+        return;
+    }
+    file.close();
+}
+
+void buildGraph(){
+    DNNGraph dnngraph(1,10,28*28,10);
+    dnngraph.writeGraph("w/test.graph");
+    dnngraph.writeGraphviz("w/test.dot");
 }
 
 /*
@@ -77,30 +123,8 @@ int main(int argc, char** argv) {
     Logging::m_logLevel = 5;
     std::ostream *stats=&std::cout;
     
-//    DNNGraph dnngraph(1,4,5,5);
-//    dnngraph.printGraph("w/test.graph");
-//    dnngraph.printGraphviz("w/test.dot");
-//    
-//    Simulator sim(2,*stats);
-//    Loader::load("w/test.graph",sim);
-//    sim.run("predict");
+    //buildGraph();
+    simulate("w/test.graph");
 
-    //Data<int,vector<int>> data;
-    //DataLoader::load(data,"data/mnist_train.csv");
-    
-//    vector<vector<double>> v;
-//    load_mnist::ReadMNIST(10000,784,v);
-//    for(auto i: v[0]){
-//        cout << i << " ";
-//    }
-    
-    auto dataset = mnist::read_dataset<std::vector, std::vector, uint8_t, uint8_t>();
-    for(int i = 0; i<dataset.training_labels.size(); ++i){   
-        cout << int(dataset.training_labels[i]) << " ";
-    }
-//    for(int i = 0; i<dataset.training_images[0].size(); ++i){
-//        cout << int(dataset.training_images[0][i]) << " ";
-//    }
     return 0;
 }
-

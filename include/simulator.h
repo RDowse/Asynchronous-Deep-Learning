@@ -17,6 +17,8 @@
 #include "tools/logging.h"
 #include "messages/message.h"
 #include "graphs/graph_settings.h"
+#include "nodes/node.h"
+#include "messages/forward_propagation_message.h"
 
 #include <cassert>
 #include <fstream>
@@ -30,8 +32,9 @@ using namespace std;
 class Simulator{
 private:
     shared_ptr<GraphSettings> settings; 
-    std::vector<shared_ptr<Edge>> m_edges;
-    std::vector<shared_ptr<Node>> m_nodes;
+    vector<shared_ptr<Edge>> m_edges;
+    vector<shared_ptr<Node>> m_nodes;
+    multimap<string, shared_ptr<Node>> m_node_map;
     
     struct stats
     {
@@ -134,11 +137,15 @@ private:
     
 public:
     Simulator(int logLevel, 
+              unsigned nNodes,
+              unsigned nEdges,
               std::ostream& stats):
         m_logLevel(logLevel),
         m_step(0),
         m_statsDst(stats){
         Logging::m_logLevel = m_logLevel;
+        m_nodes.reserve(nNodes);
+        m_edges.reserve(nEdges);
     }
         
     void addEdge(int src, int dst, int delay){
@@ -149,7 +156,32 @@ public:
     }
 
     void addNode(shared_ptr<Node> node){
+        m_node_map.insert(pair<string,shared_ptr<Node>>(node->getType(),node));
         m_nodes.push_back(node);
+    }
+    
+    void print(){
+        for(auto c: m_node_map){
+            cout << c.first << " " << c.second->getId() << "\n";
+        }
+    }
+    
+    void loadInput(const vector<uint8_t>& data){
+        assert(data.size() == m_node_map.count("Input"));
+        auto ii = m_node_map.equal_range("Input");
+        int i = 0;
+        for(auto it = ii.first; it != ii.second; ++it){
+            auto msg = std::make_shared<ForwardPropagationMessage>();
+            msg->value = data[i++];
+            it->second->onRecv(msg);
+        }
+    }
+    
+    void printOutput(){
+        auto ii = m_node_map.equal_range("Output");
+        int i = 0;
+        for(auto it = ii.first; it != ii.second; ++it){
+        }
     }
     
     void setup(){
@@ -158,7 +190,7 @@ public:
         }
     }
         
-    void run(string command){
+    void run(const string& command){
         Logging::log(1, "begin run");
         
         m_command = command;

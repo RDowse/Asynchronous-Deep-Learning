@@ -20,6 +20,7 @@
 #include "nodes/dnn_node.h"
 #include "nodes/input_node.h"
 #include "nodes/output_node.h"
+#include "nodes/bias_node.h"
 
 #include "misc/edge.h"
 
@@ -53,10 +54,14 @@ public:
         
         // Hidden nodes
         for(int i = 0; i < nHLayers; ++i){
+            // Bias node
+            prev_layer.push_back(make_shared<BiasNode>(settings));
+            
             // Layer
             for(int j = 0; j < nHidden; ++j){
                 curr_layer.push_back(make_shared<DNNNode>(settings));    
             }
+            
             // Connect Edges
             for(int j = 0; j < prev_layer.size(); ++j){
                 for(int k = 0; k < curr_layer.size(); ++k){
@@ -68,11 +73,15 @@ public:
                     );
                 }
             }
+            
             // Copy node layers
             nodes.insert(nodes.end(),prev_layer.begin(),prev_layer.end());
             swap(curr_layer,prev_layer);
             curr_layer.clear();
         }
+        
+        // Bias node
+        prev_layer.push_back(make_shared<BiasNode>(settings));
         
         // Output nodes
         for(int i = 0; i < nOutput; ++i){
@@ -97,7 +106,7 @@ public:
     
     ~DNNGraph(){}
     
-    void printGraph(const string& path){
+    void writeGraph(const string& path){
         ofstream file;
         file.open(path);
         if(file.is_open()){
@@ -127,7 +136,7 @@ public:
         file.close();
     }
  
-    void printGraphviz(const string& path){
+    void writeGraphviz(const string& path){
         FILE* file;
         file = fopen(path.c_str(),"w");
         if(file){
@@ -138,15 +147,16 @@ public:
             fprintf(file,"node [fixedsize=true, label=\"\"];\n");
             
             // Input nodes
-            printGraphvizCluster(file,index,
-                    index+nInput,nodes[index]->getType(),"blue4");
-            index = nInput;
+            index = nInput+1;
+            printGraphvizCluster(file,0,
+                    index,nodes[0]->getType(),"blue4");
             
             // Hidden nodes
-            for(int i = 0; i < nHLayers; ++i)
-                printGraphvizCluster(file,index+i*nHidden,
-                        index+(i+1)*nHidden,nodes[index]->getType(),"red2");
-            index += nHidden*nHLayers;
+            for(int i = 0; i < nHLayers; ++i){
+                printGraphvizCluster(file,index+i*(nHidden+1),
+                        index+(nHidden+1),nodes[index]->getType(),"red2");
+                index += nHidden+1;
+            }
             
             // Output nodes
             printGraphvizCluster(file,index,
@@ -166,7 +176,7 @@ private:
         fprintf(file,"    color=%s\n","white");
         fprintf(file,"    node [style=solid,color=%s,shape=circle];\n    ",color.c_str());
         for(int i = start; i < end; ++i)
-            fprintf(file,"%s%d ",prefix.c_str(),nodes[i]->getId());
+            fprintf(file,"%s%d ",nodes[i]->getType().c_str(),nodes[i]->getId());
         fprintf(file,";\n");
         fprintf(file,"    label = \"%s layer\";\n}\n",prefix.c_str());
     }

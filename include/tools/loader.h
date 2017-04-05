@@ -27,92 +27,103 @@ using namespace std;
 
 class Loader{
 public:
-    static int load(string path, Simulator& sim){
+    
+    static void loadWeights(const string& path, vector<float>& weights, char separator='\0'){
         ifstream file;
         file.open(path);
+        string token;
         if(file.is_open()){
-            string type;
-            int lineNumber = 0, nNodes = 0, nEdges = 0;
-            expect(lineNumber,file,"POETSGraph");
-            type = readType(lineNumber,file);
-            readHeader(lineNumber,file,nNodes,nEdges);
-            readBody(lineNumber,file,sim,nNodes,nEdges);
-        } else {
-            printf("Unable to open file %s\n",path.c_str());
-            return -1;
+            while(std::getline(file, token, separator)) {
+                weights.push_back(stof(token));
+            }
+            file.close();
         }
-        file.close();
-    }
-private:
-    static string readType(int& lineNumber, ifstream& src){
-        string type;
-        std::stringstream err;
-        if(!(stringstream(nextline(lineNumber,src))>>type)){
-            err<<"At line "<<lineNumber<<" : Couldn't read type";
-            throw std::runtime_error(err.str());              
-        }
-        return type;
     }
     
-    static void readHeader(int& lineNumber,ifstream& src,
+    static string readType(int& lineNumber, ifstream& src){
+        if(src.is_open()){
+            string type;
+            std::stringstream err;
+            expect(lineNumber,src,"POETSGraph");
+            if(!(stringstream(nextline(lineNumber,src))>>type)){
+                err<<"At line "<<lineNumber<<" : Couldn't read type";
+                throw std::runtime_error(err.str());              
+            }
+            return type;
+        } else {
+            printf("No file open \n");
+        }
+        return NULL;
+    }
+    
+    static void readHeader(int& lineNumber, ifstream& src,
                             int& nNodes, int& nEdges){
-        std::stringstream err;
-        expect(lineNumber,src,"BeginHeader");
-        // Parameter count
-        int paramCount;
-        if(!(stringstream(nextline(lineNumber,src))>>paramCount)){
-            err<<"At line "<<lineNumber<<" : Couldn't read parameter count";
-            throw std::runtime_error(err.str());              
-        }
-        
-        // Parameters, package depending on graph type
-        stringstream ss(nextline(lineNumber,src));
-        for(int i = 0; i < paramCount; ++i){
-            //todo
-        }
-        
-        // Node and edge count
-        if(!(stringstream(nextline(lineNumber,src))>>nNodes>>nEdges)){
-            err<<"At line "<<lineNumber<<" : Couldn't read nNodes, nEdges";
-            throw std::runtime_error(err.str());              
-        }        
+        if(src.is_open()){
+            std::stringstream err;
+            expect(lineNumber,src,"BeginHeader");
+            // Parameter count
+            int paramCount;
+            if(!(stringstream(nextline(lineNumber,src))>>paramCount)){
+                err<<"At line "<<lineNumber<<" : Couldn't read parameter count";
+                throw std::runtime_error(err.str());              
+            }
 
-        expect(lineNumber,src,"EndHeader");    
+            // Parameters, package depending on graph type
+            stringstream ss(nextline(lineNumber,src));
+            for(int i = 0; i < paramCount; ++i){
+                //todo
+            }
+
+            // Node and edge count
+            if(!(stringstream(nextline(lineNumber,src))>>nNodes>>nEdges)){
+                err<<"At line "<<lineNumber<<" : Couldn't read nNodes, nEdges";
+                throw std::runtime_error(err.str());              
+            }        
+
+            expect(lineNumber,src,"EndHeader");    
+        } else {
+            printf("No file open\n");
+        }
     } 
     
     static void readBody(int& lineNumber, std::ifstream &src, Simulator& sim,
                             int nNodes, int nEdges){
-        std::stringstream err;
-        auto settings =  make_shared<DNNGraphSettings>();
-        vector<shared_ptr<Node>> nodes;
-        nodes.reserve(nNodes);
-        
-        expect(lineNumber,src,"BeginNodes");
-        for(int i = 0; i < nNodes; ++i){
-            int id;
-            string type;
-            if(!(stringstream(nextline(lineNumber,src))>>type>>id)){
-                err<<"At line "<<lineNumber<<" : Couldn't read node";
-                throw std::runtime_error(err.str());              
-            }        
-            sim.addNode(NodeFactory::createInstance(type,settings));
+        if(src.is_open()){
+            std::stringstream err;
+            auto settings =  make_shared<DNNGraphSettings>();
+            vector<shared_ptr<Node>> nodes;
+            nodes.reserve(nNodes);
+
+            expect(lineNumber,src,"BeginNodes");
+            for(int i = 0; i < nNodes; ++i){
+                int id;
+                string type;
+                if(!(stringstream(nextline(lineNumber,src))>>type>>id)){
+                    err<<"At line "<<lineNumber<<" : Couldn't read node";
+                    throw std::runtime_error(err.str());              
+                }        
+                sim.addNode(NodeFactory::createInstance(type,settings));
+            }
+            expect(lineNumber,src,"EndNodes");
+
+            vector<shared_ptr<Edge>> edges;
+            nodes.reserve(nEdges);
+            expect(lineNumber,src,"BeginEdges");
+            for(int i = 0; i < nEdges; ++i){
+                int srcIndex, dstIndex, delay;
+                if(!(stringstream(nextline(lineNumber,src))>>srcIndex>>dstIndex>>delay)){
+                    err<<"At line "<<lineNumber<<" : Couldn't read edge";
+                    throw std::runtime_error(err.str());              
+                }  
+                sim.addEdge(srcIndex,dstIndex,delay);
+            }
+            expect(lineNumber,src,"EndEdges");
+        } else {
+            printf("No file open\n");
         }
-        expect(lineNumber,src,"EndNodes");
-        
-        vector<shared_ptr<Edge>> edges;
-        nodes.reserve(nEdges);
-        expect(lineNumber,src,"BeginEdges");
-        for(int i = 0; i < nEdges; ++i){
-            int srcIndex, dstIndex, delay;
-            if(!(stringstream(nextline(lineNumber,src))>>srcIndex>>dstIndex>>delay)){
-                err<<"At line "<<lineNumber<<" : Couldn't read edge";
-                throw std::runtime_error(err.str());              
-            }  
-            sim.addEdge(srcIndex,dstIndex,delay);
-        }
-        expect(lineNumber,src,"EndEdges");
     }
     
+private:    
     static string nextline(int& lineNumber, std::ifstream &src){
         lineNumber++;
         string line;

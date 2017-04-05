@@ -34,6 +34,8 @@ class InputNode: public Node{
     shared_ptr<DNNGraphSettings> m_graph;
 public:
     int seenCount = 0;
+    int value = 0;
+    vector<float> weights;
     shared_ptr<Message> m_msg;
     InputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
@@ -48,15 +50,23 @@ public:
     }
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}
-    bool readyToSend() override {}
+    bool readyToSend() override {
+        if(m_graph->operation==1)
+            return (m_msg!=NULL);
+        else if(m_graph->operation==2)
+            return (m_msg!=NULL) && seenCount == incomingEdges.size();
+        return false;
+    }
 
-    void setup() override{}
+    void setup() override{
+        weights = vector<float>(outgoingEdges.size(),1);
+    }
     
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
+    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override{}
     
-    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override {}
-    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {}
+    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
+    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override{}
 };
 
 #endif /* INPUT_NODE_H */

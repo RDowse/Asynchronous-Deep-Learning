@@ -6,8 +6,10 @@
                    projectFiles="true">
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
+      <itemPath>include/nodes/bias_node.h</itemPath>
       <itemPath>include/misc/data.h</itemPath>
       <itemPath>include/tools/data_loader.h</itemPath>
+      <itemPath>include/misc/data_wrapper.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
       <itemPath>include/nodes/dnn_node.h</itemPath>
@@ -18,6 +20,7 @@
       <itemPath>include/tools/load_mnist.h</itemPath>
       <itemPath>include/tools/loader.h</itemPath>
       <itemPath>include/tools/logging.h</itemPath>
+      <itemPath>include/tools/math.h</itemPath>
       <itemPath>include/messages/message.h</itemPath>
       <itemPath>include/nodes/node.h</itemPath>
       <itemPath>include/nodes/output_node.h</itemPath>
@@ -32,6 +35,7 @@
                    projectFiles="true">
       <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
       <itemPath>src/nodes/basic_node.cpp</itemPath>
+      <itemPath>src/nodes/bias_node.cpp</itemPath>
       <itemPath>src/nodes/dnn_node.cpp</itemPath>
       <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
       <itemPath>src/nodes/input_node.cpp</itemPath>
@@ -96,7 +100,11 @@
       </item>
       <item path="include/misc/data.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/data_wrapper.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -118,6 +126,8 @@
       </item>
       <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tools/math.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/messages/backward_propagation_message.cpp"
@@ -133,6 +143,8 @@
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/basic_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/dnn_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -191,7 +203,11 @@
       </item>
       <item path="include/misc/data.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/data_wrapper.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -213,6 +229,8 @@
       </item>
       <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tools/math.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/messages/backward_propagation_message.cpp"
@@ -228,6 +246,8 @@
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/basic_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/dnn_node.cpp" ex="false" tool="1" flavor2="0">
       </item>

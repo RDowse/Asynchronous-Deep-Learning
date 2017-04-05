@@ -31,7 +31,9 @@ public:
         
     };
     
-    DNNGraphSettings(){}
+    unsigned operation; // 0: unset, 1: predict, 2: training
+    
+    DNNGraphSettings():operation(0){}
     
     void info(){}
 };
