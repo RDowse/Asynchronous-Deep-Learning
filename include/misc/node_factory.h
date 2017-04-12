@@ -36,7 +36,7 @@ public:
             fprintf(stderr, "Error: %s is not registered.\n",type.c_str());
             return 0; // not registered
         }
-        printf("Creating instance: %s\n",type.c_str());
+        Logging::log(4, "Creating instance: %s\n", type.c_str());
         return it->second(graphSettings);
     }
 protected:
@@ -55,7 +55,7 @@ template<typename T>
 class NodeRegister: public NodeFactory{
 public:
     NodeRegister(const string& s) {
-        printf("Registering: %s\n", s.c_str());
+        Logging::log(4, "Registering: %s", s.c_str());
         getMap()->insert(std::pair<string,construction_func>(s, &createT<T>));
     }
 };

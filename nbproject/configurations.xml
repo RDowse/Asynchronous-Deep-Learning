@@ -17,12 +17,12 @@
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
       <itemPath>include/graphs/graph_settings.h</itemPath>
       <itemPath>include/nodes/input_node.h</itemPath>
-      <itemPath>include/tools/load_mnist.h</itemPath>
       <itemPath>include/tools/loader.h</itemPath>
       <itemPath>include/tools/logging.h</itemPath>
       <itemPath>include/tools/math.h</itemPath>
       <itemPath>include/messages/message.h</itemPath>
       <itemPath>include/nodes/node.h</itemPath>
+      <itemPath>include/nodes/nodes.h</itemPath>
       <itemPath>include/nodes/output_node.h</itemPath>
       <itemPath>include/simulator.h</itemPath>
     </logicalFolder>
@@ -112,6 +112,8 @@
       </item>
       <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/nodes.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
@@ -119,8 +121,6 @@
       <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/tools/load_mnist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/loader.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -215,6 +215,8 @@
       </item>
       <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/nodes.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
@@ -222,8 +224,6 @@
       <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/tools/load_mnist.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/loader.h" ex="false" tool="3" flavor2="0">
       </item>

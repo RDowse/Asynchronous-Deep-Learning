@@ -47,8 +47,8 @@ public:
         
         vector<shared_ptr<Node>> prev_layer;
         vector<shared_ptr<Node>> curr_layer;
-        // Input nodes
-        for(int i = 0; i < nInput; ++i){
+
+        for(int i = 0; i < nInput; ++i){         // Input nodes
             prev_layer.push_back(make_shared<InputNode>(settings));
         }
         
@@ -79,7 +79,6 @@ public:
             swap(curr_layer,prev_layer);
             curr_layer.clear();
         }
-        
         // Bias node
         prev_layer.push_back(make_shared<BiasNode>(settings));
         

@@ -14,12 +14,17 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include "tools/loader.h"
 #include "tools/logging.h"
 #include "messages/message.h"
 #include "graphs/graph_settings.h"
 #include "nodes/node.h"
 #include "messages/forward_propagation_message.h"
+#include "messages/backward_propagation_message.h"
 
+#include "nodes/output_node.h"
+
+#include <algorithm>
 #include <cassert>
 #include <fstream>
 #include <memory>
@@ -31,6 +36,8 @@ using namespace std;
 
 class Simulator{
 private:
+    friend class Loader;
+    
     shared_ptr<GraphSettings> settings; 
     vector<shared_ptr<Edge>> m_edges;
     vector<shared_ptr<Node>> m_nodes;
@@ -65,13 +72,13 @@ private:
         }
         
         if(e->msgStatus > 1){
-            Logging::log(3, "  edge %u -> %u : delay (%u)", e->src->getId(), e->dst->getId(), e->msgStatus);
+            //Logging::log(3, "  edge %u -> %u : delay (%u)", e->src->getId(), e->dst->getId(), e->msgStatus);
             e->msgStatus = static_cast<Edge::MessageStatus>(int(e->msgStatus)-1);
             //m_stats.edgeTransitSteps++;
             return true;
         }
        
-        Logging::log(3, "  edge %u -> %u : deliver", e->src->getId(), e->dst->getId());
+        //Logging::log(3, "  edge %u -> %u : deliver", e->src->getId(), e->dst->getId());
         //m_stats.edgeDeliverSteps++;
         e->msg->dispatchTo(e->dst);
         e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
@@ -97,22 +104,20 @@ private:
             }
         }
         
-        Logging::log(3, "  node %u : send", index);
+        Logging::log(3, " %s  node %u : send", n->getType().c_str(), index);
         //m_stats.nodeSendSteps++;
-                
-        auto msg = std::make_shared<ForwardPropagationMessage>();
+        
+        // todo: alter so the sim doesn't depend on the message type        
+        shared_ptr<Message> msg;
+        
+        if(m_command == "predict"){
+            msg = std::make_shared<ForwardPropagationMessage>();
+        } else {
+            msg = std::make_shared<BackwardPropagationMessage>();
+        }
+        
         // Get the device to send the message
-        //n->onSend(message);
         msg->dispatchFrom(n);
-        
-        // Copy message to edge, send out different messages
-//        for(unsigned i=0; i < n->outgoingEdges.size(); i++){
-//            assert( 0 == n->outgoingEdges[i]->msgStatus );
-//            //n->outgoingEdges[i]->msg = message; // Copy message into channel
-//            //n->outgoingEdges[i]->msgStatus = 
-//            //    static_cast<Edge::MessageStatus>(1 + n->outgoingEdges[i]->getDelay()); // How long until it is ready?
-//        }
-        
         return true;
     }
     
@@ -160,13 +165,9 @@ public:
         m_nodes.push_back(node);
     }
     
-    void print(){
-        for(auto c: m_node_map){
-            cout << c.first << " " << c.second->getId() << "\n";
-        }
-    }
-    
-    void loadInput(const vector<uint8_t>& data){
+    template<typename T>
+    void loadInput(const vector<T>& data){
+        Logging::log(2, "loading input");
         assert(data.size() == m_node_map.count("Input"));
         auto ii = m_node_map.equal_range("Input");
         int i = 0;
@@ -177,11 +178,24 @@ public:
         }
     }
     
-    void printOutput(){
-        auto ii = m_node_map.equal_range("Output");
+    void printInput(){
+        auto ii = m_node_map.equal_range("Input");
         int i = 0;
         for(auto it = ii.first; it != ii.second; ++it){
+            it->second;
         }
+    }
+    
+    void printOutput(){ // hack, to be removed
+        Logging::log(2, "printing output");
+        auto ii = m_node_map.equal_range("Output");
+        vector<float> res;
+        for(auto it = ii.first; it != ii.second; ++it){
+            auto node = std::static_pointer_cast<OutputNode>(it->second);
+            res.push_back(node->output);
+        }
+        auto it = std::max_element(res.begin(),res.end());
+        cout << "Predicted: " << std::distance(res.begin(),it) << endl;
     }
     
     void setup(){
@@ -197,19 +211,12 @@ public:
         
         bool active=true;
         
-        reset();
+        //reset();
         
         while(active){
             active = step_all();
-            
-            /*
-            m_statsDst<<m_stats.stepIndex<<", "<<m_stats.nodeIdleSteps<<", "<<m_stats.nodeBlockedSteps<<", "<<m_stats.nodeSendSteps;
-            m_statsDst<<", "<<m_stats.edgeIdleSteps<<", "<<m_stats.edgeTransitSteps<<", "<<m_stats.edgeDeliverSteps<<"\n";
-            m_step++;
-             */
         }
     }
 };
 
 #endif /* SIMULATOR_H */
-

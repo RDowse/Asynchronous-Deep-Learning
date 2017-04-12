@@ -19,6 +19,7 @@
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
 
+#include <stack>
 #include <string>
 #include <cassert>
 #include <cstdio>
@@ -32,11 +33,19 @@ class InputNode: public Node{
     static NodeRegister<InputNode> m_reg;
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph;
+    
+    // backprop
+    stack<pair<int,float>> deltas;
+    map<int,int> idIndexMap;
+    vector<float> newWeights;
+    
+    // limit sending
+    bool sent = false;
+    
 public:
     int seenCount = 0;
-    int value = 0;
+    float input = 0;
     vector<float> weights;
-    shared_ptr<Message> m_msg;
     InputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
@@ -51,22 +60,29 @@ public:
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}
     bool readyToSend() override {
-        if(m_graph->operation==1)
-            return (m_msg!=NULL);
-        else if(m_graph->operation==2)
-            return (m_msg!=NULL) && seenCount == incomingEdges.size();
-        return false;
+        bool ready = false;
+        if(m_graph->operation==1 && !sent){
+            ready = true; 
+        }
+        else if(m_graph->operation==2){
+            ready = (seenCount == incomingEdges.size());
+        }
+        return ready;
     }
 
     void setup() override{
         weights = vector<float>(outgoingEdges.size(),1);
+        newWeights = vector<float>(outgoingEdges.size(),0);
+        for(int i = 0; i < outgoingEdges.size(); ++i){
+            idIndexMap[outgoingEdges[i]->dst->getId()] = i;
+        }
     }
     
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override{}
+    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;
     
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
-    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override{}
+    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
 };
 
 #endif /* INPUT_NODE_H */

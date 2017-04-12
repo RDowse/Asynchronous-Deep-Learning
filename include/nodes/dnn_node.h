@@ -19,6 +19,7 @@
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
 
+#include <stack>
 #include <string>
 #include <cassert>
 #include <cstdio>
@@ -35,14 +36,23 @@ class DNNNode: public Node{
     shared_ptr<DNNGraphSettings> m_graph;
     vector<shared_ptr<Edge>> forwardEdges;
     vector<shared_ptr<Edge>> backwardEdges;
-    vector<float> weights;
     
-    float value = 0;
-    int seenCount = 0;
+    // edge seen count
     int seenCountForward = 0;
     int seenCountBackward = 0;
-    shared_ptr<Message> m_msg;
+    
+    // backprop
+    stack<pair<int,float>> deltas;  // store received delta values
+    map<int,int> idIndexMap;        // map backprop index to the relevant weight
+    vector<float> newWeights;       // new weights to update
+    
+    // fwdprop
+    float error = 0;
+    float value = 0;
+    float output = 0;
+
 public:
+    vector<float> weights;
     DNNNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
@@ -57,21 +67,29 @@ public:
     virtual ~DNNNode(){}
     string getType() override {return DNNNode::m_type;}
     bool readyToSend() override {
-        return (seenCountForward==forwardEdges.size() ||
-                seenCountBackward==backwardEdges.size()) 
-                && (m_msg != NULL);
+        bool ready = false;
+        if(m_graph->operation==1){
+            ready = (seenCountForward==(incomingEdges.size()-forwardEdges.size())); 
+        }else if(m_graph->operation==2) {
+            ready = (seenCountBackward==backwardEdges.size());
+        }
+        return ready;
     }
     
-    void setup() override{
+    // Setup to be called after the graph is constructed
+    void setup() override {
+        int i = 0;
         for(auto& e: outgoingEdges){
-            if(e->dst->getId() > m_id){
+            if(e->dst->getId() > m_id){ // change based on type of edge.
                 forwardEdges.push_back(e);
+                idIndexMap[e->dst->getId()] = i++;
             } else {
                 backwardEdges.push_back(e);
             }
         }
-        
-        weights = vector<float>(outgoingEdges.size(),1);
+        assert(forwardEdges.size() == backwardEdges.size());
+        weights = vector<float>(forwardEdges.size(),1);
+        newWeights = vector<float>(forwardEdges.size(),0);
     }
 
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;

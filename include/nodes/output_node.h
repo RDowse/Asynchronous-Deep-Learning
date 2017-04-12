@@ -34,7 +34,10 @@ class OutputNode: public Node{
     shared_ptr<DNNGraphSettings> m_graph;
 public:
     int seenCount = 0;
-    shared_ptr<Message> m_msg;
+    float error = 0;
+    float target = 0;
+    float output = 0;
+    float value = 0;
     OutputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             // Downcast 
@@ -49,16 +52,18 @@ public:
     virtual ~OutputNode(){}
     string getType() override{return OutputNode::m_type;}
     bool readyToSend() override {
-        return (seenCount==incomingEdges.size()) && (m_msg != NULL);
+        return seenCount == incomingEdges.size();
     }
 
-    void setup() override{}
+    void setup() override{
     
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {}
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {}
+    }
+
+    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
+    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override {}
-    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {}
+    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
+    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
 };
 
 

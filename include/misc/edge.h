@@ -34,8 +34,8 @@ public:
     shared_ptr<Node> src;
     MessageStatus msgStatus;
     
-    Edge(shared_ptr<Node> dst, shared_ptr<Node> src, unsigned delay) :
-    dst(dst), src(src), delay(delay){
+    Edge(shared_ptr<Node> src, shared_ptr<Node> dst, unsigned delay) :
+    dst(dst), src(src), delay(delay), msgStatus(MessageStatus::empty) {
     }
 
     unsigned getDelay()const {

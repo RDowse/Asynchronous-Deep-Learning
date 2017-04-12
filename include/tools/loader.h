@@ -17,6 +17,8 @@
 #include "simulator.h"
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
+#include "nodes/nodes.h"
+#include "tools/logging.h"
 
 #include <iostream>
 #include <fstream>
@@ -26,17 +28,62 @@
 using namespace std;
 
 class Loader{
-public:
-    
-    static void loadWeights(const string& path, vector<float>& weights, char separator='\0'){
+public:    
+    static void loadWeights(const string& path, Simulator& sim, 
+            const vector<int>& indexRemoved=vector<int>(1,-1), char separator='\0'){
+        Logging::log(2, "loading weights");
+        // Open weight files
         ifstream file;
         file.open(path);
         string token;
+        string line;
+        vector<float> weights;
         if(file.is_open()){
-            while(std::getline(file, token, separator)) {
+            while(std::getline(file, token)) {
                 weights.push_back(stof(token));
             }
             file.close();
+        }
+        
+        //try { assert(weights.size() == 7290); } catch (const std::exception& e) { exit(1); }
+        //try { assert(weights.size() == 12); } catch (const std::exception& e) { exit(1); }
+        // TODO add check for weights size
+        
+        // Set sim weight values
+        int index = 0;
+        auto it = weights.begin();
+        for(int i = 0; i < sim.m_nodes.size(); ++i){
+            if(indexRemoved[index] == sim.m_nodes[i]->getId()){
+                if(index < indexRemoved.size()) index++;
+            } else {
+                if("DNN" == sim.m_nodes[i]->getType()){
+                    auto node = std::static_pointer_cast<DNNNode>(sim.m_nodes[i]);
+                    if(it+node->weights.size() <= weights.end()){
+                        node->weights = vector<float>(it,it+node->weights.size());
+                        it += node->weights.size();
+                    } else {
+                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
+                    }
+                } else if("Input" == sim.m_nodes[i]->getType()){
+                    auto node = std::static_pointer_cast<InputNode>(sim.m_nodes[i]);
+                    if(it+node->weights.size() <= weights.end()){
+                        node->weights = vector<float>(it,it+node->weights.size());
+                        it += node->weights.size();
+                    } else {
+                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
+                    }
+                } else if("Bias" == sim.m_nodes[i]->getType()){
+                    auto node = std::static_pointer_cast<BiasNode>(sim.m_nodes[i]);
+                    if(it+node->weights.size() <= weights.end()){
+                        node->weights = vector<float>(it,it+node->weights.size());
+                        it += node->weights.size();
+                    } else {
+                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
+                    }
+                } else {
+                    Logging::log(5, "Type %s has no weights\n", sim.m_nodes[i]->getType().c_str());
+                } 
+            }
         }
     }
     
@@ -91,6 +138,8 @@ public:
         if(src.is_open()){
             std::stringstream err;
             auto settings =  make_shared<DNNGraphSettings>();
+            settings->operation = 1;
+            
             vector<shared_ptr<Node>> nodes;
             nodes.reserve(nNodes);
 

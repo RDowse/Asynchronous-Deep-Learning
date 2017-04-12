@@ -20,6 +20,9 @@ class BackwardPropagationMessage: public Message,
     public std::enable_shared_from_this<BackwardPropagationMessage>
 {
 public:
+    float delta = 0;
+    int src = 0; // add to base msg type?
+    
     // send message to node
     bool dispatchTo(shared_ptr<Node> handler) override;
     // prepare message sent from node

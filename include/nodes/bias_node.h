@@ -19,6 +19,8 @@
 #include "graphs/graph_settings.h"
 #include "graphs/dnn_graph_settings.h"
 
+#include <cassert>
+
 using namespace std;
 
 class BiasNode : public Node{
@@ -27,6 +29,9 @@ class BiasNode : public Node{
     shared_ptr<DNNGraphSettings> m_graphSettings; // global settings for graph
 public:
     int seenCount = 0;
+    bool sent = false;
+    float value = 1;
+    vector<float> weights; 
     BiasNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         // Downcast 
         // This is done so the same map can be used for all nodes.
@@ -40,9 +45,13 @@ public:
     }
     virtual ~BiasNode(){}
     string getType() override {return BiasNode::m_type;}
-    bool readyToSend() override {}
+    bool readyToSend() override {
+        return !sent;
+    }
     
-    void setup() override{}
+    void setup() override{
+        weights = vector<float>(outgoingEdges.size(),1);
+    }
     
     bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
     bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;

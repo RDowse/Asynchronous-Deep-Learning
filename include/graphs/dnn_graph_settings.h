@@ -32,6 +32,7 @@ public:
     };
     
     unsigned operation; // 0: unset, 1: predict, 2: training
+    float lr = 0.1;
     
     DNNGraphSettings():operation(0){}
     

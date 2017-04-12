@@ -43,6 +43,8 @@ public:
     }
     virtual string getType()=0;
     virtual bool readyToSend()=0;
+    
+    // Additional setup after the graph is constructed
     virtual void setup()=0;
     
     /*
