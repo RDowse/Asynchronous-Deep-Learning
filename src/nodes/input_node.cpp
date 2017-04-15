@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 #include "nodes/input_node.h"
 #include "messages/forward_propagation_message.h"
@@ -14,26 +9,28 @@ NodeRegister<InputNode> InputNode::m_reg(InputNode::m_type);
 
 bool InputNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
     assert(readyToSend());
-    assert(weights.size()==outgoingEdges.size());
+    assert(weights.size()==forwardEdges.size());
     
-    cout << "INPUT " << m_id <<": "<< input << endl;
+    Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, input);
     vector<shared_ptr<ForwardPropagationMessage>> msgs;
-    msgs.reserve(outgoingEdges.size());
+    msgs.reserve(forwardEdges.size());
     
-    for(unsigned i=0; i < outgoingEdges.size(); i++){
+    for(unsigned i=0; i < forwardEdges.size(); i++){
         msgs.push_back(make_shared<ForwardPropagationMessage>());
-        assert( 0 == outgoingEdges[i]->msgStatus );
+        assert( 0 == forwardEdges[i]->msgStatus );
         msgs[i]->value = input*weights[i];
-        outgoingEdges[i]->msg = msgs[i]; // Copy message into channel
-        outgoingEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + outgoingEdges[i]->getDelay()); // How long until it is ready?
+        forwardEdges[i]->msg = msgs[i]; // Copy message into channel
+        forwardEdges[i]->msgStatus = 
+            static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
     }
-    sent = true;
+    // reset seen count
+    forwardSeenCount = 0;
 }
 
 void InputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg){
+    // received msg from sync node
     input = msg->value;
-    // sending = true ?
+    forwardSeenCount++;
 } 
 
 bool InputNode::onSend(shared_ptr<BackwardPropagationMessage> msg) {
@@ -48,8 +45,6 @@ bool InputNode::onSend(shared_ptr<BackwardPropagationMessage> msg) {
         // new weight update
         newWeights[index] = weights[index] - m_graph->lr*delta*input; // update step        
     }
-    // trigger forward propagation
-    sent = false;
 }
 
 void InputNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {

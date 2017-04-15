@@ -20,7 +20,7 @@ class ForwardPropagationMessage: public Message,
         public std::enable_shared_from_this<ForwardPropagationMessage>
 {
 public:
-    float value;
+    float value = 0;
     // send message to node
     bool dispatchTo(shared_ptr<Node> handler) override;
     

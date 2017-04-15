@@ -10,7 +10,6 @@ bool BiasNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
     assert(readyToSend());
     assert(weights.size()==outgoingEdges.size());
     
-    cout << "BIAS " << m_id <<": "<< value << endl;
     vector<shared_ptr<ForwardPropagationMessage>> msgs;
     msgs.reserve(outgoingEdges.size());
 

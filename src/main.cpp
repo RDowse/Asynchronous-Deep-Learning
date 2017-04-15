@@ -62,45 +62,18 @@ void simulate(const string& path){
         int lineNumber = 0, nNodes = 0, nEdges = 0;
         string type = Loader::readType(lineNumber,file);
         Loader::readHeader(lineNumber,file,nNodes,nEdges);
-        Simulator sim(0,nNodes,nEdges,*stats);
+        Simulator sim(3,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
-        // Sim
-        sim.setup();
+        printf("Loading data\n");
+//        MNISTDatasetWrapper data(mnist::read_dataset<std::vector,
+//                std::vector, uint8_t, uint8_t>());
+        auto dataset = mnist::read_dataset<std::vector,std::vector, uint8_t, uint8_t>();
+        sim.loadInput(&dataset);
         
-//        printf("Loading data\n");
-//        MNISTDatasetWrapper data(mnist::read_dataset<std::vector, std::vector, uint8_t, uint8_t>());
-//        printf("Data size: %ld\n",data.getData()[0].size());
-//        
-//        vector<int> removedIndex; // remove redundant columns of pixels.
-//        math::removeConstantCols(data.getData(),removedIndex);
-//        
-//        Loader::loadWeights("weights.csv", sim, removedIndex);
-//        int label = 2;
-//        sim.loadInput(data.getData()[label]);
-//        sim.run("predict");
-//        /*
-//         Weights are possibly not in the order i think they are.
-//         */
-//        sim.printOutput();
-//        cout << "LABEL: " << int(data.getLabels()[label]) << endl;
-        
-//        Loader::loadWeights("tut_w.csv", sim);      
-//        vector<float> d = {0.05,0.1};
-//        sim.loadInput(d);
-//        sim.run("predict");
-//        sim.printOutput();
-        
-        Loader::loadWeights("data/net/w.csv", sim);
-        vector<float> d = {0.12304,-0.70788};
-        //vector<float> d = {0.30233,-5.9132};
-        //vector<float> d = {0.16425,-2.8781};
-        
-        sim.loadInput(d);
-        sim.run("predict");
-        sim.printOutput();
-        cout<<"INPUT "<<d[0]<<" "<<d[1]<<endl;
+        sim.run("train");
+        //sim.printOutput();
         
         // End sim
     } else {
@@ -110,9 +83,39 @@ void simulate(const string& path){
     file.close();
 }
 
+void simulateTest(const string& path){
+        printf("Staring sim...\n");
+    Logging::m_logLevel = 5;
+    std::ostream *stats=&std::cout;
+    ifstream file;
+    file.open(path);
+    if(file.is_open()){
+        int lineNumber = 0, nNodes = 0, nEdges = 0;
+        string type = Loader::readType(lineNumber,file);
+        Loader::readHeader(lineNumber,file,nNodes,nEdges);
+        Simulator sim(0,nNodes,nEdges,*stats);
+        Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
+        printf("Loaded graph to sim\n");
+        
+        Loader::loadWeights("tut_w.csv", sim);      
+        vector<float> d = {0.05,0.1};
+        //sim.loadInput(d);
+        sim.run("predict");
+        sim.printOutput();
+        
+        sim.run("predict");
+        sim.printOutput();
+        
+        // End sim
+    } else {
+        printf("Unable to open file %s\n",path.c_str());
+        return;
+    }
+}
+
 void buildGraph(string name){
-    //DNNGraph dnngraph(1,10,28*28,10);
-    DNNGraph dnngraph(1,2,2,2);
+    DNNGraph dnngraph(1,10,28*28,10);
+    //DNNGraph dnngraph(1,2,2,2);
     stringstream ss1, ss2;
     ss1 << "w/" << name << ".graph";
     ss2 << "w/" << name << ".dot";
@@ -146,11 +149,11 @@ int main(int argc, char** argv) {
 
     std::ostream *stats=&std::cout;
     
-    string name = "tut";
+    string name = "net";
     //buildGraph(name);
-    //std::this_thread::sleep_for (std::chrono::seconds(1));
-    //simulate("w/test.graph");
-    simulate("w/tut.graph");
+    
+    simulate("w/net.graph");
+    //simulate("w/tut.graph");
 
     return 0;
 }

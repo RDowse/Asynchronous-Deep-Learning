@@ -18,6 +18,7 @@
 #include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
+#include "tools/logging.h"
 
 #include <stack>
 #include <string>
@@ -39,42 +40,49 @@ class InputNode: public Node{
     map<int,int> idIndexMap;
     vector<float> newWeights;
     
-    // limit sending
-    bool sent = false;
-    
+    // Edge back to the sync node
+    shared_ptr<Edge> syncEdge;
+    vector<shared_ptr<Edge>> forwardEdges;
 public:
     int seenCount = 0;
+    int forwardSeenCount = 0;
     float input = 0;
     vector<float> weights;
     InputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
-            // Downcast 
-            // This is done so the same map can be used for all nodes.
-            if(m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings)){
-                
-            } else {std::cerr << "Bad cast for " << m_type << " node";}
-        } catch (exception& e){
-            printf("%s does not belong to graph type %s",m_type.c_str(),"TODO");
+            m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings);
+        } catch (const std::bad_cast& e) {
+            std::cout << e.what() << std::endl;
         }
     }
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}
     bool readyToSend() override {
         bool ready = false;
-        if(m_graph->operation==1 && !sent){
+        if(m_graph->cmd == DNNGraphSettings::Command::predict
+                && forwardSeenCount==1){
             ready = true; 
         }
-        else if(m_graph->operation==2){
-            ready = (seenCount == incomingEdges.size());
+        else if(m_graph->cmd == DNNGraphSettings::Command::train){
+            ready = (forwardSeenCount==1) || (seenCount == incomingEdges.size());
         }
         return ready;
     }
 
     void setup() override{
-        weights = vector<float>(outgoingEdges.size(),1);
-        newWeights = vector<float>(outgoingEdges.size(),0);
-        for(int i = 0; i < outgoingEdges.size(); ++i){
-            idIndexMap[outgoingEdges[i]->dst->getId()] = i;
+        // sort edges
+        for(auto e: outgoingEdges){
+            if(e->dst->getType() == "Sync"){
+                syncEdge = e;
+            } else {
+                forwardEdges.push_back(e);
+            }
+        }
+        // init weights
+        weights = vector<float>(forwardEdges.size(),1);
+        newWeights = vector<float>(forwardEdges.size(),0);
+        for(int i = 0; i < forwardEdges.size(); ++i){
+            idIndexMap[forwardEdges[i]->dst->getId()] = i;
         }
     }
     

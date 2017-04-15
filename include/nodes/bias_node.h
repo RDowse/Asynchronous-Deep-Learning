@@ -26,21 +26,17 @@ using namespace std;
 class BiasNode : public Node{
     static NodeRegister<BiasNode> m_reg;
     static std::string m_type;
-    shared_ptr<DNNGraphSettings> m_graphSettings; // global settings for graph
+    shared_ptr<DNNGraphSettings> m_graph; // global settings for graph
 public:
     int seenCount = 0;
     bool sent = false;
     float value = 1;
     vector<float> weights; 
     BiasNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
-        // Downcast 
-        // This is done so the same map can be used for all nodes.
         try{
-            if(m_graphSettings = std::dynamic_pointer_cast<DNNGraphSettings>(graphSettings)){
-                
-            } else {std::cerr << "Bad cast for " << m_type << " node\n";}
-        } catch (exception& e){
-            printf("%s does not belong to graph type %s",m_type.c_str(),"TODO");
+            m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings);
+        } catch (const std::bad_cast& e) {
+            std::cout << e.what() << std::endl;
         }
     }
     virtual ~BiasNode(){}

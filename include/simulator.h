@@ -23,6 +23,7 @@
 #include "messages/backward_propagation_message.h"
 
 #include "nodes/output_node.h"
+#include "nodes/sync_node.h"
 
 #include <algorithm>
 #include <cassert>
@@ -38,7 +39,7 @@ class Simulator{
 private:
     friend class Loader;
     
-    shared_ptr<GraphSettings> settings; 
+    shared_ptr<DNNGraphSettings> m_settings; 
     vector<shared_ptr<Edge>> m_edges;
     vector<shared_ptr<Node>> m_nodes;
     multimap<string, shared_ptr<Node>> m_node_map;
@@ -89,14 +90,14 @@ private:
     bool step_node(unsigned index, std::shared_ptr<Node>& n){
         // Not ready to send
         if(!n->readyToSend()){
-            Logging::log(4, "  node %u : idle", index);
+            Logging::log(4, "node %u : idle", index);
             //m_stats.nodeIdleSteps++;
             return false; // Device doesn't want to send
         }
         
         for(unsigned i=0; i < n->outgoingEdges.size(); i++){
             if( n->outgoingEdges[i]->msgStatus>0 ){
-                Logging::log(3, "  node %u : blocked on %u->%u", index, 
+                Logging::log(3, "node %u : blocked on %u->%u", index, 
                         n->outgoingEdges[i]->src->getId(),
                         n->outgoingEdges[i]->src->getId());
                 //m_stats.nodeBlockedSteps++;
@@ -104,17 +105,13 @@ private:
             }
         }
         
-        Logging::log(3, " %s  node %u : send", n->getType().c_str(), index);
+        Logging::log(3, "%s node %u : send", n->getType().c_str(), index);
         //m_stats.nodeSendSteps++;
         
         // todo: alter so the sim doesn't depend on the message type        
         shared_ptr<Message> msg;
         
-        if(m_command == "predict"){
-            msg = std::make_shared<ForwardPropagationMessage>();
-        } else {
-            msg = std::make_shared<BackwardPropagationMessage>();
-        }
+        msg = std::make_shared<ForwardPropagationMessage>();
         
         // Get the device to send the message
         msg->dispatchFrom(n);
@@ -153,8 +150,13 @@ public:
         m_edges.reserve(nEdges);
     }
         
+    void setGraphSettings(shared_ptr<DNNGraphSettings> settings){
+        m_settings = settings;
+    }
+        
     void addEdge(int src, int dst, int delay){
         auto e = make_shared<Edge>(m_nodes[src],m_nodes[dst],delay);
+        // TODO: change this for addOutgoingEdge, then do custom dst sorting
         m_nodes[src]->outgoingEdges.push_back(e);
         m_nodes[dst]->incomingEdges.push_back(e);
         m_edges.push_back(e);
@@ -165,18 +167,38 @@ public:
         m_nodes.push_back(node);
     }
     
-    template<typename T>
-    void loadInput(const vector<T>& data){
+    void loadInput(MNISTDataset* dataset){
         Logging::log(2, "loading input");
-        assert(data.size() == m_node_map.count("Input"));
-        auto ii = m_node_map.equal_range("Input");
+        auto ii = m_node_map.equal_range("Sync");
         int i = 0;
         for(auto it = ii.first; it != ii.second; ++it){
-            auto msg = std::make_shared<ForwardPropagationMessage>();
-            msg->value = data[i++];
-            it->second->onRecv(msg);
+             auto node = std::static_pointer_cast<SyncNode>(it->second);
+             node->setDataSet(dataset);
         }
     }
+    
+//    void loadInput(const MNISTDatasetWrapper* const dataset){
+//        Logging::log(2, "loading input");
+//        auto ii = m_node_map.equal_range("Sync");
+//        int i = 0;
+//        for(auto it = ii.first; it != ii.second; ++it){
+//             auto node = std::static_pointer_cast<SyncNode>(it->second);
+//             node->setDataSet(dataset);
+//        }
+//    }
+    
+//    template<typename T>
+//    void loadInput(const vector<T>& data){
+//        Logging::log(2, "loading input");
+//        assert(data.size() == m_node_map.count("Input"));
+//        auto ii = m_node_map.equal_range("Input");
+//        int i = 0;
+//        for(auto it = ii.first; it != ii.second; ++it){
+//            auto msg = std::make_shared<ForwardPropagationMessage>();
+//            msg->value = data[i++];
+//            it->second->onRecv(msg);
+//        }
+//    }
     
     void printInput(){
         auto ii = m_node_map.equal_range("Input");
@@ -207,11 +229,12 @@ public:
     void run(const string& command){
         Logging::log(1, "begin run");
         
-        m_command = command;
-        
         bool active=true;
-        
-        //reset();
+        if("predict"==command){
+            m_settings->cmd = static_cast<DNNGraphSettings::Command>(0);
+        } else if("train"==command){
+            m_settings->cmd = static_cast<DNNGraphSettings::Command>(1);
+        }
         
         while(active){
             active = step_all();

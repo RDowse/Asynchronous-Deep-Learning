@@ -18,23 +18,18 @@
 
 class DNNGraphSettings: public GraphSettings{
 public:
-    // Various global settings for all nodes in the graph.
-    struct GraphType{ 
-        
+    enum Command{
+        predict, train
     };
     
-    struct PropertiesType{
-        
-    };
+    Command cmd;
+    float lr = 0.1;         // learning rate
+    int sample = 0;         // selected sample for predicting
+    int maxEpoch = 30;      // maximum epochs for training
+    float minError = 0.01;  // minimum error to stop training
+    int batchSize = 100;
     
-    struct DeviceType{
-        
-    };
-    
-    unsigned operation; // 0: unset, 1: predict, 2: training
-    float lr = 0.1;
-    
-    DNNGraphSettings():operation(0){}
+    DNNGraphSettings(){}
     
     void info(){}
 };

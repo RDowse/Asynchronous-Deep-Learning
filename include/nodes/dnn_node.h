@@ -55,23 +55,20 @@ public:
     vector<float> weights;
     DNNNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
-            // Downcast 
-            // This is done so the same map can be used for all nodes.
-            if(m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings)){
-                
-            } else {std::cerr << "Bad cast for " << m_type << " node";}
-        } catch (exception& e){
-            printf("%s does not belong to graph type %s",m_type.c_str(),"TODO");
+            m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings);
+        } catch (const std::bad_cast& e) {
+            std::cout << e.what() << std::endl;
         }
     }
     virtual ~DNNNode(){}
     string getType() override {return DNNNode::m_type;}
     bool readyToSend() override {
         bool ready = false;
-        if(m_graph->operation==1){
+        if(m_graph->cmd == DNNGraphSettings::Command::predict){
             ready = (seenCountForward==(incomingEdges.size()-forwardEdges.size())); 
-        }else if(m_graph->operation==2) {
-            ready = (seenCountBackward==backwardEdges.size());
+        }else if(m_graph->cmd == DNNGraphSettings::Command::train) {
+            ready = (seenCountForward==(incomingEdges.size()-forwardEdges.size())) ||
+                    (seenCountBackward==backwardEdges.size());
         }
         return ready;
     }
@@ -87,7 +84,6 @@ public:
                 backwardEdges.push_back(e);
             }
         }
-        assert(forwardEdges.size() == backwardEdges.size());
         weights = vector<float>(forwardEdges.size(),1);
         newWeights = vector<float>(forwardEdges.size(),0);
     }

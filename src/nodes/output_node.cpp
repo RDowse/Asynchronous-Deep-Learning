@@ -14,9 +14,8 @@ bool OutputNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
     seenCount = 0;
     value = 0;
     
-    cout << "OUTPUT " << m_id <<": "<< value << endl; 
-    cout << "OUTPUT O " << m_id <<": "<< output << endl; 
-
+    Logging::log(3, "%s node %d output: %f", m_type.c_str(), m_id, output);
+    //syncEdge->msg = msg;
 }
 
 void OutputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {

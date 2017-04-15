@@ -15,7 +15,7 @@ NodeRegister<DNNNode> DNNNode::m_reg(DNNNode::m_type);
 bool DNNNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
     assert(readyToSend());
     // calc output
-    cout << "DNN " << m_id <<": "<< value << endl;
+    //cout << "DNN " << m_id <<": "<< value << endl;
     output = math::activation(value); 
     vector<shared_ptr<ForwardPropagationMessage>> msgs;
     msgs.reserve(forwardEdges.size());

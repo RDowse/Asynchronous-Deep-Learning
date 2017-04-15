@@ -33,11 +33,10 @@ class Node{
 protected:
     static int curr_id;
     int m_id;
-    shared_ptr<GraphSettings> graphSettings;
 public:
     vector<shared_ptr<Edge>> incomingEdges;
     vector<shared_ptr<Edge>> outgoingEdges; // replace with weak ptr for circular dependencies
-    Node(shared_ptr<GraphSettings> graphSettings):graphSettings(graphSettings){m_id = curr_id; curr_id++;}
+    Node(shared_ptr<GraphSettings> graphSettings){m_id = curr_id; curr_id++;}
     int getId() const{
         return m_id;
     }

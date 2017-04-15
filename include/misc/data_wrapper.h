@@ -25,24 +25,24 @@ struct DataWrapper{
     TDataSet m_dataSet;
     DataWrapper(TDataSet dataSet):m_dataSet(dataSet){}
     
-    virtual const vector<TDataSub>& getData()=0;
-    virtual const vector<TLabel>& getLabels()=0;
+    virtual vector<TDataSub>& getData(int sample) const =0;
+    virtual TLabel getLabel(int sample) const =0;
 };
 
 typedef mnist::MNIST_dataset<vector, vector<uint8_t>, uint8_t> MNISTDataset;
 
-struct MNISTDatasetWrapper : DataWrapper<MNISTDataset, vector<uint8_t>, uint8_t>{
-    
-    MNISTDatasetWrapper(MNISTDataset dataSet):DataWrapper(dataSet){}
-    
-    const vector<vector<uint8_t>>& getData(){
-        return m_dataSet.training_images;
-    }
-    
-    const vector<uint8_t>& getLabels(){
-        return m_dataSet.training_labels;
-    }
-};
+//struct MNISTDatasetWrapper : DataWrapper<MNISTDataset, uint8_t, uint8_t>{
+//    
+//    MNISTDatasetWrapper(MNISTDataset dataSet):DataWrapper(dataSet){}
+//    
+//    vector<uint8_t>& getData(int sample) const {
+//        return m_dataSet.training_images[sample];
+//    }
+//    
+//    uint8_t getLabel(int sample) const {
+//        return m_dataSet.training_labels[sample];
+//    }
+//};
 
 #endif /* DATA_WRAPPER_H */
 

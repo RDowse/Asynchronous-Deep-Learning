@@ -21,6 +21,7 @@
 #include "nodes/input_node.h"
 #include "nodes/output_node.h"
 #include "nodes/bias_node.h"
+#include "nodes/sync_node.h"
 
 #include "misc/edge.h"
 
@@ -48,8 +49,17 @@ public:
         vector<shared_ptr<Node>> prev_layer;
         vector<shared_ptr<Node>> curr_layer;
 
-        for(int i = 0; i < nInput; ++i){         // Input nodes
+        nodes.push_back(make_shared<SyncNode>(settings));
+        
+        // Input nodes
+        for(int i = 0; i < nInput; ++i){         
             prev_layer.push_back(make_shared<InputNode>(settings));
+            edges.push_back(
+                make_shared<Edge>(nodes.front(),prev_layer[i],1)
+            );
+            edges.push_back(
+                make_shared<Edge>(prev_layer[i],nodes.front(),1)
+            );
         }
         
         // Hidden nodes
@@ -65,9 +75,11 @@ public:
             // Connect Edges
             for(int j = 0; j < prev_layer.size(); ++j){
                 for(int k = 0; k < curr_layer.size(); ++k){
+                    // fwd edge
                     edges.push_back(
                         make_shared<Edge>(prev_layer[j],curr_layer[k],1)
                     );
+                    // bck edge
                     edges.push_back(
                         make_shared<Edge>(curr_layer[k],prev_layer[j],1)
                     );
@@ -101,6 +113,17 @@ public:
         // Copy node layers
         nodes.insert(nodes.end(),prev_layer.begin(),prev_layer.end());
         nodes.insert(nodes.end(),curr_layer.begin(),curr_layer.end());
+        
+        // Sync node
+        nodes.push_back(make_shared<SyncNode>(settings));
+        for(int i = 0; i < nOutput; ++i){
+            edges.push_back(
+                make_shared<Edge>(nodes.back(),curr_layer[i],1)
+            );
+            edges.push_back(
+                make_shared<Edge>(curr_layer[i],nodes.back(),1)
+            );
+        }
     }
     
     ~DNNGraph(){}
@@ -145,10 +168,15 @@ public:
             fprintf(file,"splines=line\n");
             fprintf(file,"node [fixedsize=true, label=\"\"];\n");
             
-            // Input nodes
-            index = nInput+1;
+            // Input sync node
             printGraphvizCluster(file,0,
-                    index,nodes[0]->getType(),"blue4");
+                    1,nodes[0]->getType(),"yellow4");
+            index++;
+            
+            // Input nodes
+            index += nInput+1;
+            printGraphvizCluster(file,1,
+                    index,nodes[1]->getType(),"blue4");
             
             // Hidden nodes
             for(int i = 0; i < nHLayers; ++i){
@@ -160,6 +188,12 @@ public:
             // Output nodes
             printGraphvizCluster(file,index,
                     index+nOutput,nodes[index]->getType(),"seagreen2");
+            index+=nOutput;
+            
+            // Output sync node
+            printGraphvizCluster(file,index,
+                    index+1,nodes[index]->getType(),"yellow4");
+            
             fprintf(file,"\n");
             printGraphvizConnections(file);
             fprintf(file,"}");

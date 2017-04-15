@@ -45,6 +45,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/nodes/input_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
 	${OBJECTDIR}/src/nodes/output_node.o \
+	${OBJECTDIR}/src/nodes/sync_node.o \
 	${OBJECTDIR}/src/tools/logging.o
 
 
@@ -121,6 +122,11 @@ ${OBJECTDIR}/src/nodes/output_node.o: src/nodes/output_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node.o src/nodes/output_node.cpp
+
+${OBJECTDIR}/src/nodes/sync_node.o: src/nodes/sync_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/sync_node.o src/nodes/sync_node.cpp
 
 ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools

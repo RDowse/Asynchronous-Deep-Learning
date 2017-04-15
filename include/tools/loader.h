@@ -52,8 +52,8 @@ public:
         // Set sim weight values
         int index = 0;
         auto it = weights.begin();
-        for(int i = 0; i < sim.m_nodes.size(); ++i){
-            if(indexRemoved[index] == sim.m_nodes[i]->getId()){
+        for(int i = 1; i < sim.m_nodes.size()-1; ++i){
+            if(indexRemoved[index]+1 == sim.m_nodes[i]->getId()){
                 if(index < indexRemoved.size()) index++;
             } else {
                 if("DNN" == sim.m_nodes[i]->getType()){
@@ -138,7 +138,7 @@ public:
         if(src.is_open()){
             std::stringstream err;
             auto settings =  make_shared<DNNGraphSettings>();
-            settings->operation = 1;
+            sim.setGraphSettings(settings);
             
             vector<shared_ptr<Node>> nodes;
             nodes.reserve(nNodes);
@@ -167,6 +167,9 @@ public:
                 sim.addEdge(srcIndex,dstIndex,delay);
             }
             expect(lineNumber,src,"EndEdges");
+            
+            // Setup nodes
+            sim.setup();
         } else {
             printf("No file open\n");
         }

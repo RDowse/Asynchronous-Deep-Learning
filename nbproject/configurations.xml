@@ -25,6 +25,7 @@
       <itemPath>include/nodes/nodes.h</itemPath>
       <itemPath>include/nodes/output_node.h</itemPath>
       <itemPath>include/simulator.h</itemPath>
+      <itemPath>include/nodes/sync_node.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -44,6 +45,7 @@
       <itemPath>src/nodes/node.cpp</itemPath>
       <itemPath>src/misc/node_factory.cpp</itemPath>
       <itemPath>src/nodes/output_node.cpp</itemPath>
+      <itemPath>src/nodes/sync_node.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -116,6 +118,8 @@
       </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/sync_node.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
@@ -153,6 +157,8 @@
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -219,6 +225,8 @@
       </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/sync_node.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
@@ -256,6 +264,8 @@
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
       </item>
