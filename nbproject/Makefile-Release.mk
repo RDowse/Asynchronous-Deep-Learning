@@ -41,11 +41,12 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/basic_node.o \
 	${OBJECTDIR}/src/nodes/bias_node.o \
-	${OBJECTDIR}/src/nodes/dnn_node.o \
+	${OBJECTDIR}/src/nodes/hidden_node.o \
 	${OBJECTDIR}/src/nodes/input_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
 	${OBJECTDIR}/src/nodes/output_node.o \
 	${OBJECTDIR}/src/nodes/sync_node.o \
+	${OBJECTDIR}/src/tools/dnn_graph.o \
 	${OBJECTDIR}/src/tools/logging.o
 
 
@@ -103,10 +104,10 @@ ${OBJECTDIR}/src/nodes/bias_node.o: src/nodes/bias_node.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node.o src/nodes/bias_node.cpp
 
-${OBJECTDIR}/src/nodes/dnn_node.o: src/nodes/dnn_node.cpp
+${OBJECTDIR}/src/nodes/hidden_node.o: src/nodes/hidden_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/dnn_node.o src/nodes/dnn_node.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/hidden_node.o src/nodes/hidden_node.cpp
 
 ${OBJECTDIR}/src/nodes/input_node.o: src/nodes/input_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
@@ -127,6 +128,11 @@ ${OBJECTDIR}/src/nodes/sync_node.o: src/nodes/sync_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/sync_node.o src/nodes/sync_node.cpp
+
+${OBJECTDIR}/src/tools/dnn_graph.o: src/tools/dnn_graph.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/tools
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/dnn_graph.o src/tools/dnn_graph.cpp
 
 ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools

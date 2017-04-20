@@ -17,7 +17,7 @@
 #include "graphs/dnn_graph_settings.h"
 
 #include "nodes/node.h"
-#include "nodes/dnn_node.h"
+#include "nodes/hidden_node.h"
 #include "nodes/input_node.h"
 #include "nodes/output_node.h"
 #include "nodes/bias_node.h"
@@ -40,6 +40,9 @@ class DNNGraph{
     int nHLayers=0, nHidden=0, nInput=0, nOutput=0;
     int clusterCount = 0;
     float thickness = 0.2;
+    
+    // Map assigning colors to nodes for Graphviz
+    static map<string,string> nodeColors;
 public:    
     DNNGraph(int nHLayers, int nHidden, int nInput, int nOutput)
         :nHLayers(nHLayers),nHidden(nHidden),nInput(nInput),nOutput(nOutput)
@@ -48,7 +51,8 @@ public:
         
         vector<shared_ptr<Node>> prev_layer;
         vector<shared_ptr<Node>> curr_layer;
-
+        
+        // Synchronisation node
         nodes.push_back(make_shared<SyncNode>(settings));
         
         // Input nodes
@@ -66,10 +70,12 @@ public:
         for(int i = 0; i < nHLayers; ++i){
             // Bias node
             prev_layer.push_back(make_shared<BiasNode>(settings));
+            edges.push_back(make_shared<Edge>(prev_layer.back(),nodes[0],1));
+            edges.push_back(make_shared<Edge>(nodes[0],prev_layer.back(),1));
             
             // Layer
             for(int j = 0; j < nHidden; ++j){
-                curr_layer.push_back(make_shared<DNNNode>(settings));    
+                curr_layer.push_back(make_shared<HiddenNode>(settings));    
             }
             
             // Connect Edges
@@ -93,6 +99,8 @@ public:
         }
         // Bias node
         prev_layer.push_back(make_shared<BiasNode>(settings));
+        edges.push_back(make_shared<Edge>(prev_layer.back(),nodes[0],1));
+        edges.push_back(make_shared<Edge>(nodes[0],prev_layer.back(),1));
         
         // Output nodes
         for(int i = 0; i < nOutput; ++i){
@@ -114,14 +122,13 @@ public:
         nodes.insert(nodes.end(),prev_layer.begin(),prev_layer.end());
         nodes.insert(nodes.end(),curr_layer.begin(),curr_layer.end());
         
-        // Sync node
-        nodes.push_back(make_shared<SyncNode>(settings));
+        // Connect output to sync node
         for(int i = 0; i < nOutput; ++i){
             edges.push_back(
-                make_shared<Edge>(nodes.back(),curr_layer[i],1)
+                make_shared<Edge>(nodes.front(),curr_layer[i],1)
             );
             edges.push_back(
-                make_shared<Edge>(curr_layer[i],nodes.back(),1)
+                make_shared<Edge>(curr_layer[i],nodes.front(),1)
             );
         }
     }
@@ -170,29 +177,25 @@ public:
             
             // Input sync node
             printGraphvizCluster(file,0,
-                    1,nodes[0]->getType(),"yellow4");
+                    1,nodes[0]->getType());
             index++;
             
             // Input nodes
             index += nInput+1;
             printGraphvizCluster(file,1,
-                    index,nodes[1]->getType(),"blue4");
+                    index,nodes[1]->getType());
             
             // Hidden nodes
             for(int i = 0; i < nHLayers; ++i){
                 printGraphvizCluster(file,index+i*(nHidden+1),
-                        index+(nHidden+1),nodes[index]->getType(),"red2");
+                        index+(nHidden+1),nodes[index]->getType());
                 index += nHidden+1;
             }
             
             // Output nodes
             printGraphvizCluster(file,index,
-                    index+nOutput,nodes[index]->getType(),"seagreen2");
+                    index+nOutput,nodes[index]->getType());
             index+=nOutput;
-            
-            // Output sync node
-            printGraphvizCluster(file,index,
-                    index+1,nodes[index]->getType(),"yellow4");
             
             fprintf(file,"\n");
             printGraphvizConnections(file);
@@ -204,13 +207,20 @@ public:
     }
  
 private:
-    void printGraphvizCluster(FILE* file, int start, int end, string prefix, string color){
+    void printGraphvizCluster(FILE* file, int start, int end, string prefix){
         fprintf(file,"subgraph cluster_%d{\n",clusterCount++);
         fprintf(file,"    color=%s\n","white");
-        fprintf(file,"    node [style=solid,color=%s,shape=circle];\n    ",color.c_str());
-        for(int i = start; i < end; ++i)
-            fprintf(file,"%s%d ",nodes[i]->getType().c_str(),nodes[i]->getId());
-        fprintf(file,";\n");
+        fprintf(file,"    node [style=solid,color=%s,shape=circle];\n",
+                nodeColors[nodes[start]->getType()].c_str());
+        fprintf(file,"    edge [style=\"invisible\",dir=\"none\"];\n");
+        fprintf(file,"    rank=\"same\";\n     ");
+        
+        for(int i = start; i < end; ++i) // TODO refactor for node specific labeling
+            if(nodes[i]->getType()=="Bias") fprintf(file,"%s%d [ label=\"+1\" ];",nodes[i]->getType().c_str(),nodes[i]->getId());
+        
+        for(int i = start; i < end-1; ++i)
+            fprintf(file,"%s%d -> ",nodes[i]->getType().c_str(),nodes[i]->getId());
+        fprintf(file,"%s%d;\n",nodes[end-1]->getType().c_str(),nodes[end-1]->getId()); 
         fprintf(file,"    label = \"%s layer\";\n}\n",prefix.c_str());
     }
     

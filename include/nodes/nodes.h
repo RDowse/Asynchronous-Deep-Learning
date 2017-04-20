@@ -17,7 +17,7 @@
 // Simpify include statements
 #include "nodes/node.h"
 #include "nodes/input_node.h"
-#include "nodes/dnn_node.h"
+#include "nodes/hidden_node.h"
 #include "nodes/output_node.h"
 #include "nodes/bias_node.h"
 

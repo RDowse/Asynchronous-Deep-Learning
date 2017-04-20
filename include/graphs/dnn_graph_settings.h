@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   dnn_graph_settings.h
  * Author: ryan
@@ -21,13 +15,19 @@ public:
     enum Command{
         predict, train
     };
+    enum Operation{
+        forward, backward
+    };
     
-    Command cmd;
-    float lr = 0.1;         // learning rate
+    Command cmd = Command::train;
+    Operation op = Operation::forward;
+    float lr = 100;         // learning rate
     int sample = 0;         // selected sample for predicting
-    int maxEpoch = 30;      // maximum epochs for training
+    int maxEpoch = 10;      // maximum epochs for training
     float minError = 0.01;  // minimum error to stop training
-    int batchSize = 100;
+    int batchSize = 20;    // batch size
+    
+    bool update = false;    // flag for updating weight. TODO: update with msgs
     
     DNNGraphSettings(){}
     

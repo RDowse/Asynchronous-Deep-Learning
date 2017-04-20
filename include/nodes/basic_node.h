@@ -53,19 +53,14 @@ public:
     
     void setup() override{}
     
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override {
-        std::cout << "Sending forward msg\n";
-    }
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override {
-        std::cout << "Sending backward msg\n";
-    }
-    
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override {
         std::cout << "Receiving forward msg\n";
     }
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override {
         std::cout << "Receiving backward msg\n";
     }
+    
+    bool dispatchMsgs() override{}
 };
 
 #endif /* BASICNODE_H */

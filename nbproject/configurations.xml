@@ -7,15 +7,16 @@
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
       <itemPath>include/nodes/bias_node.h</itemPath>
+      <itemPath>include/tools/csv.h</itemPath>
       <itemPath>include/misc/data.h</itemPath>
       <itemPath>include/tools/data_loader.h</itemPath>
       <itemPath>include/misc/data_wrapper.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
-      <itemPath>include/nodes/dnn_node.h</itemPath>
       <itemPath>include/misc/edge.h</itemPath>
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
       <itemPath>include/graphs/graph_settings.h</itemPath>
+      <itemPath>include/nodes/hidden_node.h</itemPath>
       <itemPath>include/nodes/input_node.h</itemPath>
       <itemPath>include/tools/loader.h</itemPath>
       <itemPath>include/tools/logging.h</itemPath>
@@ -37,8 +38,9 @@
       <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
       <itemPath>src/nodes/basic_node.cpp</itemPath>
       <itemPath>src/nodes/bias_node.cpp</itemPath>
-      <itemPath>src/nodes/dnn_node.cpp</itemPath>
+      <itemPath>src/tools/dnn_graph.cpp</itemPath>
       <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
+      <itemPath>src/nodes/hidden_node.cpp</itemPath>
       <itemPath>src/nodes/input_node.cpp</itemPath>
       <itemPath>src/tools/logging.cpp</itemPath>
       <itemPath>src/main.cpp</itemPath>
@@ -108,7 +110,7 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -121,6 +123,8 @@
       <item path="include/nodes/sync_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/csv.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -150,7 +154,7 @@
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/nodes/dnn_node.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -159,6 +163,8 @@
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -215,7 +221,7 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/dnn_node.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -228,6 +234,8 @@
       <item path="include/nodes/sync_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/csv.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -257,7 +265,7 @@
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/nodes/dnn_node.cpp" ex="false" tool="1" flavor2="0">
+      <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -266,6 +274,8 @@
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -23,9 +23,6 @@ public:
     float value = 0;
     // send message to node
     bool dispatchTo(shared_ptr<Node> handler) override;
-    
-    // prepare message sent from node
-    bool dispatchFrom(shared_ptr<Node> handler) override;
 }; 
 
 #endif /* FORWARD_PROPAGATION_MESSAGE_H */

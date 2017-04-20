@@ -56,8 +56,8 @@ public:
             if(indexRemoved[index]+1 == sim.m_nodes[i]->getId()){
                 if(index < indexRemoved.size()) index++;
             } else {
-                if("DNN" == sim.m_nodes[i]->getType()){
-                    auto node = std::static_pointer_cast<DNNNode>(sim.m_nodes[i]);
+                if("Hidden" == sim.m_nodes[i]->getType()){
+                    auto node = std::static_pointer_cast<HiddenNode>(sim.m_nodes[i]);
                     if(it+node->weights.size() <= weights.end()){
                         node->weights = vector<float>(it,it+node->weights.size());
                         it += node->weights.size();

@@ -27,10 +27,13 @@ class BiasNode : public Node{
     static NodeRegister<BiasNode> m_reg;
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph; // global settings for graph
-public:
+    
+    shared_ptr<Edge> syncEdge;
+    vector<shared_ptr<Edge>> forwardEdges;
+    
     int seenCount = 0;
-    bool sent = false;
     float value = 1;
+public:
     vector<float> weights; 
     BiasNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
@@ -42,18 +45,24 @@ public:
     virtual ~BiasNode(){}
     string getType() override {return BiasNode::m_type;}
     bool readyToSend() override {
-        return !sent;
+        return seenCount == 1;
     }
     
     void setup() override{
-        weights = vector<float>(outgoingEdges.size(),1);
+        for(int i = 0; i < outgoingEdges.size(); ++i){
+            if(outgoingEdges[i]->dst->getType()=="Sync"){
+                syncEdge = outgoingEdges[i];
+            } else {
+                forwardEdges.push_back(outgoingEdges[i]);
+            }
+        }
+        weights = vector<float>(forwardEdges.size(),1);
     }
-    
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;
     
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
+    
+    bool dispatchMsgs() override;
 };
 
 

@@ -36,20 +36,31 @@ class SyncNode: public Node{
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph;
     
-    //MNISTDatasetWrapper* m_dataset;
-    MNISTDataset* m_dataset;
+    DataWrapper* m_dataset;
     
     vector<shared_ptr<Edge>> inputEdges;
     vector<shared_ptr<Edge>> biasEdges;
     vector<shared_ptr<Edge>> outputEdges;
     
-    int seenCount = 0;
-    bool tick = true; // when to trigger message propagation
+    // current operation
+    enum Operation{
+        forward, backward
+    };
     
+    stack<pair<int,float>> output;
+    
+    // operation flags and counts
+    int inputSeenCount = 0;
+    int outputSeenCount = 0;
+    bool tick = true;           // trigger initial message propagation
+    bool validating = false;    // flag for propagating validation set
+  
     // training 
+    int trainingIndex = 0;
     int batchCount = 0;
     int epochCount = 0;
     float error = 0;
+    float validation_error = 0;
 public:
     SyncNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
@@ -63,12 +74,9 @@ public:
     bool readyToSend() override {
         if(m_graph->cmd == DNNGraphSettings::Command::predict && tick){
             return true;
-        } else if(m_graph->cmd == DNNGraphSettings::Command::train 
-                && (seenCount == incomingEdges.size() || tick)) {
-            cout << incomingEdges.size() << endl;
-            cout << tick << " " << seenCount << endl;
-            return true;
-        }
+        } else if(m_graph->cmd == DNNGraphSettings::Command::train && epochCount < m_graph->maxEpoch) {
+            return (outputSeenCount == outputEdges.size()) || (inputSeenCount == inputEdges.size()) || tick;
+        } 
         return false;
     }
 
@@ -82,19 +90,24 @@ public:
                 outputEdges.push_back(e);
             }
         }
-        if(inputEdges.size()==0){tick=false;} // check if its the first or last node.
     }
     
-    void setDataSet(MNISTDataset* dataset){
+    void setDataSet(DataWrapper* dataset){
         m_dataset = dataset;
     }
-    
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;
-    
+   
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
+    
+    bool dispatchMsgs() override{
+        if(DNNGraphSettings::Operation::forward == m_graph->op){
+            dispatchForwardMsgs();
+        } else if(DNNGraphSettings::Operation::backward == m_graph->op){
+            dispatchBackwardMsgs();
+        }
+    }
+    bool dispatchBackwardMsgs();
+    bool dispatchForwardMsgs();
 };
 
 #endif /* SYNC_NODE_H */
-

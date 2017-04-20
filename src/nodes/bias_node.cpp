@@ -6,26 +6,24 @@
 std::string BiasNode::m_type = "Bias";
 NodeRegister<BiasNode> BiasNode::m_reg(BiasNode::m_type);
 
-bool BiasNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
+bool BiasNode::dispatchMsgs(){
     assert(readyToSend());
-    assert(weights.size()==outgoingEdges.size());
-    
-    vector<shared_ptr<ForwardPropagationMessage>> msgs;
-    msgs.reserve(outgoingEdges.size());
 
-    for(unsigned i=0; i < outgoingEdges.size(); i++){
-        msgs.push_back(make_shared<ForwardPropagationMessage>());
-        assert( 0 == outgoingEdges[i]->msgStatus );
-        msgs[i]->value = value*weights[i];
-        outgoingEdges[i]->msg = msgs[i]; // Copy message into channel
-        outgoingEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + outgoingEdges[i]->getDelay()); // How long until it is ready?
+    for(unsigned i=0; i < forwardEdges.size(); i++){
+        assert( 0 == forwardEdges[i]->msgStatus );
+        auto msg = make_shared<ForwardPropagationMessage>();
+        msg->value = value*weights[i];
+        forwardEdges[i]->msg = msg; // Copy message into channel
+        forwardEdges[i]->msgStatus = 
+            static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
     }
-    sent = true;
+    
+    seenCount=0;
 }
 
-bool BiasNode::onSend(shared_ptr<BackwardPropagationMessage> msg) {}
-
-void BiasNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {}
+void BiasNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {
+    // notifying msg from sync node
+    seenCount++;
+}
 
 void BiasNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {}

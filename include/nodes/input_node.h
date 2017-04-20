@@ -19,6 +19,7 @@
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
 #include "tools/logging.h"
+#include "tools/math.h"
 
 #include <stack>
 #include <string>
@@ -27,6 +28,8 @@
 #include <exception>
 #include <memory>
 #include <typeinfo>
+#include <random>
+#include <functional>
 
 using namespace std;
 
@@ -35,18 +38,24 @@ class InputNode: public Node{
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph;
     
-    // backprop
-    stack<pair<int,float>> deltas;
-    map<int,int> idIndexMap;
-    vector<float> newWeights;
+    // backpropagation vars
+    stack<pair<int,float>> deltas;  // delta step
+    map<int,int> idIndexMap;        // map of weights associated to dst ids
+    vector<float> newWeights;       // intermediate updated weights
     
-    // Edge back to the sync node
-    shared_ptr<Edge> syncEdge;
+    // sorted edges
+    shared_ptr<Edge> forwardSyncEdge;
+    shared_ptr<Edge> backwardSyncEdge;
     vector<shared_ptr<Edge>> forwardEdges;
-public:
-    int seenCount = 0;
+    vector<shared_ptr<Edge>> backwardEdges;
+    
+    // seen counts
     int forwardSeenCount = 0;
+    int backwardSeenCount = 0;
+    
+    // node values
     float input = 0;
+public:
     vector<float> weights;
     InputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
@@ -58,39 +67,53 @@ public:
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}
     bool readyToSend() override {
-        bool ready = false;
-        if(m_graph->cmd == DNNGraphSettings::Command::predict
-                && forwardSeenCount==1){
-            ready = true; 
+        if(m_graph->cmd == DNNGraphSettings::Command::predict){
+            return (forwardSeenCount == 1); 
         }
         else if(m_graph->cmd == DNNGraphSettings::Command::train){
-            ready = (forwardSeenCount==1) || (seenCount == incomingEdges.size());
+            return (forwardSeenCount == 1) || (backwardSeenCount == backwardEdges.size()-1);
         }
-        return ready;
+        return false;
     }
 
     void setup() override{
         // sort edges
         for(auto e: outgoingEdges){
             if(e->dst->getType() == "Sync"){
-                syncEdge = e;
+                backwardSyncEdge = e;
             } else {
                 forwardEdges.push_back(e);
             }
         }
+        for(auto e: incomingEdges){
+            if(e->dst->getType() == "Sync"){
+                forwardSyncEdge = e;
+            } else {
+                backwardEdges.push_back(e);
+            }
+        }
         // init weights
-        weights = vector<float>(forwardEdges.size(),1);
-        newWeights = vector<float>(forwardEdges.size(),0);
+        weights = vector<float>(forwardEdges.size(),0);
+        for(auto& w: weights) w = math::randomFloat(0.0,1.0);
+        newWeights = weights;
+        // map weight index to the corresponding dst edge/node
         for(int i = 0; i < forwardEdges.size(); ++i){
             idIndexMap[forwardEdges[i]->dst->getId()] = i;
         }
     }
     
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;
-    
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
+    
+    bool dispatchMsgs() override{
+        if(DNNGraphSettings::Operation::forward == m_graph->op){
+            dispatchForwardMsgs();
+        } else if(DNNGraphSettings::Operation::backward == m_graph->op){
+            dispatchBackwardMsgs();
+        }
+    }
+    bool dispatchBackwardMsgs();
+    bool dispatchForwardMsgs();
 };
 
 #endif /* INPUT_NODE_H */

@@ -7,9 +7,8 @@
 std::string InputNode::m_type = "Input";
 NodeRegister<InputNode> InputNode::m_reg(InputNode::m_type);
 
-bool InputNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
+bool InputNode::dispatchForwardMsgs(){
     assert(readyToSend());
-    assert(weights.size()==forwardEdges.size());
     
     Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, input);
     vector<shared_ptr<ForwardPropagationMessage>> msgs;
@@ -23,17 +22,11 @@ bool InputNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
         forwardEdges[i]->msgStatus = 
             static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
     }
-    // reset seen count
+    // reset 
     forwardSeenCount = 0;
 }
 
-void InputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg){
-    // received msg from sync node
-    input = msg->value;
-    forwardSeenCount++;
-} 
-
-bool InputNode::onSend(shared_ptr<BackwardPropagationMessage> msg) {
+bool InputNode::dispatchBackwardMsgs(){
     assert(readyToSend());
     // perform weight update first
     while(!deltas.empty()){
@@ -42,11 +35,29 @@ bool InputNode::onSend(shared_ptr<BackwardPropagationMessage> msg) {
         float delta = pair.second;
         int src = pair.first;
         int index = idIndexMap[src];
+        deltas.pop();
         // new weight update
-        newWeights[index] = weights[index] - m_graph->lr*delta*input; // update step        
+        newWeights[index] = newWeights[index] - m_graph->lr*delta*input; // update step        
     }
+    // notify sync node
+    backwardSyncEdge->msg = make_shared<BackwardPropagationMessage>();
+    backwardSyncEdge->msgStatus = 
+            static_cast<Edge::MessageStatus>(1 + backwardSyncEdge->getDelay());
+    // reset
+    backwardSeenCount = 0;
 }
+
+void InputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg){
+    input = msg->value;
+    forwardSeenCount++;
+    
+    // weight update step
+    if(forwardSeenCount == forwardEdges.size() && m_graph->update){
+        weights = newWeights;
+    }
+} 
 
 void InputNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {
     deltas.push(pair<int,float>(msg->src,msg->delta));
+    backwardSeenCount++;
 }

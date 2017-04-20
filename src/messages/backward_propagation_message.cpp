@@ -5,7 +5,3 @@
 bool BackwardPropagationMessage::dispatchTo(shared_ptr<Node> handler){
     handler->onRecv(shared_from_this());
 }
-
-bool BackwardPropagationMessage::dispatchFrom(shared_ptr<Node> handler){
-    handler->onSend(shared_from_this());
-}

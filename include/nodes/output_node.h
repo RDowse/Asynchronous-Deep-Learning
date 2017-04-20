@@ -36,12 +36,15 @@ class OutputNode: public Node{
     
     shared_ptr<Edge> syncEdge;
     vector<shared_ptr<Edge>> backwardEdges;
-public:
-    int seenCount = 0;
+    
+    int forwardSeenCount = 0;
+    int backwardSeenCount = 0;
+    
     float error = 0;
     float target = 0;
-    float output = 0;
     float value = 0;
+public:
+    float output = 0;
     OutputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
             m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings);
@@ -52,7 +55,13 @@ public:
     virtual ~OutputNode(){}
     string getType() override{return OutputNode::m_type;}
     bool readyToSend() override {
-        return seenCount == incomingEdges.size()-1;
+        if(m_graph->cmd == DNNGraphSettings::Command::predict){
+            return (forwardSeenCount == incomingEdges.size()-1); 
+        }else if(m_graph->cmd == DNNGraphSettings::Command::train) {
+            return (forwardSeenCount == incomingEdges.size()-1) ||
+                    (backwardSeenCount == 1);
+        }
+        return false;
     }
 
     void setup() override{
@@ -65,11 +74,18 @@ public:
         }
     }
 
-    bool onSend(shared_ptr<ForwardPropagationMessage> msg) override;
-    bool onSend(shared_ptr<BackwardPropagationMessage> msg) override;
-    
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
+    
+    bool dispatchMsgs() override{
+        if(DNNGraphSettings::Operation::forward == m_graph->op){
+            dispatchForwardMsgs();
+        } else if(DNNGraphSettings::Operation::backward == m_graph->op){
+            dispatchBackwardMsgs();
+        }
+    }
+    bool dispatchBackwardMsgs();
+    bool dispatchForwardMsgs();
 };
 
 

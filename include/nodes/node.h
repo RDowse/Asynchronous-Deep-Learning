@@ -46,13 +46,10 @@ public:
     // Additional setup after the graph is constructed
     virtual void setup()=0;
     
-    /*
-     *  design is not particularly scalable since all nodes must know about all
-     * message types. Opt to change for dynamic casting.
-     */
-    virtual bool onSend(shared_ptr<ForwardPropagationMessage> msg)=0;
-    virtual bool onSend(shared_ptr<BackwardPropagationMessage> msg)=0;
+    // Handle sending of messages and routing for the node
+    virtual bool dispatchMsgs()=0;
     
+    // Handle message receiving
     virtual void onRecv(shared_ptr<ForwardPropagationMessage> msg)=0;
     virtual void onRecv(shared_ptr<BackwardPropagationMessage> msg)=0;
 };

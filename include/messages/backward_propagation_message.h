@@ -21,12 +21,8 @@ class BackwardPropagationMessage: public Message,
 {
 public:
     float delta = 0;
-    int src = 0; // add to base msg type?
-    
     // send message to node
     bool dispatchTo(shared_ptr<Node> handler) override;
-    // prepare message sent from node
-    bool dispatchFrom(shared_ptr<Node> handler) override;
 };
 
 #endif /* BACKWARD_PROPAGATION_MESSAGE_H */

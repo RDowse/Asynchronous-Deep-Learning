@@ -8,38 +8,50 @@
 std::string OutputNode::m_type = "Output";
 NodeRegister<OutputNode> OutputNode::m_reg(OutputNode::m_type);
 
-bool OutputNode::onSend(shared_ptr<ForwardPropagationMessage> msg) {
+bool OutputNode::dispatchForwardMsgs(){
     assert(readyToSend());
-    output = math::activation(value);
-    seenCount = 0;
-    value = 0;
     
+    // calculate output for the node
+    output = math::activationTan(value);
     Logging::log(3, "%s node %d output: %f", m_type.c_str(), m_id, output);
-    //syncEdge->msg = msg;
+    
+    // prepare the forward message
+    auto msg = make_shared<ForwardPropagationMessage>();
+    msg->value = output;
+    msg->src = m_id;
+    
+    // send the output to the sync node
+    syncEdge->msg = msg; 
+    syncEdge->msgStatus = 
+        static_cast<Edge::MessageStatus>(1 + syncEdge->getDelay()); 
+    
+    // reset state
+    forwardSeenCount = 0;
+    value = 0;
+}
+
+bool OutputNode::dispatchBackwardMsgs(){
+    assert(readyToSend());   
+    vector<shared_ptr<BackwardPropagationMessage>> msgs;
+    auto target = 0.0;
+    auto delta = -(target-output)*output*(1-output);
+    for(int i = 0; i < backwardEdges.size(); ++i){
+        auto msg = make_shared<BackwardPropagationMessage>();
+        msg->delta = delta; 
+        msg->src = m_id;
+        backwardEdges[i]->msg = msg;
+        assert( 0 == backwardEdges[i]->msgStatus );
+        backwardEdges[i]->msgStatus = 
+            static_cast<Edge::MessageStatus>(1 + outgoingEdges[i]->getDelay());
+    }   
+    backwardSeenCount = 0;
 }
 
 void OutputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {
     value += msg->value;
-    seenCount++;
-}
-
-bool OutputNode::onSend(shared_ptr<BackwardPropagationMessage> msg) {
-    assert(readyToSend());   
-    vector<shared_ptr<BackwardPropagationMessage>> msgs;
-    msgs.reserve(outgoingEdges.size());
-    auto target = 0.0;
-    auto delta = -(target-output)*output*(1-output);
-    for(int i = 0; i <= outgoingEdges.size(); ++i){
-        msgs.push_back(make_shared<BackwardPropagationMessage>());
-        msgs[i]->delta = delta; 
-        msgs[i]->src = this->getId();
-        outgoingEdges[i]->msg = msgs[i];
-        assert( 0 == outgoingEdges[i]->msgStatus );
-        outgoingEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + outgoingEdges[i]->getDelay());
-    }   
+    forwardSeenCount++;
 }
 
 void OutputNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {
-    assert(0); // should never occur
+    backwardSeenCount++;
 }

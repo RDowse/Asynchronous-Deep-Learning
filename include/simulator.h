@@ -107,14 +107,9 @@ private:
         
         Logging::log(3, "%s node %u : send", n->getType().c_str(), index);
         //m_stats.nodeSendSteps++;
-        
-        // todo: alter so the sim doesn't depend on the message type        
-        shared_ptr<Message> msg;
-        
-        msg = std::make_shared<ForwardPropagationMessage>();
-        
+           
         // Get the device to send the message
-        msg->dispatchFrom(n);
+        n->dispatchMsgs();
         return true;
     }
     
@@ -167,7 +162,7 @@ public:
         m_nodes.push_back(node);
     }
     
-    void loadInput(MNISTDataset* dataset){
+    void loadInput(DataWrapper* dataset){
         Logging::log(2, "loading input");
         auto ii = m_node_map.equal_range("Sync");
         int i = 0;
@@ -176,29 +171,6 @@ public:
              node->setDataSet(dataset);
         }
     }
-    
-//    void loadInput(const MNISTDatasetWrapper* const dataset){
-//        Logging::log(2, "loading input");
-//        auto ii = m_node_map.equal_range("Sync");
-//        int i = 0;
-//        for(auto it = ii.first; it != ii.second; ++it){
-//             auto node = std::static_pointer_cast<SyncNode>(it->second);
-//             node->setDataSet(dataset);
-//        }
-//    }
-    
-//    template<typename T>
-//    void loadInput(const vector<T>& data){
-//        Logging::log(2, "loading input");
-//        assert(data.size() == m_node_map.count("Input"));
-//        auto ii = m_node_map.equal_range("Input");
-//        int i = 0;
-//        for(auto it = ii.first; it != ii.second; ++it){
-//            auto msg = std::make_shared<ForwardPropagationMessage>();
-//            msg->value = data[i++];
-//            it->second->onRecv(msg);
-//        }
-//    }
     
     void printInput(){
         auto ii = m_node_map.equal_range("Input");

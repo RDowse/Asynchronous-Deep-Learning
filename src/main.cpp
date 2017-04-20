@@ -30,6 +30,8 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <ctime>
+#include <random>
 #include <cstdlib>
 
 typedef void (*FlagFunction)(const std::vector<char*>& parameters);
@@ -62,20 +64,16 @@ void simulate(const string& path){
         int lineNumber = 0, nNodes = 0, nEdges = 0;
         string type = Loader::readType(lineNumber,file);
         Loader::readHeader(lineNumber,file,nNodes,nEdges);
-        Simulator sim(3,nNodes,nEdges,*stats);
+        Simulator sim(1,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
         printf("Loading data\n");
-//        MNISTDatasetWrapper data(mnist::read_dataset<std::vector,
-//                std::vector, uint8_t, uint8_t>());
-        auto dataset = mnist::read_dataset<std::vector,std::vector, uint8_t, uint8_t>();
-        sim.loadInput(&dataset);
-        
+//        auto dataset = mnist::read_dataset<std::vector,std::vector, uint8_t, uint8_t>();
+//        sim.loadInput(&dataset);
+        DataWrapper data("mnist/mnist_train_100.csv","mnist/mnist_test_10.csv");
+        sim.loadInput(&data);
         sim.run("train");
-        //sim.printOutput();
-        
-        // End sim
     } else {
         printf("Unable to open file %s\n",path.c_str());
         return;
@@ -83,39 +81,39 @@ void simulate(const string& path){
     file.close();
 }
 
-void simulateTest(const string& path){
-        printf("Staring sim...\n");
-    Logging::m_logLevel = 5;
-    std::ostream *stats=&std::cout;
-    ifstream file;
-    file.open(path);
-    if(file.is_open()){
-        int lineNumber = 0, nNodes = 0, nEdges = 0;
-        string type = Loader::readType(lineNumber,file);
-        Loader::readHeader(lineNumber,file,nNodes,nEdges);
-        Simulator sim(0,nNodes,nEdges,*stats);
-        Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
-        printf("Loaded graph to sim\n");
-        
-        Loader::loadWeights("tut_w.csv", sim);      
-        vector<float> d = {0.05,0.1};
-        //sim.loadInput(d);
-        sim.run("predict");
-        sim.printOutput();
-        
-        sim.run("predict");
-        sim.printOutput();
-        
-        // End sim
-    } else {
-        printf("Unable to open file %s\n",path.c_str());
-        return;
-    }
-}
+//void simulateTest(const string& path){
+//    srand( time(NULL) );
+//    printf("Staring sim...\n");
+//    Logging::m_logLevel = 5;
+//    std::ostream *stats=&std::cout;
+//    ifstream file;
+//    file.open(path);
+//    if(file.is_open()){
+//        int lineNumber = 0, nNodes = 0, nEdges = 0;
+//        string type = Loader::readType(lineNumber,file);
+//        Loader::readHeader(lineNumber,file,nNodes,nEdges);
+//        Simulator sim(3,nNodes,nEdges,*stats);
+//        Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
+//        printf("Loaded graph to sim\n");
+//        
+//        Loader::loadWeights("tut_w.csv", sim);      
+//        vector<float> d = {0.05,0.1};
+//        //sim.loadInput(d);
+//        sim.run("predict");
+//        sim.printOutput();
+//        
+//        sim.run("predict");
+//        sim.printOutput();
+//        
+//        // End sim
+//    } else {
+//        printf("Unable to open file %s\n",path.c_str());
+//        return;
+//    }
+//}
 
-void buildGraph(string name){
-    DNNGraph dnngraph(1,10,28*28,10);
-    //DNNGraph dnngraph(1,2,2,2);
+void buildGraph(string name, int nHidden, int nInput, int nOutput){
+    DNNGraph dnngraph(1,nHidden,nInput,nOutput);
     stringstream ss1, ss2;
     ss1 << "w/" << name << ".graph";
     ss2 << "w/" << name << ".dot";
@@ -149,11 +147,10 @@ int main(int argc, char** argv) {
 
     std::ostream *stats=&std::cout;
     
-    string name = "net";
-    //buildGraph(name);
+    //buildGraph("net",10,28*28,10);
+    //buildGraph("test",2,2,2);
     
     simulate("w/net.graph");
-    //simulate("w/tut.graph");
 
     return 0;
 }

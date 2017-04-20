@@ -23,10 +23,9 @@ using namespace std;
 // Abstract message
 class Message{
 public:
+    int src = 0;
     // send message to node
     virtual bool dispatchTo(shared_ptr<Node> handler)=0;
-    // prepare message sent from node
-    virtual bool dispatchFrom(shared_ptr<Node> handler)=0;
 };
 
 #endif /* MESSAGE_H */
