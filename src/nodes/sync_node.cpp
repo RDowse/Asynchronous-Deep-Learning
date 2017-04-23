@@ -8,7 +8,7 @@ std::string SyncNode::m_type = "Sync";
 NodeRegister<SyncNode> SyncNode::m_reg(SyncNode::m_type);
 
 // Begining sync node
-bool SyncNode::dispatchForwardMsgs(){
+bool SyncNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     assert(inputEdges.size()== m_dataset->training_images[sampleIndex].size());
     
@@ -46,17 +46,13 @@ bool SyncNode::dispatchForwardMsgs(){
     outputSeenCount = 0; // for validation looping
 }
 
-bool SyncNode::dispatchBackwardMsgs(){
+bool SyncNode::dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     
     vector<int>& labels = validating ? 
         m_dataset->validation_labels : m_dataset->training_labels;
     
-    // send msg to output to trigger backpropagation
-    cout << "SAMPLE: " << sampleIndex << endl;
-    
     // prepare msgs
-    vector<shared_ptr<BackwardPropagationMessage>> msgs;
     msgs.reserve(outgoingEdges.size());
     for(int i = 0; i < outputEdges.size(); ++i){
         auto msg = make_shared<BackwardPropagationMessage>();
@@ -64,11 +60,7 @@ bool SyncNode::dispatchBackwardMsgs(){
         msgs.push_back(msg);
     }
     
-    for(int i = 0; i < outputEdges.size(); ++i){
-        outputEdges[i]->msg = msgs[i];
-        outputEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + outputEdges[i]->getDelay());
-    }
+    send(msgs,outputEdges);
     
     // reset
     outputSeenCount = 0;

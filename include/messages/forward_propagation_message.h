@@ -22,7 +22,7 @@ class ForwardPropagationMessage: public Message,
 public:
     float value = 0;
     // send message to node
-    bool dispatchTo(shared_ptr<Node> handler) override;
+    bool dispatchTo(Node* handler) override;
 }; 
 
 #endif /* FORWARD_PROPAGATION_MESSAGE_H */

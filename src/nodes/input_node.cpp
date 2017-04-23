@@ -7,26 +7,25 @@
 std::string InputNode::m_type = "Input";
 NodeRegister<InputNode> InputNode::m_reg(InputNode::m_type);
 
-bool InputNode::dispatchForwardMsgs(){
+bool InputNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     
     Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, input);
-    vector<shared_ptr<ForwardPropagationMessage>> msgs;
-    msgs.reserve(forwardEdges.size());
     
-    for(unsigned i=0; i < forwardEdges.size(); i++){
-        msgs.push_back(make_shared<ForwardPropagationMessage>());
-        assert( 0 == forwardEdges[i]->msgStatus );
-        msgs[i]->value = input*weights[i];
-        forwardEdges[i]->msg = msgs[i]; // Copy message into channel
-        forwardEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
+    msgs.reserve(weights.size());
+    for(unsigned i=0; i < weights.size(); i++){
+        auto msg = make_shared<ForwardPropagationMessage>();
+        msg->value = input*weights[i];
+        msgs.push_back(msg);
     }
+    
+    send(msgs,forwardEdges);
+    
     // reset 
     forwardSeenCount = 0;
 }
 
-bool InputNode::dispatchBackwardMsgs(){
+bool InputNode::dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     // perform weight update first
     while(!deltas.empty()){

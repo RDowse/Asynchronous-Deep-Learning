@@ -60,7 +60,7 @@ public:
         std::cout << "Receiving backward msg\n";
     }
     
-    bool dispatchMsgs() override{}
+    bool onSend(vector< shared_ptr<Message> >& msgs) override{}
 };
 
 #endif /* BASICNODE_H */

@@ -6,7 +6,7 @@
 std::string BiasNode::m_type = "Bias";
 NodeRegister<BiasNode> BiasNode::m_reg(BiasNode::m_type);
 
-bool BiasNode::dispatchMsgs(){
+bool BiasNode::onSend(vector< shared_ptr<Message> >& msgs){
     assert(readyToSend());
 
     for(unsigned i=0; i < forwardEdges.size(); i++){

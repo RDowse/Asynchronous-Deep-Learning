@@ -45,10 +45,10 @@ class InputNode: public Node{
     vector<float> deltaWeights;     // delta weights, for momentum
     
     // sorted edges
-    shared_ptr<Edge> forwardSyncEdge;
-    shared_ptr<Edge> backwardSyncEdge;
-    vector<shared_ptr<Edge>> forwardEdges;
-    vector<shared_ptr<Edge>> backwardEdges;
+    Edge* forwardSyncEdge;
+    Edge* backwardSyncEdge;
+    vector<Edge*> forwardEdges;
+    vector<Edge*> backwardEdges;
     
     // seen counts
     int forwardSeenCount = 0;
@@ -106,15 +106,15 @@ public:
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    bool dispatchMsgs() override{
+    bool onSend(vector< shared_ptr<Message> >& msgs) override{
         if(DNNGraphSettings::Operation::forward == m_graph->op){
-            dispatchForwardMsgs();
+            dispatchForwardMsgs(msgs);
         } else if(DNNGraphSettings::Operation::backward == m_graph->op){
-            dispatchBackwardMsgs();
+            dispatchBackwardMsgs(msgs);
         }
     }
-    bool dispatchBackwardMsgs();
-    bool dispatchForwardMsgs();
+    bool dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs);
 };
 
 #endif /* INPUT_NODE_H */

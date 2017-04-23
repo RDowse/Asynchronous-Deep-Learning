@@ -38,9 +38,9 @@ class SyncNode: public Node{
     
     DataWrapper* m_dataset;
     
-    vector<shared_ptr<Edge>> inputEdges;
-    vector<shared_ptr<Edge>> biasEdges;
-    vector<shared_ptr<Edge>> outputEdges;
+    vector<Edge*> inputEdges;
+    vector<Edge*> biasEdges;
+    vector<Edge*> outputEdges;
     
     // current operation
     enum Operation{
@@ -60,7 +60,7 @@ class SyncNode: public Node{
     int sampleIndex = 0;
     int batchIndex = 0;
     int epochCount = 0;
-    //float error = 0;
+    
     float validation_error = 0;
     float training_error = 0;
 public:
@@ -124,7 +124,7 @@ public:
             vector<float> tmp;
             for(auto t: out) tmp.push_back(t.second);
             //cout << "Predicted: " << (distance(tmp.begin(), max_element(tmp.begin(), tmp.end()) ) == labels[sampleIndex]) << endl;
-            cout << "Predicted: " << (distance(tmp.begin(), max_element(tmp.begin(), tmp.end()))) << endl;
+            //cout << "Predicted: " << (distance(tmp.begin(), max_element(tmp.begin(), tmp.end()))) << endl;
         }
             
         if(sampleIndex == labels.size()-1){
@@ -141,15 +141,15 @@ public:
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    bool dispatchMsgs() override{
+    bool onSend(vector< shared_ptr<Message> >& msgs) override{
         if(DNNGraphSettings::Operation::forward == m_graph->op){
-            dispatchForwardMsgs();
+            dispatchForwardMsgs(msgs);
         } else if(DNNGraphSettings::Operation::backward == m_graph->op){
-            dispatchBackwardMsgs();
+            dispatchBackwardMsgs(msgs);
         }
     }
-    bool dispatchBackwardMsgs();
-    bool dispatchForwardMsgs();
+    bool dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs);
 };
 
 #endif /* SYNC_NODE_H */

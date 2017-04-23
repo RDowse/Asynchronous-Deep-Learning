@@ -17,8 +17,13 @@
 #include "simulator.h"
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
-#include "nodes/nodes.h"
 #include "tools/logging.h"
+
+#include "nodes/node.h"
+#include "nodes/input_node.h"
+#include "nodes/hidden_node.h"
+#include "nodes/output_node.h"
+#include "nodes/bias_node.h"
 
 #include <iostream>
 #include <fstream>
@@ -57,7 +62,7 @@ public:
                 if(index < indexRemoved.size()) index++;
             } else {
                 if("Hidden" == sim.m_nodes[i]->getType()){
-                    auto node = std::static_pointer_cast<HiddenNode>(sim.m_nodes[i]);
+                    auto node = dynamic_cast<HiddenNode*>(sim.m_nodes[i]);
                     if(it+node->weights.size() <= weights.end()){
                         node->weights = vector<float>(it,it+node->weights.size());
                         it += node->weights.size();
@@ -65,7 +70,7 @@ public:
                         printf("Error: %s weight vector out of range.\n", node->getType().c_str());
                     }
                 } else if("Input" == sim.m_nodes[i]->getType()){
-                    auto node = std::static_pointer_cast<InputNode>(sim.m_nodes[i]);
+                    auto node = dynamic_cast<InputNode*>(sim.m_nodes[i]);
                     if(it+node->weights.size() <= weights.end()){
                         node->weights = vector<float>(it,it+node->weights.size());
                         it += node->weights.size();
@@ -73,7 +78,7 @@ public:
                         printf("Error: %s weight vector out of range.\n", node->getType().c_str());
                     }
                 } else if("Bias" == sim.m_nodes[i]->getType()){
-                    auto node = std::static_pointer_cast<BiasNode>(sim.m_nodes[i]);
+                    auto node = dynamic_cast<BiasNode*>(sim.m_nodes[i]);
                     if(it+node->weights.size() <= weights.end()){
                         node->weights = vector<float>(it,it+node->weights.size());
                         it += node->weights.size();

@@ -22,6 +22,8 @@
 
 #include <memory>
 #include <vector>
+#include <cassert>
+#include <iostream>
 
 using namespace std;
 
@@ -33,10 +35,10 @@ class Node{
 protected:
     static int curr_id;
     int m_id;
-    void send(vector<shared_ptr<Message>>& msgs, vector<shared_ptr<Edge>>& edges);
+    void send(vector<shared_ptr<Message>>& msgs, vector<Edge*>& edges);
 public:
-    vector<shared_ptr<Edge>> incomingEdges;
-    vector<shared_ptr<Edge>> outgoingEdges; // replace with weak ptr for circular dependencies
+    vector<Edge*> incomingEdges;
+    vector<Edge*> outgoingEdges; 
     Node(shared_ptr<GraphSettings> graphSettings){m_id = curr_id; curr_id++;}
     int getId() const{
         return m_id;
@@ -48,7 +50,7 @@ public:
     virtual void setup()=0;
     
     // Handle sending of messages and routing for the node
-    virtual bool dispatchMsgs()=0;
+    virtual bool onSend(vector< shared_ptr<Message> >& msgs)=0;
     
     // Handle message receiving
     virtual void onRecv(shared_ptr<ForwardPropagationMessage> msg)=0;
@@ -56,5 +58,5 @@ public:
 };
 
 // For registration. NodeFactory.h 
-template<typename T> shared_ptr<Node> createT(shared_ptr<GraphSettings> g) { return make_shared<T>(g); }
+template<typename T> Node* createT(shared_ptr<GraphSettings> g) { return new T(g); }
 #endif /* NODE_H */

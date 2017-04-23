@@ -52,8 +52,8 @@ class HiddenNode: public Node{
     float value = 0;
     float output = 0;
     
-    vector<shared_ptr<Edge>> forwardEdges;
-    vector<shared_ptr<Edge>> backwardEdges;
+    vector<Edge*> forwardEdges;
+    vector<Edge*> backwardEdges;
 public:
     vector<float> weights;
     HiddenNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
@@ -96,7 +96,7 @@ public:
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    bool dispatchMsgs() override{
+    bool onSend(vector< shared_ptr<Message> >& msgs) override{
         if(DNNGraphSettings::Operation::forward == m_graph->op){
             dispatchForwardMsgs();
         } else if(DNNGraphSettings::Operation::backward == m_graph->op){

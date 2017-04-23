@@ -34,8 +34,8 @@ class OutputNode: public Node{
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph;
     
-    shared_ptr<Edge> syncEdge;
-    vector<shared_ptr<Edge>> backwardEdges;
+    Edge* syncEdge;
+    vector<Edge*> backwardEdges;
     
     int forwardSeenCount = 0;
     int backwardSeenCount = 0;
@@ -77,15 +77,15 @@ public:
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    bool dispatchMsgs() override{
+    bool onSend(vector< shared_ptr<Message> >& msgs) override{
         if(DNNGraphSettings::Operation::forward == m_graph->op){
-            dispatchForwardMsgs();
+            dispatchForwardMsgs(msgs);
         } else if(DNNGraphSettings::Operation::backward == m_graph->op){
-            dispatchBackwardMsgs();
+            dispatchBackwardMsgs(msgs);
         }
     }
-    bool dispatchBackwardMsgs();
-    bool dispatchForwardMsgs();
+    bool dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs);
 };
 
 

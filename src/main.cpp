@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   main.cpp
  * Author: ryan
@@ -64,7 +58,7 @@ void simulate(const string& path){
         int lineNumber = 0, nNodes = 0, nEdges = 0;
         string type = Loader::readType(lineNumber,file);
         Loader::readHeader(lineNumber,file,nNodes,nEdges);
-        Simulator sim(1,nNodes,nEdges,*stats);
+        Simulator sim(3,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
@@ -89,9 +83,6 @@ void buildGraph(string name, int nHidden, int nInput, int nOutput){
     dnngraph.writeGraphviz(ss2.str());
 }
 
-/*
- * 
- */
 int main(int argc, char** argv) {
     // Get usage for the executable.
     if(argc==1){
@@ -113,13 +104,13 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    std::ostream *stats=&std::cout;
     
+    std::ostream *stats=&std::cout;
     //buildGraph("net",10,28*28,10);
-    buildGraph("xor",2,2,1);
+    //buildGraph("xor",2,2,1);
     //buildGraph("test",2,2,2);
     
-//    simulate("w/net.graph");
+    //simulate("w/net.graph");
     simulate("w/xor.graph");
 
     return 0;

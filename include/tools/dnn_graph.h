@@ -35,8 +35,8 @@
 using namespace std;
 
 class DNNGraph{
-    vector<shared_ptr<Node>> nodes;
-    vector<shared_ptr<Edge>> edges;
+    vector<Node*> nodes;
+    vector<Edge*> edges;
     int nHLayers=0, nHidden=0, nInput=0, nOutput=0;
     int clusterCount = 0;
     float thickness = 0.2;
@@ -49,33 +49,33 @@ public:
     {
         auto settings = make_shared<DNNGraphSettings>();
         
-        vector<shared_ptr<Node>> prev_layer;
-        vector<shared_ptr<Node>> curr_layer;
+        vector<Node*> prev_layer;
+        vector<Node*> curr_layer;
         
         // Synchronisation node
-        nodes.push_back(make_shared<SyncNode>(settings));
+        nodes.push_back(new SyncNode(settings));
         
         // Input nodes
         for(int i = 0; i < nInput; ++i){         
-            prev_layer.push_back(make_shared<InputNode>(settings));
+            prev_layer.push_back(new InputNode(settings));
             edges.push_back(
-                make_shared<Edge>(nodes.front(),prev_layer[i],1)
+                new Edge(nodes.front(),prev_layer[i],1)
             );
             edges.push_back(
-                make_shared<Edge>(prev_layer[i],nodes.front(),1)
+                new Edge(prev_layer[i],nodes.front(),1)
             );
         }
         
         // Hidden nodes
         for(int i = 0; i < nHLayers; ++i){
             // Bias node
-            prev_layer.push_back(make_shared<BiasNode>(settings));
-            edges.push_back(make_shared<Edge>(prev_layer.back(),nodes[0],1));
-            edges.push_back(make_shared<Edge>(nodes[0],prev_layer.back(),1));
+            prev_layer.push_back(new BiasNode(settings));
+            edges.push_back(new Edge(prev_layer.back(),nodes[0],1));
+            edges.push_back(new Edge(nodes[0],prev_layer.back(),1));
             
             // Layer
             for(int j = 0; j < nHidden; ++j){
-                curr_layer.push_back(make_shared<HiddenNode>(settings));    
+                curr_layer.push_back(new HiddenNode(settings));    
             }
             
             // Connect Edges
@@ -83,11 +83,11 @@ public:
                 for(int k = 0; k < curr_layer.size(); ++k){
                     // fwd edge
                     edges.push_back(
-                        make_shared<Edge>(prev_layer[j],curr_layer[k],1)
+                        new Edge(prev_layer[j],curr_layer[k],1)
                     );
                     // bck edge
                     edges.push_back(
-                        make_shared<Edge>(curr_layer[k],prev_layer[j],1)
+                        new Edge(curr_layer[k],prev_layer[j],1)
                     );
                 }
             }
@@ -98,22 +98,22 @@ public:
             curr_layer.clear();
         }
         // Bias node
-        prev_layer.push_back(make_shared<BiasNode>(settings));
-        edges.push_back(make_shared<Edge>(prev_layer.back(),nodes[0],1));
-        edges.push_back(make_shared<Edge>(nodes[0],prev_layer.back(),1));
+        prev_layer.push_back(new BiasNode(settings));
+        edges.push_back(new Edge(prev_layer.back(),nodes[0],1));
+        edges.push_back(new Edge(nodes[0],prev_layer.back(),1));
         
         // Output nodes
         for(int i = 0; i < nOutput; ++i){
-            curr_layer.push_back(make_shared<OutputNode>(settings));
+            curr_layer.push_back(new OutputNode(settings));
         }
         // Connect Edges
         for(int j = 0; j < prev_layer.size(); ++j){
             for(int k = 0; k < curr_layer.size(); ++k){
                 edges.push_back(
-                    make_shared<Edge>(prev_layer[j],curr_layer[k],1)
+                    new Edge(prev_layer[j],curr_layer[k],1)
                 );
                 edges.push_back(
-                    make_shared<Edge>(curr_layer[k],prev_layer[j],1)
+                    new Edge(curr_layer[k],prev_layer[j],1)
                 );
             }
         }
@@ -125,15 +125,22 @@ public:
         // Connect output to sync node
         for(int i = 0; i < nOutput; ++i){
             edges.push_back(
-                make_shared<Edge>(nodes.front(),curr_layer[i],1)
+                new Edge(nodes.front(),curr_layer[i],1)
             );
             edges.push_back(
-                make_shared<Edge>(curr_layer[i],nodes.front(),1)
+                new Edge(curr_layer[i],nodes.front(),1)
             );
         }
     }
     
-    ~DNNGraph(){}
+    ~DNNGraph(){
+        for(auto it = nodes.begin(); it != nodes.end(); it++)
+            delete (*it);
+        nodes.clear();
+        for(auto it = edges.begin(); it != edges.end(); it++)
+            delete (*it);
+        edges.clear();
+    }
     
     void writeGraph(const string& path){
         ofstream file;
@@ -212,22 +219,26 @@ private:
         fprintf(file,"    color=%s\n","white");
         fprintf(file,"    node [style=solid,color=%s,shape=circle];\n",
                 nodeColors[nodes[start]->getType()].c_str());
-        fprintf(file,"    edge [style=\"invisible\",dir=\"none\"];\n");
-        fprintf(file,"    rank=\"same\";\n     ");
+        //fprintf(file,"    edge [style=\"invisible\",dir=\"none\"];\n");
+        //fprintf(file,"    rank=\"same\";\n     ");
         
         for(int i = start; i < end; ++i) // TODO refactor for node specific labeling
             if(nodes[i]->getType()=="Bias") fprintf(file,"%s%d [ label=\"+1\" ];",nodes[i]->getType().c_str(),nodes[i]->getId());
         
         for(int i = start; i < end-1; ++i)
-            fprintf(file,"%s%d -> ",nodes[i]->getType().c_str(),nodes[i]->getId());
+            fprintf(file,"%s%d ",nodes[i]->getType().c_str(),nodes[i]->getId());
         fprintf(file,"%s%d;\n",nodes[end-1]->getType().c_str(),nodes[end-1]->getId()); 
         fprintf(file,"    label = \"%s layer\";\n}\n",prefix.c_str());
     }
     
     void printGraphvizConnections(FILE* file){
         for(auto e: edges){
-            fprintf(file,"%s%d -> %s%d [penwidth=%f]\n",e->src->getType().c_str(),e->src->getId(),
-                            e->dst->getType().c_str(),e->dst->getId(),thickness);
+            if(e->src->getType() == "Sync" || e->dst->getType() == "Sync")
+                fprintf(file,"%s%d -> %s%d [penwidth=%f constraint=\"false\"]\n ",e->src->getType().c_str(),e->src->getId(),
+                                e->dst->getType().c_str(),e->dst->getId(),thickness);
+            else
+                fprintf(file,"%s%d -> %s%d [penwidth=%f]\n",e->src->getType().c_str(),e->src->getId(),
+                                e->dst->getType().c_str(),e->dst->getId(),thickness);
         }
     }
 };

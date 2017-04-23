@@ -30,8 +30,8 @@ class BiasNode : public Node{
     static std::string m_type;
     shared_ptr<DNNGraphSettings> m_graph; // global settings for graph
     
-    shared_ptr<Edge> syncEdge;
-    vector<shared_ptr<Edge>> forwardEdges;
+    Edge* syncEdge;
+    vector<Edge*> forwardEdges;
     
     int forwardSeenCount = 0;
     int backwardSeenCount = 0;
@@ -74,7 +74,7 @@ public:
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    bool dispatchMsgs() override;
+    bool onSend(vector< shared_ptr<Message> >& msgs) override;
 };
 
 

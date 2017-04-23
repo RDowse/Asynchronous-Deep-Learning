@@ -17,13 +17,13 @@
 #include "messages/message.h"
 
 class BackwardPropagationMessage: public Message,
-    public std::enable_shared_from_this<BackwardPropagationMessage>
+        public std::enable_shared_from_this<BackwardPropagationMessage>
 {
 public:
     float delta = 0;
     float target = 0;
     // send message to node
-    bool dispatchTo(shared_ptr<Node> handler) override;
+    bool dispatchTo(Node* handler) override;
 };
 
 #endif /* BACKWARD_PROPAGATION_MESSAGE_H */

@@ -24,8 +24,9 @@ using namespace std;
 class Message{
 public:
     int src = 0;
+    int dst = 0;
     // send message to node
-    virtual bool dispatchTo(shared_ptr<Node> handler)=0;
+    virtual bool dispatchTo(Node* handler)=0;
 };
 
 #endif /* MESSAGE_H */

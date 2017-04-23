@@ -30,11 +30,11 @@ public:
         inflight
     };
     shared_ptr<Message> msg;
-    shared_ptr<Node> dst;
-    shared_ptr<Node> src;
+    Node* dst;
+    Node* src;
     MessageStatus msgStatus;
     
-    Edge(shared_ptr<Node> src, shared_ptr<Node> dst, unsigned delay) :
+    Edge(Node* src, Node* dst, unsigned delay) :
     dst(dst), src(src), delay(delay), msgStatus(MessageStatus::empty) {
     }
 

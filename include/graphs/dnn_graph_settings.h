@@ -24,8 +24,9 @@ public:
     float lr = 0.01;            // learning rate
     float alpha = 0.5;         // momentum
     int sample = 0;             // selected sample for predicting
-    int maxEpoch = 100;       // maximum epochs for training
+    int maxEpoch = 1;       // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
+//    int batchSize = 90;         // batch size
     int batchSize = 4;         // batch size
     
     bool update = false;    // flag for updating weight. TODO: update with msgs

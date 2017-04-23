@@ -26,11 +26,11 @@ using namespace std;
 
 class NodeFactory{    
 public:
-    typedef shared_ptr<Node>(*construction_func)(shared_ptr<GraphSettings>);
+    typedef Node* (*construction_func)(shared_ptr<GraphSettings>);
     typedef std::map<string,construction_func> map_type;
     
     // create an instance of the object name
-    static shared_ptr<Node> createInstance(string const& type, shared_ptr<GraphSettings> graphSettings) { // add some struct for parameter settings
+    static Node* createInstance(string const& type, shared_ptr<GraphSettings> graphSettings) { // add some struct for parameter settings
         map_type::iterator it = getMap()->find(type);
         if (it == getMap()->end()){
             fprintf(stderr, "Error: %s is not registered.\n",type.c_str());
