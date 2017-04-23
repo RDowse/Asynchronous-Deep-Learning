@@ -42,6 +42,7 @@ class InputNode: public Node{
     stack<pair<int,float>> deltas;  // delta step
     map<int,int> idIndexMap;        // map of weights associated to dst ids
     vector<float> newWeights;       // intermediate updated weights
+    vector<float> deltaWeights;     // delta weights, for momentum
     
     // sorted edges
     shared_ptr<Edge> forwardSyncEdge;
@@ -78,11 +79,13 @@ public:
 
     void setup() override{
         // sort edges
+        int i = 0;
         for(auto e: outgoingEdges){
             if(e->dst->getType() == "Sync"){
                 backwardSyncEdge = e;
             } else {
                 forwardEdges.push_back(e);
+                idIndexMap[e->dst->getId()] = i++;
             }
         }
         for(auto e: incomingEdges){
@@ -94,12 +97,10 @@ public:
         }
         // init weights
         weights = vector<float>(forwardEdges.size(),0);
-        for(auto& w: weights) w = math::randomFloat(0.0,1.0);
+        float maxW = 1/sqrt(backwardEdges.size());
+        for(auto& w: weights) w = math::randomFloat(-maxW,maxW);
         newWeights = weights;
-        // map weight index to the corresponding dst edge/node
-        for(int i = 0; i < forwardEdges.size(); ++i){
-            idIndexMap[forwardEdges[i]->dst->getId()] = i;
-        }
+        deltaWeights = vector<float>(weights.size(),0);
     }
     
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;

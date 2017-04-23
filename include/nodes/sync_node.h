@@ -47,7 +47,8 @@ class SyncNode: public Node{
         forward, backward
     };
     
-    stack<pair<int,float>> output;
+    stack<pair<int,float>> validation_outputs;
+    stack<pair<int,float>> training_outputs;
     
     // operation flags and counts
     int inputSeenCount = 0;
@@ -56,11 +57,12 @@ class SyncNode: public Node{
     bool validating = false;    // flag for propagating validation set
   
     // training 
-    int trainingIndex = 0;
-    int batchCount = 0;
+    int sampleIndex = 0;
+    int batchIndex = 0;
     int epochCount = 0;
-    float error = 0;
+    //float error = 0;
     float validation_error = 0;
+    float training_error = 0;
 public:
     SyncNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
         try{
@@ -94,6 +96,46 @@ public:
     
     void setDataSet(DataWrapper* dataset){
         m_dataset = dataset;
+    }
+    
+    void calculateError(stack<pair<int,float>>& outputs, const vector<int>& labels,
+        int sampleIndex, float& error){
+        vector<pair<int,float>> out;
+        while(!outputs.empty()){
+            auto tmp = outputs.top();
+            out.push_back(tmp);
+            outputs.pop();
+        }
+        sort(out.begin(),out.end(),[](const pair<int,float> &left, const pair<int,float> &right) {
+            return left.first < right.first;
+        });
+        
+        error = 0;
+        float mse = 0;
+        for(int i = 0; i < out.size(); ++i){
+            if(i == labels[sampleIndex])
+                mse += pow((1 - out[i].second),2);
+            else
+                mse += pow((-1 - out[i].second),2);
+        }
+        error += mse;
+        
+        if(!validating){
+            vector<float> tmp;
+            for(auto t: out) tmp.push_back(t.second);
+            //cout << "Predicted: " << (distance(tmp.begin(), max_element(tmp.begin(), tmp.end()) ) == labels[sampleIndex]) << endl;
+            cout << "Predicted: " << (distance(tmp.begin(), max_element(tmp.begin(), tmp.end()))) << endl;
+        }
+            
+        if(sampleIndex == labels.size()-1){
+            // output validation error
+            error/=labels.size();
+            
+            cout << endl << endl;
+            cout << (validating ? "VALIDATION ERR " : "TRAINING ERR ");
+            cout << error << endl;
+            cout << endl << endl;
+        } 
     }
    
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;

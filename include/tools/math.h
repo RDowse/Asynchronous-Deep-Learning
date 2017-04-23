@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   math.h
  * Author: ryan
@@ -36,7 +30,7 @@ namespace math{
     }
     
     static float randomFloat(float min, float max) {
-        return  (max - min) * ((((float) rand()) / (float) RAND_MAX)) + min ;
+        return (max - min) * ((((float) rand()) / (float) RAND_MAX)) + min;
     }
 
     template<typename T>

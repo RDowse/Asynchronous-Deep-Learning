@@ -31,13 +31,13 @@ bool InputNode::dispatchBackwardMsgs(){
     // perform weight update first
     while(!deltas.empty()){
         // match delta to the correct weight
-        auto pair = deltas.top(); 
-        float delta = pair.second;
-        int src = pair.first;
-        int index = idIndexMap[src];
+        int src = deltas.top().first, index = idIndexMap[src];
+        float delta = deltas.top().second;
         deltas.pop();
+        
         // new weight update
-        newWeights[index] = newWeights[index] - m_graph->lr*delta*input; // update step        
+        deltaWeights[index] = -m_graph->lr*delta*input + m_graph->alpha*deltaWeights[index];
+        newWeights[index] += deltaWeights[index]; // update step        
     }
     // notify sync node
     backwardSyncEdge->msg = make_shared<BackwardPropagationMessage>();

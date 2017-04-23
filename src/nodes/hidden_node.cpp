@@ -34,27 +34,26 @@ bool HiddenNode::dispatchBackwardMsgs(){
     float delta_sum = 0;
     while(!deltas.empty()){
         // take delta values from stack, matching to weights
-        auto pair = deltas.top(); 
-        float delta = pair.second;
-        int src = pair.first;
-        int index = idIndexMap[src];
+        int src = deltas.top().first, index = idIndexMap[src];
+        float delta = deltas.top().second;
         deltas.pop();
         
         // calc delta sum
         delta_sum += delta*weights[index];
         
         // update new weights
-        newWeights[index] = newWeights[index] - m_graph->lr*(-delta*output); // update step        
+        deltaWeights[index] = -m_graph->lr*delta*output + m_graph->alpha*deltaWeights[index];
+        newWeights[index] += deltaWeights[index]; // update step  
     }
     
     // dispatch msgs, calculating delta for next nodes
     auto delta = delta_sum*output*(1-output);
     for(unsigned i = 0; i < backwardEdges.size(); i++){
+        assert( 0 == backwardEdges[i]->msgStatus );
         auto msg = make_shared<BackwardPropagationMessage>();
         msg->delta = delta; 
         msg->src = m_id;
         outgoingEdges[i]->msg = msg;
-        assert( 0 == backwardEdges[i]->msgStatus );
         outgoingEdges[i]->msgStatus = 
             static_cast<Edge::MessageStatus>(1 + backwardEdges[i]->getDelay());
     }
@@ -70,11 +69,9 @@ void HiddenNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {
     // weight update step
     if(forwardSeenCount == forwardEdges.size() && m_graph->update){
         weights = newWeights;
-        cout << "id " << m_id << " , ";
-        for(auto w: weights){
-            cout << w << " ";
-        }
-        cout << endl;
+//        cout << "id " << m_id << " , ";
+//        for(auto w: weights) cout << w << " ";
+//        cout << endl;
     }
 }
 

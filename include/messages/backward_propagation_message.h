@@ -21,6 +21,7 @@ class BackwardPropagationMessage: public Message,
 {
 public:
     float delta = 0;
+    float target = 0;
     // send message to node
     bool dispatchTo(shared_ptr<Node> handler) override;
 };

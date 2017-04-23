@@ -14,7 +14,7 @@ bool OutputNode::dispatchForwardMsgs(){
     // calculate output for the node
     output = math::activationTan(value);
     Logging::log(3, "%s node %d output: %f", m_type.c_str(), m_id, output);
-    
+    //cout << m_type.c_str() << " " << m_id << " " << output << endl;
     // prepare the forward message
     auto msg = make_shared<ForwardPropagationMessage>();
     msg->value = output;
@@ -32,8 +32,6 @@ bool OutputNode::dispatchForwardMsgs(){
 
 bool OutputNode::dispatchBackwardMsgs(){
     assert(readyToSend());   
-    vector<shared_ptr<BackwardPropagationMessage>> msgs;
-    auto target = 0.0;
     auto delta = -(target-output)*output*(1-output);
     for(int i = 0; i < backwardEdges.size(); ++i){
         auto msg = make_shared<BackwardPropagationMessage>();
@@ -53,5 +51,6 @@ void OutputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {
 }
 
 void OutputNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {
+    target = msg->target;
     backwardSeenCount++;
 }

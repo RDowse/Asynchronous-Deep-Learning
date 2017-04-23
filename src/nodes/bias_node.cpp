@@ -18,12 +18,38 @@ bool BiasNode::dispatchMsgs(){
             static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
     }
     
-    seenCount=0;
+    forwardSeenCount = 0;
+    backwardSeenCount = 0;
 }
 
 void BiasNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {
     // notifying msg from sync node
-    seenCount++;
+    forwardSeenCount++;
+
+    // weight update step
+    if(forwardSeenCount == forwardEdges.size() && m_graph->update)
+        weights = newWeights;
 }
 
-void BiasNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {}
+void BiasNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {
+    // store delta value with their source node information
+    deltas.push(pair<int,float>(msg->src,msg->delta));
+    backwardSeenCount++;
+    
+    if(backwardSeenCount == forwardEdges.size()){
+        // perform weight update
+        assert(deltas.size() == forwardEdges.size());
+        while(!deltas.empty()){
+            // take delta values from stack, matching to weights
+            auto pair = deltas.top(); 
+            float delta = pair.second;
+            int src = pair.first;
+            int index = idIndexMap[src];
+            deltas.pop();
+            
+            // update new weights
+            deltaWeights[index] = -m_graph->lr*delta + m_graph->alpha*deltaWeights[index];
+            newWeights[index] += deltaWeights[index]; // update step 
+        }
+    }
+}

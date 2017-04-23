@@ -44,6 +44,7 @@ class HiddenNode: public Node{
     // backprop
     stack<pair<int,float>> deltas;  // store received delta values
     map<int,int> idIndexMap;        // map backprop index to the relevant weight
+    vector<float> deltaWeights;     // delta weights, for momentum
     vector<float> newWeights;       // new weights to update
    
     // fwdprop
@@ -86,8 +87,10 @@ public:
             }
         }
         weights = vector<float>(forwardEdges.size(),0);
-        for(auto& w: weights) w = math::randomFloat(0.0,1.0);
+        float maxW = 1/sqrt(backwardEdges.size());
+        for(auto& w: weights) w = math::randomFloat(-maxW,maxW);
         newWeights = weights;
+        deltaWeights = vector<float>(weights.size(),0);
     }
 
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;

@@ -33,6 +33,7 @@ class Node{
 protected:
     static int curr_id;
     int m_id;
+    void send(vector<shared_ptr<Message>>& msgs, vector<shared_ptr<Edge>>& edges);
 public:
     vector<shared_ptr<Edge>> incomingEdges;
     vector<shared_ptr<Edge>> outgoingEdges; // replace with weak ptr for circular dependencies
