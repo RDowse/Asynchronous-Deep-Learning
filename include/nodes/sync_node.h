@@ -53,6 +53,7 @@ class SyncNode: public Node{
     // operation flags and counts
     int inputSeenCount = 0;
     int outputSeenCount = 0;
+    
     bool tick = true;           // trigger initial message propagation
     bool validating = false;    // flag for propagating validation set
   
@@ -83,15 +84,15 @@ public:
     }
 
     void setup() override{
-        for(auto e: outgoingEdges){
-            if(e->dst->getType() == "Input"){
-                inputEdges.push_back(e);
-            } else if(e->dst->getType() == "Bias") {
-                biasEdges.push_back(e);
-            } else if(e->dst->getType() == "Output"){
-                outputEdges.push_back(e);
-            }
-        }
+//        for(auto e: outgoingEdges){
+//            if(e->dst->getType() == "Input"){
+//                inputEdges.push_back(e);
+//            } else if(e->dst->getType() == "Bias") {
+//                biasEdges.push_back(e);
+//            } else if(e->dst->getType() == "Output"){
+//                outputEdges.push_back(e);
+//            }
+//        }
     }
     
     void setDataSet(DataWrapper* dataset){
@@ -143,13 +144,13 @@ public:
     
     bool onSend(vector< shared_ptr<Message> >& msgs) override{
         if(DNNGraphSettings::Operation::forward == m_graph->op){
-            dispatchForwardMsgs(msgs);
+            sendForwardMsgs(msgs);
         } else if(DNNGraphSettings::Operation::backward == m_graph->op){
-            dispatchBackwardMsgs(msgs);
+            sendBackwardMsgs(msgs);
         }
     }
-    bool dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs);
-    bool dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool sendBackwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool sendForwardMsgs(vector<shared_ptr<Message>>& msgs);
 };
 
 #endif /* SYNC_NODE_H */

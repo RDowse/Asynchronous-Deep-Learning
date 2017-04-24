@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   node.h
  * Author: ryan
@@ -19,9 +13,12 @@
 
 #include "misc/edge.h"
 #include "graphs/graph_settings.h"
+#include "states/state.h"
 
+#include <stdexcept>
 #include <memory>
 #include <vector>
+#include <map>
 #include <cassert>
 #include <iostream>
 
@@ -32,27 +29,37 @@ class BackwardPropagationMessage;
 
 // Acts as a message handler
 class Node{
-protected:
     static int curr_id;
+protected:
     int m_id;
     void send(vector<shared_ptr<Message>>& msgs, vector<Edge*>& edges);
 public:
-    vector<Edge*> incomingEdges;
-    vector<Edge*> outgoingEdges; 
-    Node(shared_ptr<GraphSettings> graphSettings){m_id = curr_id; curr_id++;}
-    int getId() const{
-        return m_id;
-    }
+    //vector<Edge*> incomingEdges;
+    //vector<Edge*> outgoingEdges; 
+    map<int, Edge*> incomingEdges;  // map of edges indexed by their src
+    map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
+    
+    Node(shared_ptr<GraphSettings> settings){m_id = curr_id; curr_id++;}
+    
+    int getId() const{ return m_id;}
     virtual string getType()=0;
+    
+    // check if the node is ready
     virtual bool readyToSend()=0;
     
-    // Additional setup after the graph is constructed
-    virtual void setup()=0;
+    // TODO: REMOVE
+    virtual void setup(){};
     
-    // Handle sending of messages and routing for the node
-    virtual bool onSend(vector< shared_ptr<Message> >& msgs)=0;
+    // general implementation of adding edges
+    virtual void addEdge(Edge* e);
     
-    // Handle message receiving
+    // handle sending of messages and routing for the node
+    virtual bool onSend(vector<shared_ptr<Message>>& msgs)=0;
+    
+    // send messages to the corresponding node id, while check validity
+    virtual void send(vector<shared_ptr<Message>>& msgs);
+    
+    // handle message receiving for different message types
     virtual void onRecv(shared_ptr<ForwardPropagationMessage> msg)=0;
     virtual void onRecv(shared_ptr<BackwardPropagationMessage> msg)=0;
 };

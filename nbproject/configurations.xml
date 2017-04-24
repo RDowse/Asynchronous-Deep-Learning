@@ -5,16 +5,15 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
+      <itemPath>include/states/backward_train_state.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
       <itemPath>include/nodes/bias_node.h</itemPath>
-      <itemPath>include/tools/csv.h</itemPath>
-      <itemPath>include/misc/data.h</itemPath>
-      <itemPath>include/tools/data_loader.h</itemPath>
       <itemPath>include/misc/data_wrapper.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
       <itemPath>include/misc/edge.h</itemPath>
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
+      <itemPath>include/states/forward_train_state.h</itemPath>
       <itemPath>include/graphs/graph_settings.h</itemPath>
       <itemPath>include/nodes/hidden_node.h</itemPath>
       <itemPath>include/nodes/input_node.h</itemPath>
@@ -22,10 +21,12 @@
       <itemPath>include/tools/logging.h</itemPath>
       <itemPath>include/tools/math.h</itemPath>
       <itemPath>include/messages/message.h</itemPath>
+      <itemPath>include/nodes/neural_node.h</itemPath>
       <itemPath>include/nodes/node.h</itemPath>
-      <itemPath>include/nodes/nodes.h</itemPath>
       <itemPath>include/nodes/output_node.h</itemPath>
+      <itemPath>include/states/predict_state.h</itemPath>
       <itemPath>include/simulator.h</itemPath>
+      <itemPath>include/states/state.h</itemPath>
       <itemPath>include/nodes/sync_node.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -36,10 +37,11 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
-      <itemPath>src/nodes/basic_node.cpp</itemPath>
+      <itemPath>src/states/backward_train_state.cpp</itemPath>
       <itemPath>src/nodes/bias_node.cpp</itemPath>
       <itemPath>src/tools/dnn_graph.cpp</itemPath>
       <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
+      <itemPath>src/states/forward_train_state.cpp</itemPath>
       <itemPath>src/nodes/hidden_node.cpp</itemPath>
       <itemPath>src/nodes/input_node.cpp</itemPath>
       <itemPath>src/tools/logging.cpp</itemPath>
@@ -47,6 +49,8 @@
       <itemPath>src/nodes/node.cpp</itemPath>
       <itemPath>src/misc/node_factory.cpp</itemPath>
       <itemPath>src/nodes/output_node.cpp</itemPath>
+      <itemPath>src/states/predict_state.cpp</itemPath>
+      <itemPath>src/states/state.cpp</itemPath>
       <itemPath>src/nodes/sync_node.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -102,8 +106,6 @@
       </item>
       <item path="include/messages/message.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/misc/data.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/misc/data_wrapper.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
@@ -114,9 +116,9 @@
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/neural_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/nodes.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -124,9 +126,19 @@
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tools/csv.h" ex="false" tool="3" flavor2="0">
+      <item path="include/states/backward_train_state.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
+      <item path="include/states/forward_train_state.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/states/predict_state.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/states/state.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -150,8 +162,6 @@
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/nodes/basic_node.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
@@ -163,6 +173,17 @@
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/states/backward_train_state.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/states/forward_train_state.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/states/predict_state.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/states/state.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -213,8 +234,6 @@
       </item>
       <item path="include/messages/message.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/misc/data.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/misc/data_wrapper.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
@@ -225,9 +244,9 @@
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/neural_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/nodes.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -235,9 +254,19 @@
       </item>
       <item path="include/simulator.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tools/csv.h" ex="false" tool="3" flavor2="0">
+      <item path="include/states/backward_train_state.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="include/tools/data_loader.h" ex="false" tool="3" flavor2="0">
+      <item path="include/states/forward_train_state.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/states/predict_state.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/states/state.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -261,8 +290,6 @@
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/nodes/basic_node.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
@@ -274,6 +301,17 @@
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/states/backward_train_state.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/states/forward_train_state.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/states/predict_state.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/states/state.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>

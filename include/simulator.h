@@ -14,18 +14,19 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include "graphs/graph_settings.h"
+
 #include "tools/loader.h"
 #include "tools/logging.h"
 
 #include "messages/message.h"
-#include "messages/forward_propagation_message.h"
-#include "messages/backward_propagation_message.h"
+
+#include "states/predict_state.h"
+#include "states/forward_train_state.h"
 
 #include "nodes/node.h"
 #include "nodes/output_node.h"
 #include "nodes/sync_node.h"
-
-#include "graphs/graph_settings.h"
 
 #include <algorithm>
 #include <cassert>
@@ -70,19 +71,14 @@ private:
     bool step_edge(unsigned index, Edge* e){
         if(e->msgStatus == 0){
             Logging::log(4, "  edge %u -> %u : empty", e->src->getId(), e->dst->getId());
-            //m_stats.edgeIdleSteps++;
             return false;
         }
         
         if(e->msgStatus > 1){
-            //Logging::log(3, "  edge %u -> %u : delay (%u)", e->src->getId(), e->dst->getId(), e->msgStatus);
             e->msgStatus = static_cast<Edge::MessageStatus>(int(e->msgStatus)-1);
-            //m_stats.edgeTransitSteps++;
             return true;
         }
-       
-        //Logging::log(3, "  edge %u -> %u : deliver", e->src->getId(), e->dst->getId());
-        //m_stats.edgeDeliverSteps++;
+        
         e->msg->dispatchTo(e->dst);
         e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
         
@@ -93,33 +89,24 @@ private:
         // Not ready to send
         if(!n->readyToSend()){
             Logging::log(4, "node %u : idle", index);
-            //m_stats.nodeIdleSteps++;
             return false; // Device doesn't want to send
         }
         
-        for(unsigned i=0; i < n->outgoingEdges.size(); i++){
-            if( n->outgoingEdges[i]->msgStatus>0 ){
+        for(auto it = n->outgoingEdges.begin(); it != n->outgoingEdges.end(); ++it){
+            if( it->second->msgStatus>0 ){
                 Logging::log(3, "node %u : blocked on %u->%u", index, 
-                        n->outgoingEdges[i]->src->getId(),
-                        n->outgoingEdges[i]->src->getId());
-                //m_stats.nodeBlockedSteps++;
+                        it->second->src->getId(),
+                        it->second->src->getId());
                 return true; // One of the outputs is full, so we are blocked
             }
         }
         
         Logging::log(3, "%s node %u : send", n->getType().c_str(), index);
-        //m_stats.nodeSendSteps++;
            
         // Get the device to send the message
-        vector<shared_ptr<Message> > msgs; 
+        vector< shared_ptr<Message> > msgs; 
         n->onSend(msgs);
-        
-//        for(unsigned i=0; i < msgs.size(); i++){
-//            assert( 0 == n->outgoing[i]->messageStatus );
-//            forwardEdges[i]->msg = msg; // Copy message into channel
-//            forwardEdges[i]->msgStatus = 
-//                static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
-//        }
+        n->send(msgs);
         
         return true;
     }
@@ -171,8 +158,8 @@ public:
         
     void addEdge(int src, int dst, int delay){
         auto e = new Edge(m_nodes[src],m_nodes[dst],delay);
-        m_nodes[src]->outgoingEdges.push_back(e);
-        m_nodes[dst]->incomingEdges.push_back(e);
+        m_nodes[e->src->getId()]->addEdge(e);
+        m_nodes[e->dst->getId()]->addEdge(e);
         m_edges.push_back(e);
     }
 
@@ -191,19 +178,14 @@ public:
         }
     }
     
-    void setup(){
-        for(auto n: m_nodes)
-            n->setup();
-    }
-        
     void run(const string& command){
         Logging::log(1, "begin run");
         
         bool active=true;
         if("predict"==command){
-            m_settings->cmd = static_cast<DNNGraphSettings::Command>(0);
+            m_settings->state = new PredictState();
         } else if("train"==command){
-            m_settings->cmd = static_cast<DNNGraphSettings::Command>(1);
+            m_settings->state = new ForwardTrainState();
         }
         
         while(active){

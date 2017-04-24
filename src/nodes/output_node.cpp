@@ -8,7 +8,7 @@
 std::string OutputNode::m_type = "Output";
 NodeRegister<OutputNode> OutputNode::m_reg(OutputNode::m_type);
 
-bool OutputNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
+bool OutputNode::sendForwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     
     // calculate output for the node
@@ -29,7 +29,7 @@ bool OutputNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
     value = 0;
 }
 
-bool OutputNode::dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs){
+bool OutputNode::sendBackwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());   
     
     cout << m_type.c_str() << " " << m_id << ": (out)" << output << ", (targ)" << target << endl;

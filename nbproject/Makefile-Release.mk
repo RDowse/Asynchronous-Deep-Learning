@@ -39,13 +39,16 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/messages/backward_propagation_message.o \
 	${OBJECTDIR}/src/messages/forward_propagation_message.o \
 	${OBJECTDIR}/src/misc/node_factory.o \
-	${OBJECTDIR}/src/nodes/basic_node.o \
 	${OBJECTDIR}/src/nodes/bias_node.o \
 	${OBJECTDIR}/src/nodes/hidden_node.o \
 	${OBJECTDIR}/src/nodes/input_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
 	${OBJECTDIR}/src/nodes/output_node.o \
 	${OBJECTDIR}/src/nodes/sync_node.o \
+	${OBJECTDIR}/src/states/backward_train_state.o \
+	${OBJECTDIR}/src/states/forward_train_state.o \
+	${OBJECTDIR}/src/states/predict_state.o \
+	${OBJECTDIR}/src/states/state.o \
 	${OBJECTDIR}/src/tools/dnn_graph.o \
 	${OBJECTDIR}/src/tools/logging.o
 
@@ -94,11 +97,6 @@ ${OBJECTDIR}/src/misc/node_factory.o: src/misc/node_factory.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/node_factory.o src/misc/node_factory.cpp
 
-${OBJECTDIR}/src/nodes/basic_node.o: src/nodes/basic_node.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/nodes
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/basic_node.o src/nodes/basic_node.cpp
-
 ${OBJECTDIR}/src/nodes/bias_node.o: src/nodes/bias_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
@@ -128,6 +126,26 @@ ${OBJECTDIR}/src/nodes/sync_node.o: src/nodes/sync_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/sync_node.o src/nodes/sync_node.cpp
+
+${OBJECTDIR}/src/states/backward_train_state.o: src/states/backward_train_state.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/backward_train_state.o src/states/backward_train_state.cpp
+
+${OBJECTDIR}/src/states/forward_train_state.o: src/states/forward_train_state.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/forward_train_state.o src/states/forward_train_state.cpp
+
+${OBJECTDIR}/src/states/predict_state.o: src/states/predict_state.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/predict_state.o src/states/predict_state.cpp
+
+${OBJECTDIR}/src/states/state.o: src/states/state.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/states
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/state.o src/states/state.cpp
 
 ${OBJECTDIR}/src/tools/dnn_graph.o: src/tools/dnn_graph.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools

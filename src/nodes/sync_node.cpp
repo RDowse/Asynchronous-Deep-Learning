@@ -8,7 +8,7 @@ std::string SyncNode::m_type = "Sync";
 NodeRegister<SyncNode> SyncNode::m_reg(SyncNode::m_type);
 
 // Begining sync node
-bool SyncNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
+bool SyncNode::sendForwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     assert(inputEdges.size()== m_dataset->training_images[sampleIndex].size());
     
@@ -46,7 +46,7 @@ bool SyncNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
     outputSeenCount = 0; // for validation looping
 }
 
-bool SyncNode::dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs){
+bool SyncNode::sendBackwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     
     vector<int>& labels = validating ? 

@@ -10,6 +10,8 @@
 
 #include "graphs/graph_settings.h"
 
+#include "states/forward_train_state.h"
+
 class DNNGraphSettings: public GraphSettings{
 public:
     enum Command{
@@ -19,6 +21,7 @@ public:
         forward, backward
     };
     
+    State* state = new ForwardTrainState();
     Command cmd = Command::train;
     Operation op = Operation::forward;
     float lr = 0.01;            // learning rate
@@ -27,7 +30,7 @@ public:
     int maxEpoch = 1;       // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
 //    int batchSize = 90;         // batch size
-    int batchSize = 4;         // batch size
+    int batchSize = 4;         // batch size    TODO: check batch update logic
     
     bool update = false;    // flag for updating weight. TODO: update with msgs
     

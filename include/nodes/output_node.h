@@ -65,13 +65,13 @@ public:
     }
 
     void setup() override{
-        for(auto& e: outgoingEdges){
-            if(e->dst->getType() == "Sync"){
-                syncEdge = e;
-            } else {
-                backwardEdges.push_back(e);
-            }
-        }
+//        for(auto& e: outgoingEdges){
+//            if(e->dst->getType() == "Sync"){
+//                syncEdge = e;
+//            } else {
+//                backwardEdges.push_back(e);
+//            }
+//        }
     }
 
     void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
@@ -79,13 +79,13 @@ public:
     
     bool onSend(vector< shared_ptr<Message> >& msgs) override{
         if(DNNGraphSettings::Operation::forward == m_graph->op){
-            dispatchForwardMsgs(msgs);
+            sendForwardMsgs(msgs);
         } else if(DNNGraphSettings::Operation::backward == m_graph->op){
-            dispatchBackwardMsgs(msgs);
+            sendBackwardMsgs(msgs);
         }
     }
-    bool dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs);
-    bool dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool sendBackwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool sendForwardMsgs(vector<shared_ptr<Message>>& msgs);
 };
 
 

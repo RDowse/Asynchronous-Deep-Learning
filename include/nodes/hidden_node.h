@@ -78,14 +78,14 @@ public:
     
     void setup() override {
         int i = 0;
-        for(auto& e: outgoingEdges){
-            if(e->dst->getId() > m_id){ // change based on type of edge.
-                forwardEdges.push_back(e);
-                idIndexMap[e->dst->getId()] = i++;
-            } else {
-                backwardEdges.push_back(e);
-            }
-        }
+//        for(auto& e: outgoingEdges){
+//            if(e->dst->getId() > m_id){ // change based on type of edge.
+//                forwardEdges.push_back(e);
+//                idIndexMap[e->dst->getId()] = i++;
+//            } else {
+//                backwardEdges.push_back(e);
+//            }
+//        }
         weights = vector<float>(forwardEdges.size(),0);
         float maxW = 1/sqrt(backwardEdges.size());
         for(auto& w: weights) w = math::randomFloat(-maxW,maxW);

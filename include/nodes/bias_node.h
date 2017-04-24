@@ -57,14 +57,14 @@ public:
     
     void setup() override{
         int i = 0;
-        for(auto& e: outgoingEdges){
-            if(e->dst->getType()=="Sync"){
-                syncEdge = e;
-            } else {
-                forwardEdges.push_back(e);
-                idIndexMap[e->dst->getId()] = i++;
-            }
-        }
+//        for(auto& e: outgoingEdges){
+//            if(e.second->dst->getType()=="Sync"){
+//                syncEdge = e;
+//            } else {
+//                forwardEdges.push_back(e);
+//                idIndexMap[e->dst->getId()] = i++;
+//            }
+//        }
         weights = vector<float>(forwardEdges.size(),0);
         for(auto& w: weights) w = math::randomFloat(-0.1,0.1);
         newWeights = weights;
@@ -75,6 +75,9 @@ public:
     void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
     
     bool onSend(vector< shared_ptr<Message> >& msgs) override;
+    
+    bool sendBackwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool sendForwardMsgs(vector<shared_ptr<Message>>& msgs);
 };
 
 

@@ -4,21 +4,12 @@
  *
  * Created on 19 March 2017, 16:39
  */
-#include "graphs/basic_graph_settings.h"
-#include "graphs/dnn_graph_settings.h"
-#include "nodes/basic_node.h"
-#include "messages/message.h"
-#include "messages/forward_propagation_message.h"
-
-#include "misc/node_factory.h"
-#include "misc/data.h"
 #include "misc/data_wrapper.h"
 
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"
 
 #include "mnist/mnist_reader.hpp"
-#include "tools/math.h"
 
 #include <map>
 #include <vector>
@@ -49,7 +40,7 @@ void registerFlags(std::map<std::string, FlagFunction>& func_map){
 }
 
 void simulate(const string& path){
-    printf("Staring sim...\n");
+    printf("Starting sim...\n");
     Logging::m_logLevel = 5;
     std::ostream *stats=&std::cout;
     ifstream file;
@@ -66,7 +57,7 @@ void simulate(const string& path){
         //MNISTDataWrapper data("mnist/mnist_train_100.csv","mnist/mnist_test_10.csv");
         XORDataWrapper data("xor_train.csv","xor_test.csv");
         sim.loadInput(&data);
-        sim.run("train");
+        //sim.run("train");
     } else {
         printf("Unable to open file %s\n",path.c_str());
         return;

@@ -7,7 +7,7 @@
 std::string InputNode::m_type = "Input";
 NodeRegister<InputNode> InputNode::m_reg(InputNode::m_type);
 
-bool InputNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
+bool InputNode::sendForwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     
     Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, input);
@@ -19,13 +19,13 @@ bool InputNode::dispatchForwardMsgs(vector<shared_ptr<Message>>& msgs){
         msgs.push_back(msg);
     }
     
-    send(msgs,forwardEdges);
+    send(msgs,outgoingForwardEdges);
     
     // reset 
     forwardSeenCount = 0;
 }
 
-bool InputNode::dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs){
+bool InputNode::sendBackwardMsgs(vector<shared_ptr<Message>>& msgs){
     assert(readyToSend());
     // perform weight update first
     while(!deltas.empty()){
@@ -35,13 +35,12 @@ bool InputNode::dispatchBackwardMsgs(vector<shared_ptr<Message>>& msgs){
         deltas.pop();
         
         // new weight update
-        deltaWeights[index] = -m_graph->lr*delta*input + m_graph->alpha*deltaWeights[index];
+        deltaWeights[index] = -settings->lr*delta*input + settings->alpha*deltaWeights[index];
         newWeights[index] += deltaWeights[index]; // update step        
     }
     // notify sync node
-    backwardSyncEdge->msg = make_shared<BackwardPropagationMessage>();
-    backwardSyncEdge->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + backwardSyncEdge->getDelay());
+    msgs.push_back(make_shared<BackwardPropagationMessage>());
+    send(msgs,outgoingBackwardEdges);
     // reset
     backwardSeenCount = 0;
 }
@@ -51,7 +50,7 @@ void InputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg){
     forwardSeenCount++;
     
     // weight update step
-    if(forwardSeenCount == forwardEdges.size() && m_graph->update){
+    if(forwardSeenCount == outgoingForwardEdges.size() && settings->update){
         weights = newWeights;
     }
 } 

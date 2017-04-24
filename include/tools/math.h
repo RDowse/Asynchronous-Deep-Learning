@@ -62,14 +62,14 @@ namespace math{
         In beg;
         In end;
         int K; //how many folds in this
-        vector<int> whichFoldToGo;
+        std::vector<int> whichFoldToGo;
     };
 
     template<class In>
     Kfold<In>::Kfold(int _k, In _beg, In _end) :
             beg(_beg), end(_end), K(_k) {
         if (K <= 0)
-            throw runtime_error("The supplied value of K is =... One cannot create ... no of folds");
+            throw std::runtime_error("The supplied value of K is =... One cannot create ... no of folds");
 
         //create the vector of integers
         int foldNo = 0;
@@ -79,8 +79,8 @@ namespace math{
                 foldNo = 0;
         }
         if (!K)
-            throw runtime_error("With this value of k (="")Equal division of the data is not possible");
-        random_shuffle(whichFoldToGo.begin(), whichFoldToGo.end());
+            throw std::runtime_error("With this value of k (="")Equal division of the data is not possible");
+        std::random_shuffle(whichFoldToGo.begin(), whichFoldToGo.end());
     }
 
     template<class In>

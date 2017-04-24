@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   loader.h
  * Author: ryan
@@ -34,64 +28,6 @@ using namespace std;
 
 class Loader{
 public:    
-    static void loadWeights(const string& path, Simulator& sim, 
-            const vector<int>& indexRemoved=vector<int>(1,-1), char separator='\0'){
-        Logging::log(2, "loading weights");
-        // Open weight files
-        ifstream file;
-        file.open(path);
-        string token;
-        string line;
-        vector<float> weights;
-        if(file.is_open()){
-            while(std::getline(file, token)) {
-                weights.push_back(stof(token));
-            }
-            file.close();
-        }
-        
-        //try { assert(weights.size() == 7290); } catch (const std::exception& e) { exit(1); }
-        //try { assert(weights.size() == 12); } catch (const std::exception& e) { exit(1); }
-        // TODO add check for weights size
-        
-        // Set sim weight values
-        int index = 0;
-        auto it = weights.begin();
-        for(int i = 1; i < sim.m_nodes.size()-1; ++i){
-            if(indexRemoved[index]+1 == sim.m_nodes[i]->getId()){
-                if(index < indexRemoved.size()) index++;
-            } else {
-                if("Hidden" == sim.m_nodes[i]->getType()){
-                    auto node = dynamic_cast<HiddenNode*>(sim.m_nodes[i]);
-                    if(it+node->weights.size() <= weights.end()){
-                        node->weights = vector<float>(it,it+node->weights.size());
-                        it += node->weights.size();
-                    } else {
-                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
-                    }
-                } else if("Input" == sim.m_nodes[i]->getType()){
-                    auto node = dynamic_cast<InputNode*>(sim.m_nodes[i]);
-                    if(it+node->weights.size() <= weights.end()){
-                        node->weights = vector<float>(it,it+node->weights.size());
-                        it += node->weights.size();
-                    } else {
-                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
-                    }
-                } else if("Bias" == sim.m_nodes[i]->getType()){
-                    auto node = dynamic_cast<BiasNode*>(sim.m_nodes[i]);
-                    if(it+node->weights.size() <= weights.end()){
-                        node->weights = vector<float>(it,it+node->weights.size());
-                        it += node->weights.size();
-                    } else {
-                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
-                    }
-                } else {
-                    Logging::log(5, "Type %s has no weights\n", sim.m_nodes[i]->getType().c_str());
-                } 
-            }
-        }
-    }
-    
     static string readType(int& lineNumber, ifstream& src){
         if(src.is_open()){
             string type;
@@ -145,9 +81,6 @@ public:
             auto settings =  make_shared<DNNGraphSettings>();
             sim.setGraphSettings(settings);
             
-            vector<shared_ptr<Node>> nodes;
-            nodes.reserve(nNodes);
-
             expect(lineNumber,src,"BeginNodes");
             for(int i = 0; i < nNodes; ++i){
                 int id;
@@ -155,26 +88,21 @@ public:
                 if(!(stringstream(nextline(lineNumber,src))>>type>>id)){
                     err<<"At line "<<lineNumber<<" : Couldn't read node";
                     throw std::runtime_error(err.str());              
-                }        
+                }   
                 sim.addNode(NodeFactory::createInstance(type,settings));
             }
             expect(lineNumber,src,"EndNodes");
 
-            vector<shared_ptr<Edge>> edges;
-            nodes.reserve(nEdges);
             expect(lineNumber,src,"BeginEdges");
             for(int i = 0; i < nEdges; ++i){
                 int srcIndex, dstIndex, delay;
                 if(!(stringstream(nextline(lineNumber,src))>>srcIndex>>dstIndex>>delay)){
                     err<<"At line "<<lineNumber<<" : Couldn't read edge";
                     throw std::runtime_error(err.str());              
-                }  
+                }
                 sim.addEdge(srcIndex,dstIndex,delay);
             }
             expect(lineNumber,src,"EndEdges");
-            
-            // Setup nodes
-            sim.setup();
         } else {
             printf("No file open\n");
         }
@@ -204,3 +132,60 @@ private:
 
 #endif /* LOADER_H */
 
+//    static void loadWeights(const string& path, Simulator& sim, 
+//            const vector<int>& indexRemoved=vector<int>(1,-1), char separator='\0'){
+//        Logging::log(2, "loading weights");
+//        // Open weight files
+//        ifstream file;
+//        file.open(path);
+//        string token;
+//        string line;
+//        vector<float> weights;
+//        if(file.is_open()){
+//            while(std::getline(file, token)) {
+//                weights.push_back(stof(token));
+//            }
+//            file.close();
+//        }
+//        
+//        //try { assert(weights.size() == 7290); } catch (const std::exception& e) { exit(1); }
+//        //try { assert(weights.size() == 12); } catch (const std::exception& e) { exit(1); }
+//        // TODO add check for weights size
+//        
+//        // Set sim weight values
+//        int index = 0;
+//        auto it = weights.begin();
+//        for(int i = 1; i < sim.m_nodes.size()-1; ++i){
+//            if(indexRemoved[index]+1 == sim.m_nodes[i]->getId()){
+//                if(index < indexRemoved.size()) index++;
+//            } else {
+//                if("Hidden" == sim.m_nodes[i]->getType()){
+//                    auto node = dynamic_cast<HiddenNode*>(sim.m_nodes[i]);
+//                    if(it+node->weights.size() <= weights.end()){
+//                        node->weights = vector<float>(it,it+node->weights.size());
+//                        it += node->weights.size();
+//                    } else {
+//                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
+//                    }
+//                } else if("Input" == sim.m_nodes[i]->getType()){
+//                    auto node = dynamic_cast<InputNode*>(sim.m_nodes[i]);
+//                    if(it+node->weights.size() <= weights.end()){
+//                        node->weights = vector<float>(it,it+node->weights.size());
+//                        it += node->weights.size();
+//                    } else {
+//                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
+//                    }
+//                } else if("Bias" == sim.m_nodes[i]->getType()){
+//                    auto node = dynamic_cast<BiasNode*>(sim.m_nodes[i]);
+//                    if(it+node->weights.size() <= weights.end()){
+//                        node->weights = vector<float>(it,it+node->weights.size());
+//                        it += node->weights.size();
+//                    } else {
+//                        printf("Error: %s weight vector out of range.\n", node->getType().c_str());
+//                    }
+//                } else {
+//                    Logging::log(5, "Type %s has no weights\n", sim.m_nodes[i]->getType().c_str());
+//                } 
+//            }
+//        }
+//    }
