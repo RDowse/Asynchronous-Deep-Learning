@@ -14,11 +14,13 @@
 #include <ctime>
 #include <random>
 #include <algorithm>
+#include <cassert>
+#include <iostream>
 
 namespace math{
     
     inline float activationSig(float x){
-        return 1/(1+exp(-x));
+        return 1 / (1+exp(-x));
     }
     
     inline float activationTan(float x){
@@ -29,8 +31,24 @@ namespace math{
         return x > 0 ? 1 : -1;
     }
     
-    static float randomFloat(float min, float max) {
+    inline float deltaActivationSig(float x){
+        return x*(1-x);
+    }
+    
+    inline float deltaActivationTan(float x){
+        return 1-pow(x,2);
+    }
+    
+    inline float randomFloat(float min, float max) {
+        assert(min < max);
         return (max - min) * ((((float) rand()) / (float) RAND_MAX)) + min;
+    }
+    
+    // https://stats.stackexchange.com/a/186351 ref for formula
+    inline void initWeights(std::vector<float>& weights, int nFanIn, int nFanOut){
+        float r = sqrt(6.0/(float(nFanOut)+float(nFanIn)));
+        for(int i = 0; i < weights.size(); ++i)
+            weights[i] = randomFloat(-r, r);
     }
 
     template<typename T>

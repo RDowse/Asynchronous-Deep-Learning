@@ -40,7 +40,7 @@ public:
             fprintf(stderr, "[Sim], %u, %.3f, %s\n", level, 0.0, buffer);
             
             if(globalBuffer){
-                delete []globalBuffer;
+                delete[] globalBuffer;
             }
         }
         

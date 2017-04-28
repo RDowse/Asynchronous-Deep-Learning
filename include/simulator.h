@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   simulator.h
  * Author: ryan
@@ -27,6 +21,9 @@
 #include "nodes/node.h"
 #include "nodes/output_node.h"
 #include "nodes/sync_node.h"
+
+#include "training/stochastic_training.h"
+#include "training/stochastic_momentum_training.h"
 
 #include <algorithm>
 #include <cassert>
@@ -65,7 +62,6 @@ private:
     int m_step;
     int m_logLevel;
     
-    //std::map<string,function> m_cmd_map;
     string m_command;
     
     bool step_edge(unsigned index, Edge* e){
@@ -92,11 +88,12 @@ private:
             return false; // Device doesn't want to send
         }
         
-        for(auto it = n->outgoingEdges.begin(); it != n->outgoingEdges.end(); ++it){
-            if( it->second->msgStatus>0 ){
+        // vec version
+        for(Edge* e: n->outgoingEdges){
+            if( e->msgStatus>0 ){
                 Logging::log(3, "node %u : blocked on %u->%u", index, 
-                        it->second->src->getId(),
-                        it->second->src->getId());
+                        e->src->getId(),
+                        e->dst->getId());
                 return true; // One of the outputs is full, so we are blocked
             }
         }
@@ -104,9 +101,9 @@ private:
         Logging::log(3, "%s node %u : send", n->getType().c_str(), index);
            
         // Get the device to send the message
-        vector< shared_ptr<Message> > msgs; 
+        vector<Message*> msgs; 
         n->onSend(msgs);
-        n->send(msgs);
+        //n->send(msgs);
         
         return true;
     }
@@ -114,11 +111,11 @@ private:
     bool step_all(){
         Logging::log(2, "stepping edges");
         bool active=false;
-        for(unsigned i=0; i<m_edges.size(); i++){
+        for(unsigned i = 0; i < m_edges.size(); i++){
             active = step_edge(i ,m_edges[i]) || active;
         }        
         Logging::log(2, "stepping nodes");
-        for(unsigned i=0; i<m_nodes.size(); i++){
+        for(unsigned i = 0; i < m_nodes.size(); i++){
             active = step_node(i, m_nodes[i]) || active;
         }
         return active;
@@ -156,7 +153,7 @@ public:
         m_settings = settings;
     }
         
-    void addEdge(int src, int dst, int delay){
+    void addEdge(int src, int dst, int delay = 1){
         auto e = new Edge(m_nodes[src],m_nodes[dst],delay);
         m_nodes[e->src->getId()]->addEdge(e);
         m_nodes[e->dst->getId()]->addEdge(e);
@@ -181,10 +178,12 @@ public:
     void run(const string& command){
         Logging::log(1, "begin run");
         
+//        m_settings->trainingStrategy = new StochasticTraining();
+        m_settings->trainingStrategy = new StochasticMomentumTraining();
         bool active=true;
         if("predict"==command){
             m_settings->state = new PredictState();
-        } else if("train"==command){
+        } else if("train"== command){
             m_settings->state = new ForwardTrainState();
         }
         

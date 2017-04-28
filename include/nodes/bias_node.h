@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   bias_node.h
  * Author: ryan
@@ -14,7 +8,7 @@
 #ifndef BIAS_NODE_H
 #define BIAS_NODE_H
 
-#include "nodes/node.h"
+#include "nodes/neural_node.h"
 #include "misc/node_factory.h"
 #include "graphs/graph_settings.h"
 #include "graphs/dnn_graph_settings.h"
@@ -25,59 +19,73 @@
 
 using namespace std;
 
-class BiasNode : public Node{
+class BiasNode : public NeuralNode{
     static NodeRegister<BiasNode> m_reg;
     static std::string m_type;
-    shared_ptr<DNNGraphSettings> m_graph; // global settings for graph
     
-    Edge* syncEdge;
-    vector<Edge*> forwardEdges;
-    
-    int forwardSeenCount = 0;
-    int backwardSeenCount = 0;
-    float value = 1;
-    stack< pair<int,float> > deltas;
-    map<int,int> idIndexMap;        // map backprop index to the relevant weight
+    vector<float> deltas;
     vector<float> newWeights;
     vector<float> deltaWeights;
-public:
     vector<float> weights; 
-    BiasNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
-        try{
-            m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings);
-        } catch (const std::bad_cast& e) {
-            std::cout << e.what() << std::endl;
-        }
-    }
+public:
+    BiasNode(shared_ptr<GraphSettings> context): NeuralNode(context){ output = 0;};
     virtual ~BiasNode(){}
     string getType() override {return BiasNode::m_type;}
-    bool readyToSend() override {
-        return forwardSeenCount == 1;
+    
+    void addEdge(Edge* e) override{
+        // add to original edge sets
+        Node::addEdge(e);
+        // check edge belongs to this node
+        if(e->src->getId() == m_id){
+            if(e->dst->getType() == "Sync"){
+                outgoingBackwardEdges.push_back(e);
+            } else if(e->dst->getType() == "Hidden"
+                    || e->dst->getType() == "Output"){
+                outgoingForwardEdges.push_back(e);
+            } else {
+                cout << "Unknown type " << e->dst->getType() << endl;
+                assert(0);
+            }
+        } else if(e->dst->getId() == m_id){
+            if(e->src->getType() == "Sync"){
+                incomingForwardEdges.push_back(e);
+            } else if(e->src->getType() == "Hidden"
+                    || e->src->getType() == "Output"){
+                incomingBackwardEdges.push_back(e);
+            } else {
+                cout << "Unknown type " << e->src->getType() << endl;
+                assert(0);
+            }
+        } 
     }
     
-    void setup() override{
-        int i = 0;
-//        for(auto& e: outgoingEdges){
-//            if(e.second->dst->getType()=="Sync"){
-//                syncEdge = e;
-//            } else {
-//                forwardEdges.push_back(e);
-//                idIndexMap[e->dst->getId()] = i++;
-//            }
-//        }
-        weights = vector<float>(forwardEdges.size(),0);
-        for(auto& w: weights) w = math::randomFloat(-0.1,0.1);
-        newWeights = weights;
-        deltaWeights = vector<float>(weights.size(),0);
+    void setWeights(const vector<float>& w) override{
+        assert(w.size() == 1);
+        weights = w;
+        newWeights = w; 
+        
+        // init size of delta values
+        deltas = vector<float>(weights.size());
+        deltaWeights = vector<float>(weights.size());
     }
     
-    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
-    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
+    void onRecv(ForwardPropagationMessage* msg) override;
+    void onRecv(BackwardPropagationMessage* msg) override;
     
-    bool onSend(vector< shared_ptr<Message> >& msgs) override;
-    
-    bool sendBackwardMsgs(vector<shared_ptr<Message>>& msgs);
-    bool sendForwardMsgs(vector<shared_ptr<Message>>& msgs);
+    bool sendBackwardMsgs(vector<Message*>& msgs) override;
+    bool sendForwardMsgs(vector<Message*>& msgs) override;
+private:
+    // for populating weights map
+    int map_index = 0;
+    void initWeights(){
+        weights = vector<float>(1);
+        settings->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
+        newWeights = weights;    
+        
+        // init size of delta values
+        deltas = vector<float>(weights.size());
+        deltaWeights = vector<float>(weights.size());
+    }
 };
 
 

@@ -67,8 +67,8 @@ struct MNISTDataWrapper: public DataWrapper{
         readCSV(training_path,tmp_labels,tmp_images);
         readCSV(testing_path,testing_labels,testing_images);
         
-        training_labels.reserve(tmp_labels.size());
-        training_images.reserve(tmp_labels.size());
+        //training_labels.reserve(tmp_labels.size());
+        //training_images.reserve(tmp_labels.size());
         
         std::vector<int> indicies(tmp_labels.size());
         std::iota(indicies.begin(), indicies.end(), 0);

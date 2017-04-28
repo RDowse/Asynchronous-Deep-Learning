@@ -16,8 +16,7 @@
 
 #include "messages/message.h"
 
-class ForwardPropagationMessage: public Message,
-        public std::enable_shared_from_this<ForwardPropagationMessage>
+class ForwardPropagationMessage: public Message
 {
 public:
     float value = 0;

@@ -23,7 +23,7 @@ public:
         ready,    
         inflight
     };
-    shared_ptr<Message> msg;
+    Message* msg;
     Node* dst;
     Node* src;
     MessageStatus msgStatus;

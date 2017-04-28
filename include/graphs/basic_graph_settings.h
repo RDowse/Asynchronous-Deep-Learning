@@ -32,8 +32,6 @@ public:
     };
     
     BasicGraphSettings(){}
-    
-    void info(){}
 };
 
 #endif /* BASIC_GRAPH_H */

@@ -9,34 +9,48 @@
 #define DNN_GRAPH_SETTINGS_H
 
 #include "graphs/graph_settings.h"
+#include "training/training_strategy.h"
+#include "states/state.h"
 
-#include "states/forward_train_state.h"
-
+// Note: context design pattern, maintains and shared information for the system 
 class DNNGraphSettings: public GraphSettings{
 public:
-    enum Command{
-        predict, train
-    };
-    enum Operation{
-        forward, backward
-    };
+    // Training method
+    TrainingStrategy* trainingStrategy; // = NULL;
     
-    State* state = new ForwardTrainState();
-    Command cmd = Command::train;
-    Operation op = Operation::forward;
-    float lr = 0.01;            // learning rate
-    float alpha = 0.5;         // momentum
+    // Training param
+    float lr = 0.1;            // learning rate
+    float alpha = 1;          // momentum
     int sample = 0;             // selected sample for predicting
-    int maxEpoch = 1;       // maximum epochs for training
+    int maxEpoch = 100000;           // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
-//    int batchSize = 90;         // batch size
-    int batchSize = 4;         // batch size    TODO: check batch update logic
+    //int batchSize = 90;         // batch size TODO: add after basic backprop complete
     
-    bool update = false;    // flag for updating weight. TODO: update with msgs
+    // SampleFunc
+    // SampleParam
     
-    DNNGraphSettings(){}
+    // Weight initialisation
+    void (*initWeightsFnc)(vector<float>& ,int ,int) = NULL;
     
-    void info(){}
+    // Activation function
+    float (*activationFnc)(float) = NULL;
+    
+    // Differentiated Activation function
+    float (*deltaActivationFnc)(float) = NULL;
+    
+    // Current network state
+    State* state = NULL;
+    
+    // Flags
+    bool update = false;        // flag for updating weight. TODO: update with msgs
+    
+    DNNGraphSettings(){
+//        activationFnc = &math::activationTan;
+//        deltaActivationFnc = &math::deltaActivationTan;
+        activationFnc = &math::activationSig;
+        deltaActivationFnc = &math::deltaActivationSig;
+        initWeightsFnc = &math::initWeights;
+    }
 };
 
 #endif /* DNN_GRAPH_H */

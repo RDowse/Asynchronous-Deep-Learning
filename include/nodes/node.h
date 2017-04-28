@@ -32,14 +32,14 @@ class Node{
     static int curr_id;
 protected:
     int m_id;
-    void send(vector<shared_ptr<Message>>& msgs, vector<Edge*>& edges);
+    void send(vector<Message*>& msgs, vector<Edge*>& edges);
 public:
-    //vector<Edge*> incomingEdges;
-    //vector<Edge*> outgoingEdges; 
-    map<int, Edge*> incomingEdges;  // map of edges indexed by their src
-    map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
+//    map<int, Edge*> incomingEdges;  // map of edges indexed by their src
+//    map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
+    vector<Edge*> incomingEdges; 
+    vector<Edge*> outgoingEdges;  
     
-    Node(shared_ptr<GraphSettings> settings){m_id = curr_id; curr_id++;}
+    Node(shared_ptr<GraphSettings> settings){m_id = curr_id++;}
     
     int getId() const{ return m_id;}
     virtual string getType()=0;
@@ -47,21 +47,18 @@ public:
     // check if the node is ready
     virtual bool readyToSend()=0;
     
-    // TODO: REMOVE
-    virtual void setup(){};
-    
     // general implementation of adding edges
     virtual void addEdge(Edge* e);
     
     // handle sending of messages and routing for the node
-    virtual bool onSend(vector<shared_ptr<Message>>& msgs)=0;
+    virtual bool onSend(vector<Message*>& msgs)=0;
     
     // send messages to the corresponding node id, while check validity
-    virtual void send(vector<shared_ptr<Message>>& msgs);
+    virtual void send(vector<Message*>& msgs);
     
     // handle message receiving for different message types
-    virtual void onRecv(shared_ptr<ForwardPropagationMessage> msg)=0;
-    virtual void onRecv(shared_ptr<BackwardPropagationMessage> msg)=0;
+    virtual void onRecv(ForwardPropagationMessage* msg)=0;
+    virtual void onRecv(BackwardPropagationMessage* msg)=0;
 };
 
 // For registration. NodeFactory.h 

@@ -2,7 +2,7 @@
 #include "states/backward_train_state.h"
 #include "nodes/neural_node.h"
 
-void BackwardTrainState::onSend(NeuralNode* n, vector<shared_ptr<Message>>& msgs){
+void BackwardTrainState::onSend(NeuralNode* n, vector<Message*>& msgs){
     n->sendBackwardMsgs(msgs);
 }
 

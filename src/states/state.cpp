@@ -3,11 +3,11 @@
 #include "nodes/neural_node.h"
 #include "nodes/node.h"
 
-void State::onSend(NeuralNode* n, vector<shared_ptr<Message>>& msgs){ 
+void State::onSend(NeuralNode* n, vector<Message*>& msgs){ 
     notImplemented(); 
 }
 
-void State::onSend(Node* n, vector<shared_ptr<Message>>& msgs){ 
+void State::onSend(Node* n, vector<Message*>& msgs){ 
     notImplemented(); 
 }
 

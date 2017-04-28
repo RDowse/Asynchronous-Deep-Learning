@@ -2,7 +2,7 @@
 #include "states/predict_state.h"
 #include "nodes/neural_node.h"
 
-void PredictState::onSend(NeuralNode* n, vector<shared_ptr<Message>>& msgs){
+void PredictState::onSend(NeuralNode* n, vector<Message*>& msgs){
     n->sendForwardMsgs(msgs);
 }
 

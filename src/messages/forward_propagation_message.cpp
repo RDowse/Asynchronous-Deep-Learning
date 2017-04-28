@@ -3,5 +3,5 @@
 #include "nodes/node.h"
 
 bool ForwardPropagationMessage::dispatchTo(Node* handler) {
-    handler->onRecv(shared_from_this());
+    handler->onRecv(this);
 }

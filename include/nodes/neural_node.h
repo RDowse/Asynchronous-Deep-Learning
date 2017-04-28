@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   neural_node.h
  * Author: ryan
@@ -27,7 +21,7 @@ class ForwardPropagationMessage;
 class BackwardPropagationMessage;
 
 class NeuralNode: public Node{
-public:
+protected:
     shared_ptr<DNNGraphSettings> settings;
     
     // sorted edges
@@ -40,35 +34,48 @@ public:
     int forwardSeenCount = 0;
     int backwardSeenCount = 0;
     
-    NeuralNode(shared_ptr<GraphSettings> settings): Node(settings){}
+    // node output/activation
+    float output = 0;
+public:
+    NeuralNode(shared_ptr<GraphSettings> context): Node(context){        
+        try{
+            settings = std::static_pointer_cast<DNNGraphSettings>(context);
+        } catch (const std::bad_cast& e) {
+            std::cout << e.what() << std::endl;
+        }
+    }
     
     virtual string getType()=0;
-    virtual bool readyToSend(){
-        settings->state->readyToSend(this);
-    }  
-    
-    // Handle sending of messages and routing for the node
-    virtual bool onSend(vector< shared_ptr<Message> >& msgs){
-        settings->state->onSend(this, msgs);
-    }
     
     virtual void setWeights(const vector<float>& w){
         cout << "setWeights not implemented for this node, " << m_id << endl;
     }
     
+    virtual bool readyToSend(){
+        if(!settings->state) assert(0);
+        settings->state->readyToSend(this);
+    }  
+    
+    // Handle sending of messages and routing for the node
+    virtual bool onSend(vector<Message*>& msgs){
+        settings->state->onSend(this, msgs);
+    }
+    
     // Handle message receiving
-    virtual void onRecv(shared_ptr<ForwardPropagationMessage> msg)=0;
-    virtual void onRecv(shared_ptr<BackwardPropagationMessage> msg)=0;
+    virtual void onRecv(ForwardPropagationMessage* msg)=0;
+    virtual void onRecv(BackwardPropagationMessage* msg)=0;
     
-    virtual bool sendBackwardMsgs(vector<shared_ptr<Message>>& msgs)=0;
-    virtual bool sendForwardMsgs(vector<shared_ptr<Message>>& msgs)=0;
+    virtual bool sendBackwardMsgs(vector<Message*>& msgs)=0;
+    virtual bool sendForwardMsgs(vector<Message*>& msgs)=0;
     
-    bool readyToSendForward(){
+    virtual bool readyToSendForward(){
         return (forwardSeenCount == incomingForwardEdges.size()); 
     }
-    bool readyToSendBackward(){
+    virtual bool readyToSendBackward(){
         return (backwardSeenCount == incomingBackwardEdges.size());
     }
+    
+    float getOutput() const{ return output; }
 };
 
 #endif /* NEURAL_NODE_H */

@@ -6,77 +6,97 @@
 std::string HiddenNode::m_type = "Hidden";
 NodeRegister<HiddenNode> HiddenNode::m_reg(HiddenNode::m_type);
 
-bool HiddenNode::dispatchForwardMsgs() {
-    assert(readyToSend());
-    
-    // calc output
-    output = math::activationTan(value); 
-    // send messages
-    for(unsigned i=0; i < forwardEdges.size(); i++){
-        assert( 0 == forwardEdges[i]->msgStatus );
-        auto msg = make_shared<ForwardPropagationMessage>();
-        msg->value = weights[i]*output;
-        forwardEdges[i]->msg = msg; // Copy message into channel
-        forwardEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
+void HiddenNode::addEdge(Edge* e) {
+    // add to original edge sets
+    Node::addEdge(e);
+    if(e->src->getId() == m_id){
+        if(e->dst->getId() > m_id){ // change based on type of edge.
+            outgoingForwardEdges.push_back(e);
+            dstWeightIndex[e->dst->getId()] = map_index++;
+        } else {
+            outgoingBackwardEdges.push_back(e);
+        }
+    } else if(e->dst->getId() == m_id){
+        if(e->src->getId() < m_id){ // change based on type of edge.
+            incomingForwardEdges.push_back(e);
+        } else {
+            incomingBackwardEdges.push_back(e);
+        }
     }
+}
+
+bool HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
+    assert(readyToSendForward());
+    
+    if(weights.empty()) initWeights();
+    
+    // calulate output activation
+    output = settings->activationFnc(value);
+    
+    //msgs.reserve(weights.size());
+    assert(weights.size() == outgoingForwardEdges.size());
+    for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
+        assert( 0 == outgoingForwardEdges[i]->msgStatus );
+        auto msg = new ForwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingForwardEdges[i]->dst->getId();
+        msg->value = output*weights[i];
+        msgs.push_back(msg);
+    }
+    
+    send(msgs,outgoingForwardEdges);
     
     // reset
     value = 0;
     forwardSeenCount = 0;
-    return true;
 }
 
-bool HiddenNode::dispatchBackwardMsgs(){
-    assert(readyToSend());
-    
+bool HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
+    assert(readyToSendBackward());
+
     // perform weight update
     float delta_sum = 0;
-    while(!deltas.empty()){
-        // take delta values from stack, matching to weights
-        int src = deltas.top().first, index = idIndexMap[src];
-        float delta = deltas.top().second;
-        deltas.pop();
+    for(int i = 0; i < weights.size(); ++i)
+        delta_sum += deltas[i]*weights[i];
+    
+    // perform weight update first
+    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
         
-        // calc delta sum
-        delta_sum += delta*weights[index];
-        
-        // update new weights
-        deltaWeights[index] = -m_graph->lr*delta*output + m_graph->alpha*deltaWeights[index];
-        newWeights[index] += deltaWeights[index]; // update step  
-    }
+    for(int i = 0; i < deltaWeights.size(); ++i)
+        newWeights[i] += deltaWeights[i]; // update step  
     
     // dispatch msgs, calculating delta for next nodes
-    auto delta = delta_sum*output*(1-output);
-    for(unsigned i = 0; i < backwardEdges.size(); i++){
-        assert( 0 == backwardEdges[i]->msgStatus );
-        auto msg = make_shared<BackwardPropagationMessage>();
-        msg->delta = delta; 
+    auto delta = delta_sum*settings->deltaActivationFnc(output);
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+        auto msg = new BackwardPropagationMessage();
         msg->src = m_id;
-        outgoingEdges[i]->msg = msg;
-        outgoingEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + backwardEdges[i]->getDelay());
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        msg->delta = delta; 
+        msgs.push_back(msg);
     }
+    
+    send(msgs,outgoingBackwardEdges);
     
     // reset
     backwardSeenCount = 0;
 }
 
-void HiddenNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {
+void HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     value += msg->value;
     forwardSeenCount++;
     
+    delete msg;
+    
     // weight update step
-    if(forwardSeenCount == forwardEdges.size() && m_graph->update){
+    if(readyToSendForward() && settings->update)
         weights = newWeights;
-//        cout << "id " << m_id << " , ";
-//        for(auto w: weights) cout << w << " ";
-//        cout << endl;
-    }
 }
 
-void HiddenNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {
-    // store delta value with their source node information
-    deltas.push(pair<int,float>(msg->src,msg->delta));
+void HiddenNode::onRecv(BackwardPropagationMessage* msg) {
+    int index = dstWeightIndex[msg->src];
+    deltas[index] = msg->delta;
     backwardSeenCount++;
+    
+    delete msg;
 }

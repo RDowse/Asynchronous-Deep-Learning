@@ -6,50 +6,66 @@
 std::string BiasNode::m_type = "Bias";
 NodeRegister<BiasNode> BiasNode::m_reg(BiasNode::m_type);
 
-bool BiasNode::onSend(vector< shared_ptr<Message> >& msgs){
-    assert(readyToSend());
-
-    for(unsigned i=0; i < forwardEdges.size(); i++){
-        assert( 0 == forwardEdges[i]->msgStatus );
-        auto msg = make_shared<ForwardPropagationMessage>();
-        msg->value = value*weights[i];
-        forwardEdges[i]->msg = msg; // Copy message into channel
-        forwardEdges[i]->msgStatus = 
-            static_cast<Edge::MessageStatus>(1 + forwardEdges[i]->getDelay()); // How long until it is ready?
+bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
+    assert(readyToSendForward());
+    
+    if(weights.empty()) initWeights();
+    
+    //msgs.reserve(weights.size());
+    assert(weights.size() == 1);
+    for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
+        assert( 0 == outgoingForwardEdges[i]->msgStatus );
+        auto msg = new ForwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingForwardEdges[i]->dst->getId();
+        msg->value = output*weights[0];
+        msgs.push_back(msg);
     }
     
+    send(msgs,outgoingForwardEdges);
+    
     forwardSeenCount = 0;
+}
+
+bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
+    assert(readyToSendBackward());
+    
+    deltas[0] /= outgoingForwardEdges.size();
+    
+    // perform weights update first
+    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
+
+    newWeights[0] += deltaWeights[0]; // update step  
+    
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );        
+        auto msg = new BackwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        msgs.push_back(msg);
+    }
+    assert(msgs.size() == 1);
+    
+    send(msgs,outgoingBackwardEdges);
+    
     backwardSeenCount = 0;
 }
 
-void BiasNode::onRecv(shared_ptr<ForwardPropagationMessage> msg) {
+
+void BiasNode::onRecv(ForwardPropagationMessage* msg) {
     // notifying msg from sync node
     forwardSeenCount++;
 
-    // weight update step
-    if(forwardSeenCount == forwardEdges.size() && m_graph->update)
+    delete msg;
+    
+    // weights update step
+    if(readyToSendForward() && settings->update)
         weights = newWeights;
 }
 
-void BiasNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {
-    // store delta value with their source node information
-    deltas.push(pair<int,float>(msg->src,msg->delta));
+void BiasNode::onRecv(BackwardPropagationMessage* msg) {
+    deltas[0] += msg->delta;
     backwardSeenCount++;
     
-    if(backwardSeenCount == forwardEdges.size()){
-        // perform weight update
-        assert(deltas.size() == forwardEdges.size());
-        while(!deltas.empty()){
-            // take delta values from stack, matching to weights
-            auto pair = deltas.top(); 
-            float delta = pair.second;
-            int src = pair.first;
-            int index = idIndexMap[src];
-            deltas.pop();
-            
-            // update new weights
-            deltaWeights[index] = -m_graph->lr*delta + m_graph->alpha*deltaWeights[index];
-            newWeights[index] += deltaWeights[index]; // update step 
-        }
-    }
+    delete msg;
 }

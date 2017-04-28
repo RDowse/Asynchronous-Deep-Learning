@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   output_node.h
  * Author: ryan
@@ -14,7 +8,7 @@
 #ifndef OUTPUT_NODE_H
 #define OUTPUT_NODE_H
 
-#include "nodes/node.h"
+#include "nodes/neural_node.h"
 #include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
@@ -29,65 +23,26 @@
 
 using namespace std;
 
-class OutputNode: public Node{
+class OutputNode: public NeuralNode{
     static NodeRegister<OutputNode> m_reg;
     static std::string m_type;
-    shared_ptr<DNNGraphSettings> m_graph;
-    
-    Edge* syncEdge;
-    vector<Edge*> backwardEdges;
-    
-    int forwardSeenCount = 0;
-    int backwardSeenCount = 0;
     
     float error = 0;
     float target = 0;
     float value = 0;
 public:
-    float output = 0;
-    OutputNode(shared_ptr<GraphSettings> graphSettings): Node(graphSettings){
-        try{
-            m_graph = std::static_pointer_cast<DNNGraphSettings>(graphSettings);
-        } catch (const std::bad_cast& e) {
-            std::cout << e.what() << std::endl;
-        }
-    }
+    OutputNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~OutputNode(){}
     string getType() override{return OutputNode::m_type;}
-    bool readyToSend() override {
-        if(m_graph->cmd == DNNGraphSettings::Command::predict){
-            return (forwardSeenCount == incomingEdges.size()-1); 
-        }else if(m_graph->cmd == DNNGraphSettings::Command::train) {
-            return (forwardSeenCount == incomingEdges.size()-1) ||
-                    (backwardSeenCount == 1);
-        }
-        return false;
-    }
-
-    void setup() override{
-//        for(auto& e: outgoingEdges){
-//            if(e->dst->getType() == "Sync"){
-//                syncEdge = e;
-//            } else {
-//                backwardEdges.push_back(e);
-//            }
-//        }
-    }
-
-    void onRecv(shared_ptr<ForwardPropagationMessage> msg) override;
-    void onRecv(shared_ptr<BackwardPropagationMessage> msg) override;
     
-    bool onSend(vector< shared_ptr<Message> >& msgs) override{
-        if(DNNGraphSettings::Operation::forward == m_graph->op){
-            sendForwardMsgs(msgs);
-        } else if(DNNGraphSettings::Operation::backward == m_graph->op){
-            sendBackwardMsgs(msgs);
-        }
-    }
-    bool sendBackwardMsgs(vector<shared_ptr<Message>>& msgs);
-    bool sendForwardMsgs(vector<shared_ptr<Message>>& msgs);
-};
+    void addEdge(Edge* e) override;
 
+    void onRecv(ForwardPropagationMessage* msg) override;
+    void onRecv(BackwardPropagationMessage* msg) override;
+    
+    bool sendForwardMsgs(vector<Message*>& msgs) override;
+    bool sendBackwardMsgs(vector<Message*>& msgs) override;
+};
 
 #endif /* OUTPUT_NODE_H */
 

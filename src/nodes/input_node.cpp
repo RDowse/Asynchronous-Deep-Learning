@@ -7,15 +7,53 @@
 std::string InputNode::m_type = "Input";
 NodeRegister<InputNode> InputNode::m_reg(InputNode::m_type);
 
-bool InputNode::sendForwardMsgs(vector<shared_ptr<Message>>& msgs){
-    assert(readyToSend());
+void InputNode::addEdge(Edge* e) {
+     // add to original edge sets
+     Node::addEdge(e);
+     // check edge belongs to this node
+     if(e->src->getId() == m_id){
+         if(e->dst->getType() == "Sync"){
+             outgoingBackwardEdges.push_back(e);
+         } else if(e->dst->getType() == "Hidden"
+                 || e->dst->getType() == "Output"){
+             outgoingForwardEdges.push_back(e);
+             dstWeightIndex[e->dst->getId()] = map_index++;
+         } else {
+             cout << "Unknown type " << e->dst->getType() << endl;
+             assert(0);
+         }
+     } else if(e->dst->getId() == m_id){
+         if(e->src->getType() == "Sync"){
+             incomingForwardEdges.push_back(e);
+         } else if(e->src->getType() == "Hidden"
+                 || e->src->getType() == "Output"){
+             incomingBackwardEdges.push_back(e);
+         } else {
+             cout << "Unknown type " << e->dst->getType() << endl;
+             assert(0);
+         }
+     } 
+     
+     // tmp tests
+     assert(outgoingBackwardEdges.size() <= 1);        
+     assert(incomingForwardEdges.size() <= 1);
+ }
+
+bool InputNode::sendForwardMsgs(vector<Message*>& msgs){
+    assert(readyToSendForward());
     
-    Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, input);
+    if(weights.empty()) initWeights();
     
-    msgs.reserve(weights.size());
-    for(unsigned i=0; i < weights.size(); i++){
-        auto msg = make_shared<ForwardPropagationMessage>();
-        msg->value = input*weights[i];
+    Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, output);
+    
+    //msgs.reserve(weights.size());
+    assert(weights.size() == outgoingForwardEdges.size());
+    for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
+        assert( 0 == outgoingForwardEdges[i]->msgStatus );
+        auto msg = new ForwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingForwardEdges[i]->dst->getId();
+        msg->value = output*weights[i];
         msgs.push_back(msg);
     }
     
@@ -25,37 +63,45 @@ bool InputNode::sendForwardMsgs(vector<shared_ptr<Message>>& msgs){
     forwardSeenCount = 0;
 }
 
-bool InputNode::sendBackwardMsgs(vector<shared_ptr<Message>>& msgs){
-    assert(readyToSend());
+bool InputNode::sendBackwardMsgs(vector<Message*>& msgs){
+    assert(readyToSendBackward());
+            
     // perform weight update first
-    while(!deltas.empty()){
-        // match delta to the correct weight
-        int src = deltas.top().first, index = idIndexMap[src];
-        float delta = deltas.top().second;
-        deltas.pop();
-        
-        // new weight update
-        deltaWeights[index] = -settings->lr*delta*input + settings->alpha*deltaWeights[index];
-        newWeights[index] += deltaWeights[index]; // update step        
+    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
+    
+    for(int i = 0; i < deltaWeights.size(); ++i)
+        newWeights[i] += deltaWeights[i]; // update step    
+    
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+        auto msg = new BackwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        msgs.push_back(msg);
     }
-    // notify sync node
-    msgs.push_back(make_shared<BackwardPropagationMessage>());
+    assert(msgs.size() == 1);
+    
     send(msgs,outgoingBackwardEdges);
+    
     // reset
     backwardSeenCount = 0;
 }
 
-void InputNode::onRecv(shared_ptr<ForwardPropagationMessage> msg){
-    input = msg->value;
+void InputNode::onRecv(ForwardPropagationMessage* msg){
+    output = msg->value;
     forwardSeenCount++;
     
+    delete msg;
+    
     // weight update step
-    if(forwardSeenCount == outgoingForwardEdges.size() && settings->update){
+    if(readyToSendForward() && settings->update)
         weights = newWeights;
-    }
 } 
 
-void InputNode::onRecv(shared_ptr<BackwardPropagationMessage> msg) {
-    deltas.push(pair<int,float>(msg->src,msg->delta));
+void InputNode::onRecv(BackwardPropagationMessage* msg) {
+    int index = dstWeightIndex[msg->src];
+    deltas[index] = msg->delta;
     backwardSeenCount++;
+    
+    delete msg;
 }

@@ -39,6 +39,19 @@ void registerFlags(std::map<std::string, FlagFunction>& func_map){
     func_map["-r"] = &run;
 }
 
+void printData(const DataWrapper& data){
+    for(auto a: data.training_images){
+        for(auto i: a){
+            cout << i;
+        }
+        cout << endl;
+    }
+    cout << endl;        
+    for(auto i: data.training_labels){
+        cout << i << endl;
+    }
+}
+
 void simulate(const string& path){
     printf("Starting sim...\n");
     Logging::m_logLevel = 5;
@@ -49,15 +62,14 @@ void simulate(const string& path){
         int lineNumber = 0, nNodes = 0, nEdges = 0;
         string type = Loader::readType(lineNumber,file);
         Loader::readHeader(lineNumber,file,nNodes,nEdges);
-        Simulator sim(3,nNodes,nEdges,*stats);
+        Simulator sim(1,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
         printf("Loading data\n");
-        //MNISTDataWrapper data("mnist/mnist_train_100.csv","mnist/mnist_test_10.csv");
-        XORDataWrapper data("xor_train.csv","xor_test.csv");
+        XORDataWrapper data("xor_train.csv","xor_train.csv");
         sim.loadInput(&data);
-        //sim.run("train");
+        sim.run("train");
     } else {
         printf("Unable to open file %s\n",path.c_str());
         return;
@@ -65,8 +77,34 @@ void simulate(const string& path){
     file.close();
 }
 
+void simulateMNIST(const string& path){
+    printf("Starting sim...\n");
+    Logging::m_logLevel = 5;
+    std::ostream *stats=&std::cout;
+    ifstream file;
+    file.open(path);
+    if(file.is_open()){
+        int lineNumber = 0, nNodes = 0, nEdges = 0;
+        string type = Loader::readType(lineNumber,file);
+        Loader::readHeader(lineNumber,file,nNodes,nEdges);
+        Simulator sim(1,nNodes,nEdges,*stats);
+        Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
+        printf("Loaded graph to sim\n");
+        
+        printf("Loading data\n");
+        MNISTDataWrapper data("mnist/mnist_train_100.csv","mnist/mnist_test_10.csv");
+        sim.loadInput(&data);
+        sim.run("train");
+    } else {
+        printf("Unable to open file %s\n",path.c_str());
+        return;
+    }
+    file.close();
+}
+
+
 void buildGraph(string name, int nHidden, int nInput, int nOutput){
-    DNNGraph dnngraph(1,nHidden,nInput,nOutput);
+    DNNGraph dnngraph(2,nHidden,nInput,nOutput);
     stringstream ss1, ss2;
     ss1 << "w/" << name << ".graph";
     ss2 << "w/" << name << ".dot";
@@ -98,11 +136,11 @@ int main(int argc, char** argv) {
     
     std::ostream *stats=&std::cout;
     //buildGraph("net",10,28*28,10);
-    //buildGraph("xor",2,2,1);
+    //buildGraph("xor2",2,2,1); // correct so it works with 0 hidden nodes
     //buildGraph("test",2,2,2);
     
-    //simulate("w/net.graph");
-    simulate("w/xor.graph");
-
+    //simulateMNIST("w/net.graph");
+    simulate("w/xor2.graph");
+    
     return 0;
 }

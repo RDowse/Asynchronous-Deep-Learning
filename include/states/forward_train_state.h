@@ -13,7 +13,7 @@
 
 class ForwardTrainState: public State{
     public:
-    void onSend(NeuralNode* n, vector<shared_ptr<Message>>& msgs) override;
+    void onSend(NeuralNode* n, vector<Message*>& msgs) override;
     bool readyToSend(NeuralNode* n) override;
 };
 
