@@ -38,8 +38,8 @@ class SyncNode: public NeuralNode{
     int sampleIndex = 0;
     int epochCount = 0;
     
-    vector<float> min_error; // = vector<float>(4,10); 
-    vector<float> error; // = vector<float>(4,0);
+    vector<float> min_error; 
+    vector<float> error;
     
     vector<int> trainingIndices;
     

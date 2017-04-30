@@ -19,7 +19,7 @@ void InputNode::addEdge(Edge* e) {
              outgoingForwardEdges.push_back(e);
              dstWeightIndex[e->dst->getId()] = map_index++;
          } else {
-             cout << "Unknown type " << e->dst->getType() << endl;
+             cout << "Unknown type " << e->dst->getType() << "\n";
              assert(0);
          }
      } else if(e->dst->getId() == m_id){
@@ -29,7 +29,7 @@ void InputNode::addEdge(Edge* e) {
                  || e->src->getType() == "Output"){
              incomingBackwardEdges.push_back(e);
          } else {
-             cout << "Unknown type " << e->dst->getType() << endl;
+             cout << "Unknown type " << e->dst->getType() << "\n";
              assert(0);
          }
      } 
@@ -57,8 +57,6 @@ bool InputNode::sendForwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    send(msgs,outgoingForwardEdges);
-    
     // reset 
     forwardSeenCount = 0;
 }
@@ -80,8 +78,6 @@ bool InputNode::sendBackwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     assert(msgs.size() == 1);
-    
-    send(msgs,outgoingBackwardEdges);
     
     // reset
     backwardSeenCount = 0;

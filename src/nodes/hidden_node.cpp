@@ -44,7 +44,7 @@ bool HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
         msgs.push_back(msg);
     }
     
-    send(msgs,outgoingForwardEdges);
+    //send(msgs,outgoingForwardEdges);
     
     // reset
     value = 0;
@@ -76,7 +76,7 @@ bool HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    send(msgs,outgoingBackwardEdges);
+    //send(msgs,outgoingBackwardEdges);
     
     // reset
     backwardSeenCount = 0;

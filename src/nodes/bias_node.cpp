@@ -22,7 +22,7 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    send(msgs,outgoingForwardEdges);
+    //send(msgs,outgoingForwardEdges);
     
     forwardSeenCount = 0;
 }
@@ -46,7 +46,7 @@ bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     }
     assert(msgs.size() == 1);
     
-    send(msgs,outgoingBackwardEdges);
+    //send(msgs,outgoingBackwardEdges);
     
     backwardSeenCount = 0;
 }

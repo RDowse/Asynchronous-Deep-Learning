@@ -43,7 +43,7 @@ public:
                     || e->dst->getType() == "Output"){
                 outgoingForwardEdges.push_back(e);
             } else {
-                cout << "Unknown type " << e->dst->getType() << endl;
+                cout << "Unknown type " << e->dst->getType() << "\n";
                 assert(0);
             }
         } else if(e->dst->getId() == m_id){
@@ -53,7 +53,7 @@ public:
                     || e->src->getType() == "Output"){
                 incomingBackwardEdges.push_back(e);
             } else {
-                cout << "Unknown type " << e->src->getType() << endl;
+                cout << "Unknown type " << e->src->getType() << "\n";
                 assert(0);
             }
         } 

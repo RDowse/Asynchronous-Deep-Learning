@@ -20,7 +20,7 @@ void OutputNode::addEdge(Edge* e) {
         } else if(e->dst->getType() == "Sync"){
             outgoingForwardEdges.push_back(e);
         } else {
-            cout << "Unknown type " << e->dst->getType() << endl;
+            cout << "Unknown type " << e->dst->getType() << "\n";
             assert(0);
         }
     } else if(e->dst->getId() == m_id){
@@ -31,7 +31,7 @@ void OutputNode::addEdge(Edge* e) {
         } else if(e->src->getType() == "Sync"){
             incomingBackwardEdges.push_back(e);
         } else {
-            cout << "Unknown type " << e->src->getType() << endl;
+            cout << "Unknown type " << e->src->getType() << "\n";
             assert(0);
         }
     } 
@@ -44,7 +44,7 @@ bool OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     output = settings->activationFnc(value);
     
     Logging::log(3, "%s%d forward out: %f", m_type.c_str(), m_id, output);
-    //cout << "Out: " << output << endl; 
+    //cout << "Out: " << output << "\n"; 
     
     auto msg = new ForwardPropagationMessage();
     for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
@@ -56,7 +56,7 @@ bool OutputNode::sendForwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    send(msgs,outgoingForwardEdges);
+    //send(msgs,outgoingForwardEdges);
     
     // reset state
     value = 0;
@@ -78,7 +78,7 @@ bool OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    send(msgs,outgoingBackwardEdges);
+    //send(msgs,outgoingBackwardEdges);
     
     backwardSeenCount = 0;
 }

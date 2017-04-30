@@ -18,6 +18,7 @@
 #include <stdexcept>
 #include <memory>
 #include <vector>
+#include <list>
 #include <map>
 #include <cassert>
 #include <iostream>
@@ -32,12 +33,9 @@ class Node{
     static int curr_id;
 protected:
     int m_id;
-    void send(vector<Message*>& msgs, vector<Edge*>& edges);
 public:
-//    map<int, Edge*> incomingEdges;  // map of edges indexed by their src
-//    map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
-    vector<Edge*> incomingEdges; 
-    vector<Edge*> outgoingEdges;  
+    map<int, Edge*> incomingEdges;  // map of edges indexed by their src
+    map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
     
     Node(shared_ptr<GraphSettings> settings){m_id = curr_id++;}
     
@@ -54,7 +52,7 @@ public:
     virtual bool onSend(vector<Message*>& msgs)=0;
     
     // send messages to the corresponding node id, while check validity
-    virtual void send(vector<Message*>& msgs);
+    virtual void send(vector<Message*>& msgs, list<Edge*>& activeEdges);
     
     // handle message receiving for different message types
     virtual void onRecv(ForwardPropagationMessage* msg)=0;

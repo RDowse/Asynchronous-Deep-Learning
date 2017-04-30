@@ -21,7 +21,7 @@ void SyncNode::addEdge(Edge* e) {
              e->dst->getType() == "Bias"){ 
             outgoingForwardEdges.push_back(e);
         } else {
-            cout << "Unknown type " << e->dst->getType() << endl;
+            cout << "Unknown type " << e->dst->getType() << "\n";
             assert(0);
         }
     } else if(e->dst->getId() == m_id){
@@ -31,7 +31,7 @@ void SyncNode::addEdge(Edge* e) {
                 || e->src->getType() == "Bias"){
             incomingBackwardEdges.push_back(e);
         } else {
-            cout << "Unknown type " << e->src->getType() << endl;
+            cout << "Unknown type " << e->src->getType() << "\n";
             assert(0);
         }
     } 
@@ -63,7 +63,7 @@ bool SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    send(msgs,outgoingForwardEdges);
+    //send(msgs,outgoingForwardEdges);
     
     // reset
     tick = false;
@@ -92,10 +92,10 @@ bool SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         else 
             assert(0); // should not occur
         msgs.push_back(msg);
-        //cout << "Sending sample" << trainingIndices[sampleIndex] << " " << msg->target << endl;
+        //cout << "Sending sample" << trainingIndices[sampleIndex] << " " << msg->target << "\n";
     }
     
-    send(msgs,outgoingBackwardEdges);
+    //send(msgs,outgoingBackwardEdges);
     
     // reset
     forwardSeenCount = 0;
@@ -120,20 +120,20 @@ void SyncNode::onRecv(BackwardPropagationMessage* msg){
         settings->state = new ForwardTrainState();
         settings->update = true;
         sampleIndex++;
-        
+       
         // end of epoch, all samples in the training set have been passed
         if(sampleIndex==dataset->training_images.size()){
             // calulate training error for current epoch
             float sum = accumulate(error.begin(),error.end(),0.0);
             if(sum <= 0.01){
-                cout << "final error" << sum << endl;
+                cout << "final error" << sum << "\n";
                 exit(0);
             }
             // allow for sampling without replacement
             std::random_shuffle(trainingIndices.begin(), trainingIndices.end());
             sampleIndex = 0;
             epochCount++;
-            cout << "EPOCH: " << epochCount << endl << endl;
+            cout << "EPOCH: " << epochCount << "\n" << "\n";
         }
     }
 }
@@ -156,8 +156,8 @@ void SyncNode::onRecv(ForwardPropagationMessage* msg){
         min_error[trainingIndices[sampleIndex]] = min(training_error,min_error[trainingIndices[sampleIndex]]);
         error[trainingIndices[sampleIndex]] = training_error;
         
-        cout << "Training error sample" << trainingIndices[sampleIndex] << " " << training_error << endl;
-        cout << "Minimum error sample" << trainingIndices[sampleIndex] << ": " << min_error[trainingIndices[sampleIndex]] << endl;
+        cout << "Training error sample" << trainingIndices[sampleIndex] << " " << training_error << "\n";
+        cout << "Minimum error sample" << trainingIndices[sampleIndex] << ": " << min_error[trainingIndices[sampleIndex]] << "\n";
         
         cout << "\n";
         cout << "Epoch "<< epochCount << " (targ) " << dataset->training_labels[sampleIndex] << "\n";

@@ -80,20 +80,20 @@ struct MNISTDataWrapper: public DataWrapper{
         
         kf.getFold(folds, back_inserter(train), back_inserter(test));
 
-        cout << "Fold " << 1 << " Training Data" << endl;
+        cout << "Fold " << 1 << " Training Data" << "\n";
         for(auto x: train){
             training_labels.push_back(tmp_labels[x]);
             training_images.push_back(tmp_images[x]);
             cout << tmp_labels[x] << " ";
         }
-        cout << endl;
-        cout << "Fold " << folds << " Testing Data" << endl;
+        cout << "\n";
+        cout << "Fold " << folds << " Testing Data" << "\n";
         for(auto x: test){
             validation_labels.push_back(tmp_labels[x]);
             validation_images.push_back(tmp_images[x]);
             cout << tmp_labels[x] << " ";
         }
-        cout << endl;
+        cout << "\n";
     }
 };
 

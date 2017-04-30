@@ -44,11 +44,11 @@ void printData(const DataWrapper& data){
         for(auto i: a){
             cout << i;
         }
-        cout << endl;
+        cout << "\n";
     }
-    cout << endl;        
+    cout << "\n";        
     for(auto i: data.training_labels){
-        cout << i << endl;
+        cout << i << "\n";
     }
 }
 
@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
     //buildGraph("test",2,2,2);
     
     //simulateMNIST("w/net.graph");
-    simulate("w/xor2.graph");
+    simulate("w/xor.graph");
     
     return 0;
 }

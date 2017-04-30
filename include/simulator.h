@@ -25,7 +25,12 @@
 #include "training/stochastic_training.h"
 #include "training/stochastic_momentum_training.h"
 
+#include "tbb/parallel_while.h"
+
+#include "tools/clock.h"
+
 #include <algorithm>
+#include <list>
 #include <cassert>
 #include <fstream>
 #include <memory>
@@ -44,39 +49,27 @@ private:
     vector<Node*> m_nodes;
     multimap<string, Node*> m_node_map;
     
-    struct stats
-    {
-        uint32_t stepIndex;
-        
-        uint32_t nodeIdleSteps;
-        uint32_t nodeBlockedSteps;
-        uint32_t nodeSendSteps;
-        
-        uint32_t edgeIdleSteps;
-        uint32_t edgeTransitSteps;
-        uint32_t edgeDeliverSteps;
-    };
+    list<Edge*> activeEdges;
+    list<Node*> readyNodes;
     
     std::ostream& m_statsDst;
-    stats m_stats;
     int m_step;
     int m_logLevel;
     
     string m_command;
     
-    bool step_edge(unsigned index, Edge* e){
-        if(e->msgStatus == 0){
-            Logging::log(4, "  edge %u -> %u : empty", e->src->getId(), e->dst->getId());
-            return false;
-        }
+    bool step_edge(list<Edge*>::iterator& it){
+        Edge* e = (*it);
         
         if(e->msgStatus > 1){
             e->msgStatus = static_cast<Edge::MessageStatus>(int(e->msgStatus)-1);
+            it++;
             return true;
         }
         
         e->msg->dispatchTo(e->dst);
         e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
+        it = activeEdges.erase(it);
         
         return true;
     }
@@ -88,8 +81,8 @@ private:
             return false; // Device doesn't want to send
         }
         
-        // vec version
-        for(Edge* e: n->outgoingEdges){
+        for(auto p: n->outgoingEdges){
+            auto e = p.second;
             if( e->msgStatus>0 ){
                 Logging::log(3, "node %u : blocked on %u->%u", index, 
                         e->src->getId(),
@@ -103,7 +96,7 @@ private:
         // Get the device to send the message
         vector<Message*> msgs; 
         n->onSend(msgs);
-        //n->send(msgs);
+        n->send(msgs, activeEdges);
         
         return true;
     }
@@ -111,8 +104,9 @@ private:
     bool step_all(){
         Logging::log(2, "stepping edges");
         bool active=false;
-        for(unsigned i = 0; i < m_edges.size(); i++){
-            active = step_edge(i ,m_edges[i]) || active;
+        list<Edge*>::iterator it = activeEdges.begin();
+        while( it != activeEdges.end()){
+            active = step_edge(it) || active;
         }        
         Logging::log(2, "stepping nodes");
         for(unsigned i = 0; i < m_nodes.size(); i++){
@@ -178,7 +172,6 @@ public:
     void run(const string& command){
         Logging::log(1, "begin run");
         
-//        m_settings->trainingStrategy = new StochasticTraining();
         m_settings->trainingStrategy = new StochasticMomentumTraining();
         bool active=true;
         if("predict"==command){

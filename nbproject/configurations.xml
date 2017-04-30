@@ -8,6 +8,8 @@
       <itemPath>include/states/backward_train_state.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
       <itemPath>include/nodes/bias_node.h</itemPath>
+      <itemPath>include/nodes/block_neural_node.h</itemPath>
+      <itemPath>include/tools/clock.h</itemPath>
       <itemPath>include/misc/data_wrapper.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
@@ -42,6 +44,7 @@
       <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
       <itemPath>src/states/backward_train_state.cpp</itemPath>
       <itemPath>src/nodes/bias_node.cpp</itemPath>
+      <itemPath>src/tools/clock.cpp</itemPath>
       <itemPath>src/tools/dnn_graph.cpp</itemPath>
       <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
       <itemPath>src/states/forward_train_state.cpp</itemPath>
@@ -96,9 +99,13 @@
           <incDir>
             <pElem>include</pElem>
             <pElem>mnist/include</pElem>
+            <pElem>/usr/include/eigen3</pElem>
           </incDir>
           <commandLine>-g</commandLine>
         </ccTool>
+        <linkerTool>
+          <commandLine>-ltbb</commandLine>
+        </linkerTool>
       </compileType>
       <folder path="TestFiles/f1">
         <cTool>
@@ -160,6 +167,8 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/block_neural_node.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
@@ -187,6 +196,8 @@
       <item path="include/states/predict_state.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/states/state.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/clock.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -247,6 +258,8 @@
       <item path="src/states/predict_state.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/states/state.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tools/clock.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -347,6 +360,8 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/block_neural_node.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
@@ -374,6 +389,8 @@
       <item path="include/states/predict_state.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/states/state.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/tools/clock.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -434,6 +451,8 @@
       <item path="src/states/predict_state.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/states/state.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tools/clock.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>

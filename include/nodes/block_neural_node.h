@@ -1,34 +1,30 @@
+
 /* 
- * File:   neural_node.h
+ * File:   block_neural_node.h
  * Author: ryan
  *
- * Created on 24 April 2017, 00:27
+ * Created on 30 April 2017, 19:00
  */
 
-#ifndef NEURAL_NODE_H
-#define NEURAL_NODE_H
+#ifndef BLOCK_NEURAL_NODE_H
+#define BLOCK_NEURAL_NODE_H
 
-#include "nodes/node.h"
-#include "graphs/dnn_graph_settings.h"
-
-#include <vector>
 #include <memory>
+#include <cassert>
 
 using namespace std;
 
-class State;
-class ForwardPropagationMessage;
-class BackwardPropagationMessage;
-
-class NeuralNode: public Node{
+class BlockNeuralNode{
 protected:
     shared_ptr<DNNGraphSettings> settings;
     
+    vector<int> ids; // collection of nodes represented by this node
+    
     // sorted edges
-    vector<Edge*> incomingForwardEdges;
-    vector<Edge*> incomingBackwardEdges;
-    vector<Edge*> outgoingBackwardEdges;
-    vector<Edge*> outgoingForwardEdges;
+//    vector<Edge*> incomingForwardEdges;
+//    vector<Edge*> incomingBackwardEdges;
+//    vector<Edge*> outgoingBackwardEdges;
+//    vector<Edge*> outgoingForwardEdges;
     
     // seen counts
     int forwardSeenCount = 0;
@@ -47,10 +43,6 @@ public:
     
     virtual string getType()=0;
     
-    virtual void setWeights(const vector<float>& w){
-        cout << "setWeights not implemented for this node, " << m_id << "\n";
-    }
-    
     virtual bool readyToSend(){
         if(!settings->state) assert(0);
         settings->state->readyToSend(this);
@@ -68,15 +60,11 @@ public:
     virtual bool sendBackwardMsgs(vector<Message*>& msgs)=0;
     virtual bool sendForwardMsgs(vector<Message*>& msgs)=0;
     
-    virtual bool readyToSendForward(){
-        return (forwardSeenCount == incomingForwardEdges.size()); 
-    }
-    virtual bool readyToSendBackward(){
-        return (backwardSeenCount == incomingBackwardEdges.size());
-    }
+    virtual bool readyToSendForward(){}
+    virtual bool readyToSendBackward(){}
     
     float getOutput() const{ return output; }
 };
 
-#endif /* NEURAL_NODE_H */
+#endif /* BLOCK_NEURAL_NODE_H */
 

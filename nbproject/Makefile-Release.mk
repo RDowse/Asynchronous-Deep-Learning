@@ -49,6 +49,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/states/forward_train_state.o \
 	${OBJECTDIR}/src/states/predict_state.o \
 	${OBJECTDIR}/src/states/state.o \
+	${OBJECTDIR}/src/tools/clock.o \
 	${OBJECTDIR}/src/tools/dnn_graph.o \
 	${OBJECTDIR}/src/tools/logging.o \
 	${OBJECTDIR}/src/training/stochastic_momentum_training.o \
@@ -160,6 +161,11 @@ ${OBJECTDIR}/src/states/state.o: src/states/state.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/states
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/state.o src/states/state.cpp
+
+${OBJECTDIR}/src/tools/clock.o: src/tools/clock.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/tools
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/clock.o src/tools/clock.cpp
 
 ${OBJECTDIR}/src/tools/dnn_graph.o: src/tools/dnn_graph.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
@@ -389,6 +395,19 @@ ${OBJECTDIR}/src/states/state_nomain.o: ${OBJECTDIR}/src/states/state.o src/stat
 	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/state_nomain.o src/states/state.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/states/state.o ${OBJECTDIR}/src/states/state_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/tools/clock_nomain.o: ${OBJECTDIR}/src/tools/clock.o src/tools/clock.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/tools
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/tools/clock.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/clock_nomain.o src/tools/clock.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/tools/clock.o ${OBJECTDIR}/src/tools/clock_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/tools/dnn_graph_nomain.o: ${OBJECTDIR}/src/tools/dnn_graph.o src/tools/dnn_graph.cpp 
