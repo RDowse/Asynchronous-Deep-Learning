@@ -1,45 +1,57 @@
 
 /* 
- * File:   block_neural_node.h
+ * File:   neural_node.h
  * Author: ryan
  *
- * Created on 30 April 2017, 19:00
+ * Created on 01 May 2017, 20:22
  */
 
 #ifndef BLOCK_NEURAL_NODE_H
 #define BLOCK_NEURAL_NODE_H
 
+#include "nodes/node.h"
+#include "graphs/dnn_graph_settings.h"
+
+#include <Eigen/Dense>
 #include <memory>
 #include <cassert>
 
 using namespace std;
+using namespace Eigen;
 
-class BlockNeuralNode{
+class BlockNeuralNode: public Node{
 protected:
     shared_ptr<DNNGraphSettings> settings;
     
-    vector<int> ids; // collection of nodes represented by this node
+    int nNodes;
+    
+    // collection of nodes represented by this node
+    vector<int> ids;
     
     // sorted edges
-//    vector<Edge*> incomingForwardEdges;
-//    vector<Edge*> incomingBackwardEdges;
-//    vector<Edge*> outgoingBackwardEdges;
-//    vector<Edge*> outgoingForwardEdges;
-    
+    vector<Edge*> incomingForwardEdges;
+    vector<Edge*> incomingBackwardEdges;
+    vector<Edge*> outgoingBackwardEdges;
+    vector<Edge*> outgoingForwardEdges;
+        
     // seen counts
     int forwardSeenCount = 0;
     int backwardSeenCount = 0;
     
-    // node output/activation
-    float output = 0;
+    // node outputs/activations
+    VectorXf output;
 public:
-    NeuralNode(shared_ptr<GraphSettings> context): Node(context){        
+    
+    BlockNeuralNode(shared_ptr<GraphSettings> context): Node(context){        
         try{
             settings = std::static_pointer_cast<DNNGraphSettings>(context);
         } catch (const std::bad_cast& e) {
             std::cout << e.what() << "\n";
         }
     }
+    class InputNode;
+    class OutputNode;
+    class HiddenNode;
     
     virtual string getType()=0;
     
@@ -60,10 +72,12 @@ public:
     virtual bool sendBackwardMsgs(vector<Message*>& msgs)=0;
     virtual bool sendForwardMsgs(vector<Message*>& msgs)=0;
     
-    virtual bool readyToSendForward(){}
-    virtual bool readyToSendBackward(){}
-    
-    float getOutput() const{ return output; }
+    virtual bool readyToSendForward(){
+        return (forwardSeenCount == incomingForwardEdges.size()); 
+    }
+    virtual bool readyToSendBackward(){
+        return (backwardSeenCount == incomingBackwardEdges.size());
+    }
 };
 
 #endif /* BLOCK_NEURAL_NODE_H */

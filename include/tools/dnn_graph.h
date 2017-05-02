@@ -9,15 +9,13 @@
 #define DNN_GRAPH_H
 
 #include "graphs/dnn_graph_settings.h"
+#include "misc/edge.h"
 
 #include "nodes/node.h"
-#include "nodes/hidden_node.h"
-#include "nodes/input_node.h"
-#include "nodes/output_node.h"
 #include "nodes/bias_node.h"
 #include "nodes/sync_node.h"
 
-#include "misc/edge.h"
+//#include "nodes/block_nodes/block_input_node.h"
 
 #include <algorithm>
 #include <vector>
@@ -28,17 +26,24 @@
 
 using namespace std;
 
-class DNNGraph{
+template<typename TNode>
+class DNNGraphBuilder{
+    typedef typename TNode::InputNode InputNode;
+    typedef typename TNode::OutputNode OutputNode;
+    typedef typename TNode::HiddenNode HiddenNode;
+    
     vector<Node*> nodes;
     vector<Edge*> edges;
-    int nHLayers=0, nHidden=0, nInput=0, nOutput=0;
+    int nHLayers, nHidden, nInput, nOutput;
+    bool bias;
     int clusterCount = 0;
     float thickness = 0.2;
     
     // Map assigning colors to nodes for Graphviz
     static map<string,string> nodeColors;
+    
 public:    
-    DNNGraph(int nHLayers, int nHidden, int nInput, int nOutput)
+    DNNGraphBuilder(int nHLayers, int nHidden, int nInput, int nOutput, bool bias)
         :nHLayers(nHLayers),nHidden(nHidden),nInput(nInput),nOutput(nOutput)
     {
         auto settings = make_shared<DNNGraphSettings>();
@@ -62,11 +67,14 @@ public:
         
         // Hidden nodes
         for(int i = 0; i < nHLayers; ++i){
-            // Bias node
-            prev_layer.push_back(new BiasNode(settings));
-            edges.push_back(new Edge(prev_layer.back(),nodes[0],1));
-            edges.push_back(new Edge(nodes[0],prev_layer.back(),1));
             
+            if(bias){
+                // Bias node
+                prev_layer.push_back(new BiasNode(settings));
+                edges.push_back(new Edge(prev_layer.back(),nodes[0],1));
+                edges.push_back(new Edge(nodes[0],prev_layer.back(),1));
+            }
+                
             // Layer
             for(int j = 0; j < nHidden; ++j){
                 curr_layer.push_back(new HiddenNode(settings));    
@@ -91,11 +99,14 @@ public:
             swap(curr_layer,prev_layer);
             curr_layer.clear();
         }
-        // Bias node
-        prev_layer.push_back(new BiasNode(settings));
-        edges.push_back(new Edge(prev_layer.back(),nodes[0],1));
-        edges.push_back(new Edge(nodes[0],prev_layer.back(),1));
         
+        if(bias){
+            // Bias node
+            prev_layer.push_back(new BiasNode(settings));
+            edges.push_back(new Edge(prev_layer.back(),nodes[0],1));
+            edges.push_back(new Edge(nodes[0],prev_layer.back(),1));
+        }
+            
         // Output nodes
         for(int i = 0; i < nOutput; ++i){
             curr_layer.push_back(new OutputNode(settings));
@@ -127,7 +138,7 @@ public:
         }
     }
     
-    ~DNNGraph(){
+    ~DNNGraphBuilder(){
         for(auto it = nodes.begin(); it != nodes.end(); it++)
             delete (*it);
         nodes.clear();
@@ -235,6 +246,15 @@ private:
                                 e->dst->getType().c_str(),e->dst->getId(),thickness);
         }
     }
+};
+
+template <typename T> 
+map<string,string> DNNGraphBuilder<T>::nodeColors = {
+    std::pair<string,string>("Input","green2"),
+    std::pair<string,string>("Hidden","yellow2"),
+    std::pair<string,string>("Output","red2"),
+    std::pair<string,string>("Sync","grey2"),
+    std::pair<string,string>("Bias","blue2")
 };
 
 #endif /* DNN_GRAPH_H */

@@ -56,9 +56,9 @@ bool SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         // sampling strategy
         if(outgoingForwardEdges[i]->dst->getType() == "Input" 
                 && j < images[trainingIndices[sampleIndex]].size()){
-            msg->value = images[trainingIndices[sampleIndex]][j++];
+            msg->activation = images[trainingIndices[sampleIndex]][j++];
         } else if(outgoingForwardEdges[i]->dst->getType() == "Bias"){
-            msg->value = 0;
+            msg->activation = 0;
         } 
         msgs.push_back(msg);
     }
@@ -143,9 +143,9 @@ void SyncNode::onRecv(ForwardPropagationMessage* msg){
     
     int index = dstOutputIndex[msg->src];
     float target = (dataset->training_labels[trainingIndices[sampleIndex]] == index ? actMax : actMin);
-    training_error += 0.5*pow((target-msg->value),2);
+    training_error += 0.5*pow((target-msg->activation),2);
     
-    out[index] = msg->value;
+    out[index] = msg->activation;
     
     delete msg;
     

@@ -40,6 +40,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/messages/forward_propagation_message.o \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/bias_node.o \
+	${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o \
+	${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o \
+	${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o \
 	${OBJECTDIR}/src/nodes/hidden_node.o \
 	${OBJECTDIR}/src/nodes/input_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
@@ -116,6 +119,21 @@ ${OBJECTDIR}/src/nodes/bias_node.o: src/nodes/bias_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node.o src/nodes/bias_node.cpp
+
+${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o: src/nodes/block_nodes/block_hidden_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o src/nodes/block_nodes/block_hidden_node.cpp
+
+${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o: src/nodes/block_nodes/block_input_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o src/nodes/block_nodes/block_input_node.cpp
+
+${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o: src/nodes/block_nodes/block_output_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o src/nodes/block_nodes/block_output_node.cpp
 
 ${OBJECTDIR}/src/nodes/hidden_node.o: src/nodes/hidden_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
@@ -278,6 +296,45 @@ ${OBJECTDIR}/src/nodes/bias_node_nomain.o: ${OBJECTDIR}/src/nodes/bias_node.o sr
 	    $(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node_nomain.o src/nodes/bias_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/bias_node.o ${OBJECTDIR}/src/nodes/bias_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node_nomain.o: ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o src/nodes/block_nodes/block_hidden_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node_nomain.o src/nodes/block_nodes/block_hidden_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/block_nodes/block_input_node_nomain.o: ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o src/nodes/block_nodes/block_input_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_input_node_nomain.o src/nodes/block_nodes/block_input_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o ${OBJECTDIR}/src/nodes/block_nodes/block_input_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/block_nodes/block_output_node_nomain.o: ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o src/nodes/block_nodes/block_output_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Iinclude -Imnist/include -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_output_node_nomain.o src/nodes/block_nodes/block_output_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o ${OBJECTDIR}/src/nodes/block_nodes/block_output_node_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/nodes/hidden_node_nomain.o: ${OBJECTDIR}/src/nodes/hidden_node.o src/nodes/hidden_node.cpp 

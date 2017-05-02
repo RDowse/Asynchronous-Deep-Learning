@@ -18,7 +18,7 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = new ForwardPropagationMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->value = output*weights[0];
+        msg->activation = output*weights[0];
         msgs.push_back(msg);
     }
     

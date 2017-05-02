@@ -9,9 +9,7 @@
 #define INPUT_NODE_H
 
 #include "nodes/neural_node.h"
-#include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
-#include "graphs/dnn_graph_settings.h"
 #include "tools/logging.h"
 #include "tools/math.h"
 

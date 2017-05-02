@@ -8,7 +8,11 @@
       <itemPath>include/states/backward_train_state.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
       <itemPath>include/nodes/bias_node.h</itemPath>
-      <itemPath>include/nodes/block_neural_node.h</itemPath>
+      <itemPath>include/nodes/block_nodes/block_hidden_node.h</itemPath>
+      <itemPath>include/nodes/block_nodes/block_input_node.h</itemPath>
+      <itemPath>include/nodes/block_nodes/block_neural_node.h</itemPath>
+      <itemPath>include/nodes/block_nodes/block_node.h</itemPath>
+      <itemPath>include/nodes/block_nodes/block_output_node.h</itemPath>
       <itemPath>include/tools/clock.h</itemPath>
       <itemPath>include/misc/data_wrapper.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
@@ -44,6 +48,9 @@
       <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
       <itemPath>src/states/backward_train_state.cpp</itemPath>
       <itemPath>src/nodes/bias_node.cpp</itemPath>
+      <itemPath>src/nodes/block_nodes/block_hidden_node.cpp</itemPath>
+      <itemPath>src/nodes/block_nodes/block_input_node.cpp</itemPath>
+      <itemPath>src/nodes/block_nodes/block_output_node.cpp</itemPath>
       <itemPath>src/tools/clock.cpp</itemPath>
       <itemPath>src/tools/dnn_graph.cpp</itemPath>
       <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
@@ -167,7 +174,30 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/block_neural_node.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/block_nodes/block_hidden_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_input_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_neural_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -237,6 +267,21 @@
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_hidden_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_input_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -360,7 +405,30 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/block_neural_node.h" ex="false" tool="3" flavor2="0">
+      <item path="include/nodes/block_nodes/block_hidden_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_input_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_neural_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -430,6 +498,21 @@
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_hidden_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_input_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
       </item>

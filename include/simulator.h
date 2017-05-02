@@ -25,7 +25,7 @@
 #include "training/stochastic_training.h"
 #include "training/stochastic_momentum_training.h"
 
-#include "tbb/parallel_while.h"
+#include "tbb/parallel_for.h"
 
 #include "tools/clock.h"
 
@@ -110,8 +110,12 @@ private:
         }        
         Logging::log(2, "stepping nodes");
         for(unsigned i = 0; i < m_nodes.size(); i++){
-            active = step_node(i, m_nodes[i]) || active;
+            if(step_node(i, m_nodes[i])) active = true;
         }
+//        tbb::parallel_for(tbb::blocked_range<size_t>(0,m_nodes.size(),2000),[&](tbb::blocked_range<size_t>& r){
+//            for(int i = r.begin(); i != r.end(); ++i)
+//                if(step_node(i, m_nodes[i])) active = true;
+//        },tbb::auto_partitioner());
         return active;
     }
     

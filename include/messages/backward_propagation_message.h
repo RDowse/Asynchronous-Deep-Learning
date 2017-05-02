@@ -10,11 +10,19 @@
 
 #include "messages/message.h"
 
+#include <Eigen/Dense>
+
 class BackwardPropagationMessage: public Message
 {
 public:
+    // individual node values
     float delta = 0;
     float target = 0;
+    
+    // block node values
+    Eigen::MatrixXf matDelta;
+    Eigen::MatrixXf matTarget;
+    
     // send message to node
     bool dispatchTo(Node* handler) override;
 };

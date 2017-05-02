@@ -9,6 +9,9 @@
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"
 
+#include "nodes/block_nodes/block_neural_node.h"
+#include "nodes/block_nodes/block_input_node.h"
+
 #include "mnist/mnist_reader.hpp"
 
 #include <map>
@@ -103,14 +106,23 @@ void simulateMNIST(const string& path){
 }
 
 
-void buildGraph(string name, int nHidden, int nInput, int nOutput){
-    DNNGraph dnngraph(2,nHidden,nInput,nOutput);
-    stringstream ss1, ss2;
-    ss1 << "w/" << name << ".graph";
-    ss2 << "w/" << name << ".dot";
-    dnngraph.writeGraph(ss1.str());
-    dnngraph.writeGraphviz(ss2.str());
-}
+//void buildGraph(string name, int nHidden, int nInput, int nOutput){
+//    DNNGraphBuilder dnngraph(2,nHidden,nInput,nOutput);
+//    stringstream ss1, ss2;
+//    ss1 << "w/" << name << ".graph";
+//    ss2 << "w/" << name << ".dot";
+//    dnngraph.writeGraph(ss1.str());
+//    dnngraph.writeGraphviz(ss2.str());
+//}
+
+//void buildGraph(string name, int nHidden, int nInput, int nOutput){
+//    DNNGraphBuilder<BlockNode> graphBuilder(2,nHidden,nInput,nOutput,false);
+//    stringstream ss1, ss2;
+//    ss1 << "w/" << name << ".graph";
+//    ss2 << "w/" << name << ".dot";
+//    graphBuilder.writeGraph(ss1.str());
+//    graphBuilder.writeGraphviz(ss2.str());
+//}
 
 int main(int argc, char** argv) {
     // Get usage for the executable.
@@ -140,7 +152,9 @@ int main(int argc, char** argv) {
     //buildGraph("test",2,2,2);
     
     //simulateMNIST("w/net.graph");
-    simulate("w/xor.graph");
+    //simulate("w/xor.graph");
+    BlockNeuralNode* n = BlockNeuralNode::InputNode(make_shared<DNNGraphSettings>());
+   // BlockNeuralNode* n;
     
     return 0;
 }

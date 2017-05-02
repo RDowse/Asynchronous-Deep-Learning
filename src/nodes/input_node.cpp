@@ -53,7 +53,7 @@ bool InputNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = new ForwardPropagationMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->value = output*weights[i];
+        msg->activation = output*weights[i];
         msgs.push_back(msg);
     }
     
@@ -84,7 +84,7 @@ bool InputNode::sendBackwardMsgs(vector<Message*>& msgs){
 }
 
 void InputNode::onRecv(ForwardPropagationMessage* msg){
-    output = msg->value;
+    output = msg->activation;
     forwardSeenCount++;
     
     delete msg;

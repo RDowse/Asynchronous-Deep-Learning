@@ -10,10 +10,17 @@
 
 #include "messages/message.h"
 
+#include <Eigen/Dense>
+
 class ForwardPropagationMessage: public Message
 {
 public:
-    float value = 0;
+    // individual node value
+    float activation = 0;
+    
+    // block node value
+    Eigen::MatrixXf matActivation;
+    
     // send message to node
     bool dispatchTo(Node* handler) override;
 }; 
