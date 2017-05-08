@@ -8,6 +8,8 @@
 #ifndef MATH_H
 #define MATH_H
 
+#include <Eigen/Dense>
+
 #include <vector>
 #include <map>
 #include <cmath>
@@ -53,6 +55,15 @@ namespace math{
         float r = sqrt(6.0/(float(nFanOut)+float(nFanIn)));
         for(int i = 0; i < weights.size(); ++i)
             weights[i] = randomFloat(-r, r);
+    }
+    
+    inline void initBlockWeights(Eigen::MatrixXf& weights, int nFanIn, int nFanOut){
+        float r = sqrt(6.0/(float(nFanOut)+float(nFanIn)));
+        for(int col = 0; col < weights.cols(); ++col){
+            for(int row = 0; row < weights.rows(); ++row){
+                weights(row,col) = randomFloat(-r, r);
+            }
+        }
     }
 
     template<typename T>

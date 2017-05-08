@@ -10,9 +10,11 @@
       <itemPath>include/nodes/bias_node.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_hidden_node.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_input_node.h</itemPath>
+      <itemPath>include/graphs/block_neural_network_settings.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_neural_node.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_node.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_output_node.h</itemPath>
+      <itemPath>include/nodes/block_nodes/block_sync_node.h</itemPath>
       <itemPath>include/tools/clock.h</itemPath>
       <itemPath>include/misc/data_wrapper.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
@@ -51,6 +53,7 @@
       <itemPath>src/nodes/block_nodes/block_hidden_node.cpp</itemPath>
       <itemPath>src/nodes/block_nodes/block_input_node.cpp</itemPath>
       <itemPath>src/nodes/block_nodes/block_output_node.cpp</itemPath>
+      <itemPath>src/nodes/block_nodes/block_sync_node.cpp</itemPath>
       <itemPath>src/tools/clock.cpp</itemPath>
       <itemPath>src/tools/dnn_graph.cpp</itemPath>
       <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
@@ -149,6 +152,11 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="include/graphs/block_neural_network_settings.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="include/graphs/dnn_graph_settings.h"
             ex="false"
             tool="3"
@@ -195,6 +203,11 @@
             flavor2="0">
       </item>
       <item path="include/nodes/block_nodes/block_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_sync_node.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -279,6 +292,11 @@
             flavor2="0">
       </item>
       <item path="src/nodes/block_nodes/block_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_sync_node.cpp"
             ex="false"
             tool="1"
             flavor2="0">
@@ -380,6 +398,11 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="include/graphs/block_neural_network_settings.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="include/graphs/dnn_graph_settings.h"
             ex="false"
             tool="3"
@@ -426,6 +449,11 @@
             flavor2="0">
       </item>
       <item path="include/nodes/block_nodes/block_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/block_nodes/block_sync_node.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -510,6 +538,11 @@
             flavor2="0">
       </item>
       <item path="src/nodes/block_nodes/block_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/block_nodes/block_sync_node.cpp"
             ex="false"
             tool="1"
             flavor2="0">

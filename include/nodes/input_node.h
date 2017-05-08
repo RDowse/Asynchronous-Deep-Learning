@@ -25,7 +25,7 @@
 
 using namespace std;
 
-class InputNode: public NeuralNode{
+class NeuralNode::InputNode: public NeuralNode{
     static NodeRegister<InputNode> m_reg;
     static std::string m_type;
     

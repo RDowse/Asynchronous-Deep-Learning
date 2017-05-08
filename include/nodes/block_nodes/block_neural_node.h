@@ -10,7 +10,7 @@
 #define BLOCK_NEURAL_NODE_H
 
 #include "nodes/node.h"
-#include "graphs/dnn_graph_settings.h"
+#include "graphs/block_neural_network_settings.h"
 
 #include <Eigen/Dense>
 #include <memory>
@@ -20,13 +20,17 @@ using namespace std;
 using namespace Eigen;
 
 class BlockNeuralNode: public Node{
+public:
+    class InputNode;
+    class OutputNode;
+    class HiddenNode;
+    class SyncNode;
 protected:
-    shared_ptr<DNNGraphSettings> settings;
+    shared_ptr<BlockNeuralNetworkSettings> settings;
     
-    int nNodes;
-    
-    // collection of nodes represented by this node
-    vector<int> ids;
+    // Are these useful??
+    // int nNodes; 
+    int layer;
     
     // sorted edges
     vector<Edge*> incomingForwardEdges;
@@ -39,19 +43,16 @@ protected:
     int backwardSeenCount = 0;
     
     // node outputs/activations
-    VectorXf output;
+    MatrixXf output;
 public:
     
     BlockNeuralNode(shared_ptr<GraphSettings> context): Node(context){        
         try{
-            settings = std::static_pointer_cast<DNNGraphSettings>(context);
+            settings = std::static_pointer_cast<BlockNeuralNetworkSettings>(context);
         } catch (const std::bad_cast& e) {
             std::cout << e.what() << "\n";
         }
     }
-    class InputNode;
-    class OutputNode;
-    class HiddenNode;
     
     virtual string getType()=0;
     

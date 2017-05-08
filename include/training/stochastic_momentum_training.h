@@ -10,7 +10,6 @@
 #define STOCHASTIC_MOMENTUM_TRAINING_H
 
 #include "training/training_strategy.h"
-#include "graphs/dnn_graph_settings.h"
 
 #include <cassert>
 

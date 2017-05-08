@@ -28,7 +28,9 @@ class BlockNeuralNode::InputNode : public BlockNeuralNode{
     Eigen::MatrixXf newWeights;       // intermediate updated weights
     Eigen::MatrixXf weights;
 public:
-    InputNode(shared_ptr<GraphSettings> graphSettings): BlockNeuralNode(graphSettings){}
+    InputNode(shared_ptr<GraphSettings> graphSettings): BlockNeuralNode(graphSettings){
+        layer = 0;
+    }
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}
 
@@ -42,7 +44,18 @@ public:
 private:
     // for populating weights map
     int map_index = 0;
-    void initWeights(){}    
+    void initWeights(){
+        int inputBlockSize = settings->blockTopology[layer].front();
+        int nextLayerSize = settings->netTopology[layer+1];
+        weights = MatrixXf::Zero(inputBlockSize,nextLayerSize);
+        settings->initWeightsFnc(weights,1,nextLayerSize);
+        newWeights = weights;
+    }
+    void initOutput(){
+        int inputBlockSize = settings->blockTopology[layer].front();
+        int batchSize = settings->miniBatchSize;
+        output = MatrixXf(inputBlockSize,batchSize);
+    }
 };
 
 #endif /* BLOCK_INPUT_NODE_H */

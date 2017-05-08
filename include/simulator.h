@@ -40,11 +40,14 @@
 
 using namespace std;
 
+template<typename TNode>
 class Simulator{
 private:
     friend class Loader;
     
-    shared_ptr<DNNGraphSettings> m_settings; 
+    typedef typename TNode::SyncNode SyncNode;
+    
+    shared_ptr<GraphSettings> m_settings; 
     vector<Edge*> m_edges;
     vector<Node*> m_nodes;
     multimap<string, Node*> m_node_map;
@@ -147,7 +150,7 @@ public:
         m_edges.clear();
     }
         
-    void setGraphSettings(shared_ptr<DNNGraphSettings> settings){
+    void setGraphSettings(shared_ptr<GraphSettings> settings){
         m_settings = settings;
     }
         
@@ -165,7 +168,7 @@ public:
     
     void loadInput(DataWrapper* dataset){
         Logging::log(2, "loading input");
-        auto ii = m_node_map.equal_range("Sync");
+        auto ii = m_node_map.equal_range(SyncNode::m_type);
         int i = 0;
         for(auto it = ii.first; it != ii.second; ++it){
              auto node = dynamic_cast<SyncNode*>(it->second);
@@ -175,13 +178,14 @@ public:
     
     void run(const string& command){
         Logging::log(1, "begin run");
-        
-        m_settings->trainingStrategy = new StochasticMomentumTraining();
         bool active=true;
+        
         if("predict"==command){
             m_settings->state = new PredictState();
         } else if("train"== command){
             m_settings->state = new ForwardTrainState();
+        } else {
+            assert(0);
         }
         
         while(active){

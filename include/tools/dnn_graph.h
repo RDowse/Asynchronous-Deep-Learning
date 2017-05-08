@@ -14,15 +14,34 @@
 #include "nodes/node.h"
 #include "nodes/bias_node.h"
 #include "nodes/sync_node.h"
+#include "nodes/input_node.h"
+#include "nodes/output_node.h"
+#include "nodes/hidden_node.h"
 
-//#include "nodes/block_nodes/block_input_node.h"
+#include "nodes/block_nodes/block_input_node.h"
+#include "nodes/block_nodes/block_hidden_node.h"
+#include "nodes/block_nodes/block_output_node.h"
+#include "nodes/block_nodes/block_sync_node.h"
 
 #include <algorithm>
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 #include <stdio.h>
+
+// set number of processors on machine
+#if defined(_WIN32) || defined(_WIN64)
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    #define N_CPU sysinfo.dwNumberOfProcessors
+#elif defined(__linux__)
+    #define N_CPU sysconf(_SC_NPROCESSORS_ONLN)
+#else
+    #define N_CPU -1
+    #error Unknown environment!
+#endif
 
 using namespace std;
 
@@ -31,21 +50,108 @@ class DNNGraphBuilder{
     typedef typename TNode::InputNode InputNode;
     typedef typename TNode::OutputNode OutputNode;
     typedef typename TNode::HiddenNode HiddenNode;
+    typedef typename TNode::SyncNode SyncNode;
     
     vector<Node*> nodes;
     vector<Edge*> edges;
+    int paramCount = 4;
     int nHLayers, nHidden, nInput, nOutput;
     bool bias;
     int clusterCount = 0;
-    float thickness = 0.2;
+    float thickness = 0.2;  
     
+    // hack
+    int actNHidden, actNInput, actNOutput; 
+    bool block;
+
     // Map assigning colors to nodes for Graphviz
     static map<string,string> nodeColors;
-    
 public:    
-    DNNGraphBuilder(int nHLayers, int nHidden, int nInput, int nOutput, bool bias)
-        :nHLayers(nHLayers),nHidden(nHidden),nInput(nInput),nOutput(nOutput)
-    {
+    DNNGraphBuilder(int _nHLayers, int _nHidden, int _nInput, int _nOutput, bool _bias, int _nCPU);
+        
+    ~DNNGraphBuilder(){
+        for(auto it = nodes.begin(); it != nodes.end(); it++)
+            delete (*it);
+        nodes.clear();
+        for(auto it = edges.begin(); it != edges.end(); it++)
+            delete (*it);
+        edges.clear();
+    }
+    
+    void writeGraph(const string& path){
+        ofstream file;
+        file.open(path);
+        if(file.is_open()){
+            file<<"POETSGraph\n";
+            file<<type()<<"\n";      // Node type used
+            file<<"BeginHeader\n";
+            writeParams(file);      // Specialised for the node type
+            file<<nodes.size()<<" "<<edges.size()<<"\n";
+            file<<"EndHeader\n";   
+            
+            file<<"BeginNodes\n";
+            for(auto n: nodes)
+                file<<n->getType()<<" "<<n->getId()<<"\n";
+            file<<"EndNodes\n";
+            
+            file<<"BeginEdges\n";
+            for(auto e: edges)
+                file<<e->src->getId()<<" "<<e->dst->getId()<<" "<<e->getDelay()<<"\n";
+            file<<"EndEdges\n";
+        } else {
+            std::cout<< "Error opening file: %s" << path;
+        }
+        file.close();
+    }
+ 
+    void writeGraphviz(const string& path){
+        FILE* file;
+        file = fopen(path.c_str(),"w");
+        if(file){
+            int index = 0;
+            fprintf(file,"digraph G {\n");
+            fprintf(file,"rankdir=LR\n");
+            fprintf(file,"splines=line\n");
+            fprintf(file,"node [fixedsize=true, label=\"\"];\n");
+            
+            // Input sync node
+            printGraphvizCluster(file,0,
+                    1,nodes[0]->getType());
+            index++;
+            
+            // Input nodes
+            if(bias) index += nInput+1;
+            else index += nInput;
+            printGraphvizCluster(file,1,
+                    index,nodes[1]->getType());
+            
+            // Hidden nodes
+            for(int i = 0; i < nHLayers; ++i){
+                int prev_index = index;
+                if(bias) index += nHidden+1;
+                else index += nHidden;
+                printGraphvizCluster(file,prev_index,
+                        index,nodes[index]->getType());
+            }
+            
+            // Output nodes
+            printGraphvizCluster(file,index,
+                    index+nOutput,nodes[index]->getType());
+            index+=nOutput;
+            
+            fprintf(file,"\n");
+            printGraphvizConnections(file);
+            fprintf(file,"}");
+        } else {
+            std::cout<< "Error opening file: %s" << path;
+        }
+        fclose(file);
+    }
+ 
+private:
+    string type();
+    void writeParams(ofstream& file);
+    void init(){
         auto settings = make_shared<DNNGraphSettings>();
         
         vector<Node*> prev_layer;
@@ -138,87 +244,6 @@ public:
         }
     }
     
-    ~DNNGraphBuilder(){
-        for(auto it = nodes.begin(); it != nodes.end(); it++)
-            delete (*it);
-        nodes.clear();
-        for(auto it = edges.begin(); it != edges.end(); it++)
-            delete (*it);
-        edges.clear();
-    }
-    
-    void writeGraph(const string& path){
-        ofstream file;
-        file.open(path);
-        if(file.is_open()){
-            file<<"POETSGraph\n";
-            file<<"DNN"<<"\n";      // TYPE
-            
-            file<<"BeginHeader\n";
-            file<<"0"<<"\n";        // PARAMETER COUNT
-            file<<"NULL"<<"\n";     // PARAMETERS
-            file<<nodes.size()<<" "<<edges.size()<<"\n";
-            file<<"EndHeader\n";   
-            
-            file<<"BeginNodes\n";
-            for(auto n: nodes){
-                file<<n->getType()<<" "<<n->getId()<<"\n";
-            }
-            file<<"EndNodes\n";
-            
-            file<<"BeginEdges\n";
-            for(auto e: edges){
-            file<<e->src->getId()<<" "<<e->dst->getId()<<" "<<e->getDelay()<<"\n";
-            }
-            file<<"EndEdges\n";
-        } else {
-            std::cout<< "Error opening file: %s" << path;
-        }
-        file.close();
-    }
- 
-    void writeGraphviz(const string& path){
-        FILE* file;
-        file = fopen(path.c_str(),"w");
-        if(file){
-            int index = 0;
-            fprintf(file,"digraph G {\n");
-            fprintf(file,"rankdir=LR\n");
-            fprintf(file,"splines=line\n");
-            fprintf(file,"node [fixedsize=true, label=\"\"];\n");
-            
-            // Input sync node
-            printGraphvizCluster(file,0,
-                    1,nodes[0]->getType());
-            index++;
-            
-            // Input nodes
-            index += nInput+1;
-            printGraphvizCluster(file,1,
-                    index,nodes[1]->getType());
-            
-            // Hidden nodes
-            for(int i = 0; i < nHLayers; ++i){
-                printGraphvizCluster(file,index+i*(nHidden+1),
-                        index+(nHidden+1),nodes[index]->getType());
-                index += nHidden+1;
-            }
-            
-            // Output nodes
-            printGraphvizCluster(file,index,
-                    index+nOutput,nodes[index]->getType());
-            index+=nOutput;
-            
-            fprintf(file,"\n");
-            printGraphvizConnections(file);
-            fprintf(file,"}");
-        } else {
-            std::cout<< "Error opening file: %s" << path;
-        }
-        fclose(file);
-    }
- 
-private:
     void printGraphvizCluster(FILE* file, int start, int end, string prefix){
         fprintf(file,"subgraph cluster_%d{\n",clusterCount++);
         fprintf(file,"    color=%s\n","white");
@@ -254,7 +279,10 @@ map<string,string> DNNGraphBuilder<T>::nodeColors = {
     std::pair<string,string>("Hidden","yellow2"),
     std::pair<string,string>("Output","red2"),
     std::pair<string,string>("Sync","grey2"),
-    std::pair<string,string>("Bias","blue2")
+    std::pair<string,string>("Bias","blue2"),
+    std::pair<string,string>("BlockInput","green2"),
+    std::pair<string,string>("BlockHidden","yellow2"),
+    std::pair<string,string>("BlockOutput","red2"),
 };
 
 #endif /* DNN_GRAPH_H */

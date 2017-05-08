@@ -5,10 +5,10 @@
 #include "messages/backward_propagation_message.h"
 #include "tools/math.h"
 
-std::string OutputNode::m_type = "Output";
-NodeRegister<OutputNode> OutputNode::m_reg(OutputNode::m_type);
+std::string NeuralNode::OutputNode::m_type = "Output";
+NodeRegister<NeuralNode::OutputNode> NeuralNode::OutputNode::m_reg(NeuralNode::OutputNode::m_type);
 
-void OutputNode::addEdge(Edge* e) {
+void NeuralNode::OutputNode::addEdge(Edge* e) {
     // add to original edge sets
     Node::addEdge(e);
     // check edge belongs to this node
@@ -37,7 +37,7 @@ void OutputNode::addEdge(Edge* e) {
     } 
 }
 
-bool OutputNode::sendForwardMsgs(vector<Message*>& msgs){
+bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     // calulate output activation
@@ -56,14 +56,12 @@ bool OutputNode::sendForwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    //send(msgs,outgoingForwardEdges);
-    
     // reset state
     value = 0;
     forwardSeenCount = 0;
 }
 
-bool OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());   
     
     Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
@@ -78,19 +76,17 @@ bool OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    //send(msgs,outgoingBackwardEdges);
-    
     backwardSeenCount = 0;
 }
 
-void OutputNode::onRecv(ForwardPropagationMessage* msg) {
+void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
     value += msg->activation;
     forwardSeenCount++;
     
     delete msg;
 }
 
-void OutputNode::onRecv(BackwardPropagationMessage* msg) {
+void NeuralNode::OutputNode::onRecv(BackwardPropagationMessage* msg) {
     target = msg->target;
     backwardSeenCount++;
     

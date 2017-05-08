@@ -3,10 +3,10 @@
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 
-std::string HiddenNode::m_type = "Hidden";
-NodeRegister<HiddenNode> HiddenNode::m_reg(HiddenNode::m_type);
+std::string NeuralNode::HiddenNode::m_type = "Hidden";
+NodeRegister<NeuralNode::HiddenNode> NeuralNode::HiddenNode::m_reg(NeuralNode::HiddenNode::m_type);
 
-void HiddenNode::addEdge(Edge* e) {
+void NeuralNode::HiddenNode::addEdge(Edge* e) {
     // add to original edge sets
     Node::addEdge(e);
     if(e->src->getId() == m_id){
@@ -25,7 +25,7 @@ void HiddenNode::addEdge(Edge* e) {
     }
 }
 
-bool HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
+bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     assert(readyToSendForward());
     
     if(weights.empty()) initWeights();
@@ -51,7 +51,7 @@ bool HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     forwardSeenCount = 0;
 }
 
-bool HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
 
     // perform weight update
@@ -82,7 +82,7 @@ bool HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     backwardSeenCount = 0;
 }
 
-void HiddenNode::onRecv(ForwardPropagationMessage* msg) {
+void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     value += msg->activation;
     forwardSeenCount++;
     
@@ -93,7 +93,7 @@ void HiddenNode::onRecv(ForwardPropagationMessage* msg) {
         weights = newWeights;
 }
 
-void HiddenNode::onRecv(BackwardPropagationMessage* msg) {
+void NeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
     int index = dstWeightIndex[msg->src];
     deltas[index] = msg->delta;
     backwardSeenCount++;

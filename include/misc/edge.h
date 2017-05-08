@@ -8,8 +8,6 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include <memory>
-
 using namespace std;
 
 class Message;

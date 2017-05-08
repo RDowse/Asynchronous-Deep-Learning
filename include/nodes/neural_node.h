@@ -21,6 +21,11 @@ class ForwardPropagationMessage;
 class BackwardPropagationMessage;
 
 class NeuralNode: public Node{
+public:
+    class InputNode;
+    class HiddenNode;
+    class OutputNode;
+    class SyncNode;
 protected:
     shared_ptr<DNNGraphSettings> settings;
     

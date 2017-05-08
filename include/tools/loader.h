@@ -10,7 +10,7 @@
 
 #include "simulator.h"
 #include "misc/node_factory.h"
-#include "graphs/dnn_graph_settings.h"
+#include "graphs/graph_settings.h"
 #include "tools/logging.h"
 
 #include "nodes/node.h"
@@ -44,7 +44,7 @@ public:
         return NULL;
     }
     
-    static void readHeader(int& lineNumber, ifstream& src,
+    static void readHeader(int& lineNumber, ifstream& src, shared_ptr<GraphSettings> settings,
                             int& nNodes, int& nEdges){
         if(src.is_open()){
             std::stringstream err;
@@ -57,28 +57,32 @@ public:
             }
 
             // Parameters, package depending on graph type
+            vector<int> params;
             stringstream ss(nextline(lineNumber,src));
             for(int i = 0; i < paramCount; ++i){
-                //todo
+                int tmpParam;
+                ss >> tmpParam;
+                params.push_back(tmpParam);
             }
+            settings->setParameters(params);
 
             // Node and edge count
             if(!(stringstream(nextline(lineNumber,src))>>nNodes>>nEdges)){
                 err<<"At line "<<lineNumber<<" : Couldn't read nNodes, nEdges";
                 throw std::runtime_error(err.str());              
-            }        
+            }
 
-            expect(lineNumber,src,"EndHeader");    
+            expect(lineNumber,src,"EndHeader");
         } else {
             printf("No file open\n");
         }
     } 
     
-    static void readBody(int& lineNumber, std::ifstream &src, Simulator& sim,
+    template<typename TNode>
+    static void readBody(int& lineNumber, std::ifstream &src, shared_ptr<GraphSettings> settings, Simulator<TNode>& sim,
                             int nNodes, int nEdges){
         if(src.is_open()){
             std::stringstream err;
-            auto settings =  make_shared<DNNGraphSettings>();
             sim.setGraphSettings(settings);
             
             expect(lineNumber,src,"BeginNodes");

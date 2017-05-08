@@ -11,8 +11,12 @@
 #include "states/state.h"
 
 class PredictState: public State{
+    public:
     void onSend(NeuralNode* n, vector<Message*>& msgs) override;
     bool readyToSend(NeuralNode* n) override;
+        
+    void onSend(BlockNeuralNode* n, vector<Message*>& msgs) override;
+    bool readyToSend(BlockNeuralNode* n) override;
 };
 
 #endif /* PREDICT_STATE_H */

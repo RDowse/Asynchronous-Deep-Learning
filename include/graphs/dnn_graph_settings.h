@@ -10,13 +10,14 @@
 
 #include "graphs/graph_settings.h"
 #include "training/training_strategy.h"
-#include "states/state.h"
+#include "training/stochastic_momentum_training.h"
 
 // Note: context design pattern, maintains and shared information for the system 
 class DNNGraphSettings: public GraphSettings{
 public:
+    
     // Training method
-    TrainingStrategy* trainingStrategy; // = NULL;
+    TrainingStrategy* trainingStrategy;
     
     // Training param
     float lr = 0.1;            // learning rate
@@ -24,33 +25,28 @@ public:
     int sample = 0;             // selected sample for predicting
     int maxEpoch = 100000;           // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
-    //int batchSize = 90;         // batch size TODO: add after basic backprop complete
-    
-    // SampleFunc
-    // SampleParam
-    
+    int miniBatchSize = 1;
     // Weight initialisation
-    void (*initWeightsFnc)(vector<float>& ,int ,int) = NULL;
+    void (*initWeightsFnc)(vector<float>& ,int ,int);
     
     // Activation function
-    float (*activationFnc)(float) = NULL;
+    float (*activationFnc)(float);
     
     // Differentiated Activation function
-    float (*deltaActivationFnc)(float) = NULL;
-    
-    // Current network state
-    State* state = NULL;
+    float (*deltaActivationFnc)(float);
     
     // Flags
     bool update = false;        // flag for updating weight. TODO: update with msgs
     
     DNNGraphSettings(){
-//        activationFnc = &math::activationTan;
-//        deltaActivationFnc = &math::deltaActivationTan;
+        trainingStrategy = new StochasticMomentumTraining();
         activationFnc = &math::activationSig;
-        //activationFnc = &math::activationFastSig;
         deltaActivationFnc = &math::deltaActivationSig;
         initWeightsFnc = &math::initWeights;
+    }
+    
+    void setParameters(vector<int>& params) override {
+
     }
 };
 

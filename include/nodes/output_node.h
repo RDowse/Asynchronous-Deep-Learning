@@ -23,7 +23,7 @@
 
 using namespace std;
 
-class OutputNode: public NeuralNode{
+class NeuralNode::OutputNode: public NeuralNode{
     static NodeRegister<OutputNode> m_reg;
     static std::string m_type;
     

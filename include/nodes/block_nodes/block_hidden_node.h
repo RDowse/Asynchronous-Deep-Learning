@@ -17,8 +17,8 @@
 
 #include <Eigen/Dense>
 
-class BlockNode::HiddenNode: public BlockNeuralNode{
-    static NodeRegister<BlockNode::HiddenNode> m_reg;
+class BlockNeuralNode::HiddenNode: public BlockNeuralNode{
+    static NodeRegister<BlockNeuralNode::HiddenNode> m_reg;
     static std::string m_type;
     
     map<int,int> dstWeightIndex;        // map backprop index to the relevant weight
@@ -31,9 +31,11 @@ class BlockNode::HiddenNode: public BlockNeuralNode{
     float value = 0;
     float error = 0;
 public:
-    HiddenNode(shared_ptr<GraphSettings> context): BlockNode::NeuralNode(context){}
+    HiddenNode(shared_ptr<GraphSettings> context): BlockNeuralNode(context){
+        layer = 1;
+    }
     virtual ~HiddenNode(){}
-    string getType() override {return BlockNode::HiddenNode::m_type;}
+    string getType() override {return BlockNeuralNode::HiddenNode::m_type;}
     
     void addEdge(Edge* e) override;
 
@@ -45,7 +47,19 @@ public:
 private:
     // for populating weights map
     int map_index = 0;
-    void initWeights(){}
+    void initWeights(){
+        // TODO add bias node
+        int blockSize = settings->blockTopology[layer].front();
+        int nextLayerSize = settings->netTopology[layer+1];
+        weights = MatrixXf::Zero(blockSize,nextLayerSize);
+        settings->initWeightsFnc(weights,1,nextLayerSize);
+        newWeights = weights;
+    }
+    void initOutput(){
+        int blockSize = settings->blockTopology[layer].front();
+        int batchSize = settings->miniBatchSize;
+        output = MatrixXf(blockSize,batchSize);
+    }
 };
 
 

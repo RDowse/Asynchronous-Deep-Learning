@@ -1,21 +1,23 @@
+
 /* 
- * File:   sync_node.h
+ * File:   block_sync_node.h
  * Author: ryan
  *
- * Created on 13 April 2017, 00:47
+ * Created on 03 May 2017, 23:36
  */
 
-#ifndef SYNC_NODE_H
-#define SYNC_NODE_H
+#ifndef BLOCK_SYNC_NODE_H
+#define BLOCK_SYNC_NODE_H
 
-#include "nodes/neural_node.h"
+#include "nodes/block_nodes/block_neural_node.h"
 #include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
 
 #include "misc/data_wrapper.h"
 
-#include <stack>
+#include <Eigen/Dense>
+
 #include <string>
 #include <cassert>
 #include <cstdio>
@@ -26,10 +28,13 @@
 
 using namespace std;
 
-class NeuralNode::SyncNode: public NeuralNode{
+class BlockNeuralNode::SyncNode: public BlockNeuralNode{
     static NodeRegister<SyncNode> m_reg;
     
     DataWrapper* dataset;
+    
+    int nInput;                 // number of input nodes
+    int nOutput;                // number of output nodes
     
     bool tick = true;           // trigger initial message propagation
     bool validating = false;    // flag for propagating validation set
@@ -43,7 +48,6 @@ class NeuralNode::SyncNode: public NeuralNode{
     vector<int> trainingIndices;
     
     map<int,int> dstOutputIndex;        // map backprop index to output
-    vector<float> out;
     
     float actMax = settings->activationFnc(10);
     float actMin = settings->activationFnc(-10);
@@ -51,17 +55,18 @@ class NeuralNode::SyncNode: public NeuralNode{
     float training_error = 0;
 public:
     static std::string m_type;
-    SyncNode(shared_ptr<GraphSettings> settings): NeuralNode(settings){}
+    SyncNode(shared_ptr<GraphSettings> settings): BlockNeuralNode(settings){}
     virtual ~SyncNode(){}
     
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;
-        trainingIndices.reserve(dataset->training_images.rows());
-        for(int i = 0; i < dataset->training_images.rows(); ++i)
+        
+        for(int i = 0; i < dataset->training_images.size(); ++i)
             trainingIndices.push_back(i);
-        min_error = vector<float>(dataset->training_images.rows(),std::numeric_limits<float>::max());
-        error = vector<float>(dataset->training_images.rows(),std::numeric_limits<float>::max());
+        
+        min_error = vector<float>(dataset->training_images.size(),std::numeric_limits<float>::max());
+        error = vector<float>(dataset->training_images.size(),std::numeric_limits<float>::max());
     }
     void addEdge(Edge* e) override;    
     
@@ -76,6 +81,13 @@ public:
     
 private:
     int map_index = 0;
+    void initOutput(){
+        int blockSize = settings->netTopology.back();
+        int batchSize = settings->miniBatchSize;
+        output = MatrixXf(blockSize,batchSize);
+    }
 };
 
-#endif /* SYNC_NODE_H */
+
+#endif /* BLOCK_SYNC_NODE_H */
+

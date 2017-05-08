@@ -25,7 +25,9 @@ class BlockNeuralNode::OutputNode: public BlockNeuralNode{
     Eigen::MatrixXf target;
     Eigen::MatrixXf value;
 public:
-    OutputNode(shared_ptr<GraphSettings> context): BlockNeuralNode(context){}
+    OutputNode(shared_ptr<GraphSettings> context): BlockNeuralNode(context){
+        layer = 2; // TODO correct so multiple layers can be added
+    }
     virtual ~OutputNode(){}
     string getType() override{return OutputNode::m_type;}
     
@@ -36,6 +38,17 @@ public:
     
     bool sendForwardMsgs(vector<Message*>& msgs) override;
     bool sendBackwardMsgs(vector<Message*>& msgs) override;
+private:
+    void initOutput(){
+        int blockSize = settings->blockTopology[layer].front();
+        int batchSize = settings->miniBatchSize;
+        output = MatrixXf(blockSize,batchSize);
+    }
+    void initTarget(){
+        int blockSize = settings->blockTopology[layer].front();
+        int batchSize = settings->miniBatchSize;
+        target = MatrixXf(blockSize,batchSize);
+    }
 };
 
 

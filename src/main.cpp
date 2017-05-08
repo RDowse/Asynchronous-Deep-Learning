@@ -6,11 +6,11 @@
  */
 #include "misc/data_wrapper.h"
 
+#include "nodes/neural_node.h"
+#include "nodes/block_nodes/block_neural_node.h"
+
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"
-
-#include "nodes/block_nodes/block_neural_node.h"
-#include "nodes/block_nodes/block_input_node.h"
 
 #include "mnist/mnist_reader.hpp"
 
@@ -43,18 +43,13 @@ void registerFlags(std::map<std::string, FlagFunction>& func_map){
 }
 
 void printData(const DataWrapper& data){
-    for(auto a: data.training_images){
-        for(auto i: a){
-            cout << i;
-        }
-        cout << "\n";
-    }
-    cout << "\n";        
-    for(auto i: data.training_labels){
-        cout << i << "\n";
-    }
+    cout << "Images: " << endl;
+    cout << data.training_images << "\n";
+    cout << "Labels: " << endl;
+    cout << data.training_labels << "\n";
 }
 
+template<typename TNode>
 void simulate(const string& path){
     printf("Starting sim...\n");
     Logging::m_logLevel = 5;
@@ -64,9 +59,11 @@ void simulate(const string& path){
     if(file.is_open()){
         int lineNumber = 0, nNodes = 0, nEdges = 0;
         string type = Loader::readType(lineNumber,file);
-        Loader::readHeader(lineNumber,file,nNodes,nEdges);
-        Simulator sim(1,nNodes,nEdges,*stats);
-        Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
+//        /auto settings = make_shared<DNNGraphSettings>();
+        auto settings = make_shared<BlockNeuralNetworkSettings>();
+        Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
+        Simulator<TNode> sim(1,nNodes,nEdges,*stats);
+        Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
         printf("Loading data\n");
@@ -80,6 +77,7 @@ void simulate(const string& path){
     file.close();
 }
 
+template<typename TNode>
 void simulateMNIST(const string& path){
     printf("Starting sim...\n");
     Logging::m_logLevel = 5;
@@ -88,10 +86,12 @@ void simulateMNIST(const string& path){
     file.open(path);
     if(file.is_open()){
         int lineNumber = 0, nNodes = 0, nEdges = 0;
-        string type = Loader::readType(lineNumber,file);
-        Loader::readHeader(lineNumber,file,nNodes,nEdges);
-        Simulator sim(1,nNodes,nEdges,*stats);
-        Loader::readBody(lineNumber,file,sim,nNodes,nEdges);
+        string type = Loader::readType(lineNumber,file); // template blockneuralnode or neuralnode
+        //auto settings = make_shared<DNNGraphSettings>();
+        auto settings = make_shared<BlockNeuralNetworkSettings>();
+        Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
+        Simulator<TNode> sim(1,nNodes,nEdges,*stats);
+        Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
         printf("Loading data\n");
@@ -105,24 +105,15 @@ void simulateMNIST(const string& path){
     file.close();
 }
 
-
-//void buildGraph(string name, int nHidden, int nInput, int nOutput){
-//    DNNGraphBuilder dnngraph(2,nHidden,nInput,nOutput);
-//    stringstream ss1, ss2;
-//    ss1 << "w/" << name << ".graph";
-//    ss2 << "w/" << name << ".dot";
-//    dnngraph.writeGraph(ss1.str());
-//    dnngraph.writeGraphviz(ss2.str());
-//}
-
-//void buildGraph(string name, int nHidden, int nInput, int nOutput){
-//    DNNGraphBuilder<BlockNode> graphBuilder(2,nHidden,nInput,nOutput,false);
-//    stringstream ss1, ss2;
-//    ss1 << "w/" << name << ".graph";
-//    ss2 << "w/" << name << ".dot";
-//    graphBuilder.writeGraph(ss1.str());
-//    graphBuilder.writeGraphviz(ss2.str());
-//}
+template<typename T>
+void buildGraph(string name, int nHidden, int nInput, int nOutput, bool bias, int nCPU){
+    DNNGraphBuilder<T> dnngraph(1,nHidden,nInput,nOutput,bias,nCPU);
+    stringstream ss1, ss2;
+    ss1 << "w/" << name << ".graph";
+    ss2 << "w/" << name << ".dot";
+    dnngraph.writeGraph(ss1.str());
+    dnngraph.writeGraphviz(ss2.str());
+}
 
 int main(int argc, char** argv) {
     // Get usage for the executable.
@@ -147,14 +138,13 @@ int main(int argc, char** argv) {
 
     
     std::ostream *stats=&std::cout;
-    //buildGraph("net",10,28*28,10);
-    //buildGraph("xor2",2,2,1); // correct so it works with 0 hidden nodes
-    //buildGraph("test",2,2,2);
+    //buildGraph<NeuralNode>("net",10,28*28,10,true);
+    //buildGraph<NeuralNode>("xor2",2,2,1,true); // correct so it works with 0 hidden nodes
+    //buildGraph<BlockNeuralNode>("test",10,28*28,10,false,2);
     
-    //simulateMNIST("w/net.graph");
-    //simulate("w/xor.graph");
-    BlockNeuralNode* n = BlockNeuralNode::InputNode(make_shared<DNNGraphSettings>());
-   // BlockNeuralNode* n;
+    //simulateMNIST<NeuralNode>("w/net.graph");
+    //simulate<NeuralNode>("w/xor.graph");
+    simulateMNIST<BlockNeuralNode>("w/test.graph");
     
     return 0;
 }

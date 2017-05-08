@@ -6,6 +6,6 @@ dist/
 nbproject/private/
 w/
 *.cpp~
-
+mnist/
 
 

@@ -4,10 +4,10 @@
 #include "messages/backward_propagation_message.h"
 #include "tools/math.h"
 
-std::string InputNode::m_type = "Input";
-NodeRegister<InputNode> InputNode::m_reg(InputNode::m_type);
+std::string NeuralNode::InputNode::m_type = "Input";
+NodeRegister<NeuralNode::InputNode> NeuralNode::InputNode::m_reg(NeuralNode::InputNode::m_type);
 
-void InputNode::addEdge(Edge* e) {
+void NeuralNode::InputNode::addEdge(Edge* e) {
      // add to original edge sets
      Node::addEdge(e);
      // check edge belongs to this node
@@ -39,7 +39,7 @@ void InputNode::addEdge(Edge* e) {
      assert(incomingForwardEdges.size() <= 1);
  }
 
-bool InputNode::sendForwardMsgs(vector<Message*>& msgs){
+bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     if(weights.empty()) initWeights();
@@ -61,7 +61,7 @@ bool InputNode::sendForwardMsgs(vector<Message*>& msgs){
     forwardSeenCount = 0;
 }
 
-bool InputNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
             
     // perform weight update first
@@ -83,7 +83,7 @@ bool InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     backwardSeenCount = 0;
 }
 
-void InputNode::onRecv(ForwardPropagationMessage* msg){
+void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     output = msg->activation;
     forwardSeenCount++;
     
@@ -94,7 +94,7 @@ void InputNode::onRecv(ForwardPropagationMessage* msg){
         weights = newWeights;
 } 
 
-void InputNode::onRecv(BackwardPropagationMessage* msg) {
+void NeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     int index = dstWeightIndex[msg->src];
     deltas[index] = msg->delta;
     backwardSeenCount++;
