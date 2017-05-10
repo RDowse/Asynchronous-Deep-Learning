@@ -61,12 +61,12 @@ public:
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;
-        
-        for(int i = 0; i < dataset->training_images.size(); ++i)
+        for(int i = 0; i < dataset->training_images.cols(); ++i){
             trainingIndices.push_back(i);
-        
-        min_error = vector<float>(dataset->training_images.size(),std::numeric_limits<float>::max());
-        error = vector<float>(dataset->training_images.size(),std::numeric_limits<float>::max());
+        }
+            
+        min_error = vector<float>(dataset->training_images.cols(),std::numeric_limits<float>::max());
+        error = vector<float>(dataset->training_images.cols(),std::numeric_limits<float>::max());
     }
     void addEdge(Edge* e) override;    
     

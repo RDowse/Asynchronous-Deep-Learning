@@ -41,9 +41,7 @@ bool BlockNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     // sigmoid calculations
-    for(int col = 0; col < output.cols(); ++col)
-        for(int row = 0; row < output.rows(); ++row)
-            output(row,col) = settings->activationFnc(output(row,col));
+    output = output.unaryExpr(settings->activationFnc);
     
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
@@ -57,28 +55,27 @@ bool BlockNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     }
     
     // reset
-    output.Zero(output.rows(),output.cols());
+    //output.Zero(output.rows(),output.cols());
     forwardSeenCount = 0;
 }
 
 bool BlockNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());   
         
-    // sigmoid calculations
-    MatrixXf deltaAct(output.rows(),output.cols());
-    for(int col = 0; col < output.cols(); ++col)
-        for(int row = 0; row < output.rows(); ++row)
-            deltaAct(row,col) = settings->deltaActivationFnc(output(row,col));
+    // sigmoid calculations, in matrix form
+    MatrixXf deltaAct = settings->deltaActivationFnc(output);
     
     MatrixXf delta = (target-output)*deltaAct;
-//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-//        auto msg = new BackwardPropagationMessage();
-//        msg->src = m_id;
-//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-//        msg->delta = delta; 
-//        msgs.push_back(msg);
-//    }
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+        auto msg = new BackwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        
+        // set msg data
+        msg->matDelta = delta; 
+        msgs.push_back(msg);
+    }
     
     backwardSeenCount = 0;
 }

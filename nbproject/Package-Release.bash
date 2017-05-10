@@ -13,8 +13,8 @@ CND_BUILDDIR=build
 CND_DLIB_EXT=so
 NBTMPDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/asynchronous-deep-learning
-OUTPUT_BASENAME=asynchronous-deep-learning
+OUTPUT_PATH=${TESTDIR}/TestFiles/f2
+OUTPUT_BASENAME=f2
 PACKAGE_TOP_DIR=asynchronous-deep-learning/
 
 # Functions

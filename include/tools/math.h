@@ -41,6 +41,11 @@ namespace math{
         return x*(1-x);
     }
     
+    inline Eigen::MatrixXf blockDeltaActivationSig(Eigen::MatrixXf x){
+        auto ones = Eigen::MatrixXf::Ones(x.rows(),x.cols());
+        return x.transpose()*(ones - x);
+    }
+    
     inline float deltaActivationTan(float x){
         return 1-pow(x,2);
     }

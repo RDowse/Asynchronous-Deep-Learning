@@ -60,6 +60,11 @@ private:
         int batchSize = settings->miniBatchSize;
         output = MatrixXf(blockSize,batchSize);
     }
+    void initDeltas(){
+        int batchSize = settings->miniBatchSize;
+        int nextLayerSize = settings->netTopology[layer+1];
+        deltas = MatrixXf(nextLayerSize,batchSize);    
+    }
 };
 
 

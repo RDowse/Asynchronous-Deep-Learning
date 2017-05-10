@@ -45,10 +45,13 @@ class NeuralNode::SyncNode: public NeuralNode{
     map<int,int> dstOutputIndex;        // map backprop index to output
     vector<float> out;
     
-    float actMax = settings->activationFnc(10);
-    float actMin = settings->activationFnc(-10);
+    float actMax = settings->activationFnc(5);
+    float actMin = settings->activationFnc(-5);
     
     float training_error = 0;
+    
+    // random number generation
+    std::default_random_engine engine = std::default_random_engine{};
 public:
     static std::string m_type;
     SyncNode(shared_ptr<GraphSettings> settings): NeuralNode(settings){}
@@ -57,11 +60,11 @@ public:
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;
-        trainingIndices.reserve(dataset->training_images.rows());
-        for(int i = 0; i < dataset->training_images.rows(); ++i)
+        trainingIndices.reserve(dataset->training_labels.size());
+        for(int i = 0; i < dataset->training_labels.size(); ++i)
             trainingIndices.push_back(i);
-        min_error = vector<float>(dataset->training_images.rows(),std::numeric_limits<float>::max());
-        error = vector<float>(dataset->training_images.rows(),std::numeric_limits<float>::max());
+        min_error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
+        error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
     }
     void addEdge(Edge* e) override;    
     

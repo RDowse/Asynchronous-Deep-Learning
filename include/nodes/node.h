@@ -14,6 +14,7 @@
 #include "misc/edge.h"
 #include "graphs/graph_settings.h"
 #include "states/state.h"
+#include "tbb/concurrent_queue.h"
 
 #include <stdexcept>
 #include <memory>
@@ -52,7 +53,10 @@ public:
     virtual bool onSend(vector<Message*>& msgs)=0;
     
     // send messages to the corresponding node id, while check validity
-    virtual void send(vector<Message*>& msgs, list<Edge*>& activeEdges);
+    void send(vector<Message*>& msgs, list<Edge*>& activeEdges);
+    
+    // send messages to the corresponding node id, while check validity (TBB) 
+    void send(vector<Message*>& msgs, tbb::concurrent_queue<Edge*>& edgeQueue);
     
     // handle message receiving for different message types
     virtual void onRecv(ForwardPropagationMessage* msg)=0;

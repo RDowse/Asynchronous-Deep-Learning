@@ -56,7 +56,7 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         // sampling strategy
         if(outgoingForwardEdges[i]->dst->getType() == "Input" 
                 && j < images.rows()){
-            msg->activation = images(trainingIndices[sampleIndex],j++);
+            msg->activation = images(j++,trainingIndices[sampleIndex]);
         } else if(outgoingForwardEdges[i]->dst->getType() == "Bias"){
             msg->activation = 0;
         } 
@@ -82,6 +82,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         auto msg = new BackwardPropagationMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        
         if(outgoingBackwardEdges[i]->dst->getType() == "Output")
             if(outgoingBackwardEdges.size() == 1) // binary classification
                 msg->target = (labels(trainingIndices[sampleIndex]) ? actMax : actMin);
@@ -90,7 +91,6 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         else 
             assert(0); // should not occur
         msgs.push_back(msg);
-        //cout << "Sending sample" << trainingIndices[sampleIndex] << " " << msg->target << "\n";
     }
     
     // reset
@@ -110,15 +110,14 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     delete msg;
     
     // update flags and indexes once all data is received
-    if(readyToSendForward() && !validating){
+    if(readyToSendForward()){
         // start forward pass on the next sample
         delete settings->state;
         settings->state = new ForwardTrainState();
-        settings->update = true;
         sampleIndex++;
        
         // end of epoch, all samples in the training set have been passed
-        if(sampleIndex==dataset->training_images.rows()){
+        if(sampleIndex==dataset->training_labels.size()){
             // calulate training error for current epoch
             float sum = accumulate(error.begin(),error.end(),0.0);
             if(sum <= 0.01){
@@ -126,10 +125,12 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
                 exit(0);
             }
             // allow for sampling without replacement
-            std::random_shuffle(trainingIndices.begin(), trainingIndices.end());
+            std::shuffle(std::begin(trainingIndices), std::end(trainingIndices), engine);
+            //std::random_shuffle(trainingIndices.begin(), trainingIndices.end());
             sampleIndex = 0;
             epochCount++;
-            cout << "EPOCH: " << epochCount << "\n" << "\n";
+            Logging::log(0,"TOTAL ERROR: %f\n",sum);
+            Logging::log(0,"EPOCH: %d\n\n",epochCount);
         }
     }
 }
@@ -137,29 +138,33 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
 void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     forwardSeenCount++;    
     
+    int currSample = trainingIndices[sampleIndex]; // refactor to member variable
     int index = dstOutputIndex[msg->src];
-    float target = (dataset->training_labels(trainingIndices[sampleIndex]) == index ? actMax : actMin);
+    float target = 0;
+    if(outgoingBackwardEdges.size() == 1) {
+        target = (dataset->training_labels(currSample) ? actMax : actMin);
+    } else {
+        target = (dataset->training_labels(currSample) == index ? actMax : actMin);
+    }
     training_error += 0.5*pow((target-msg->activation),2);
-    
     out[index] = msg->activation;
     
     delete msg;
     
     // switch propagation direction
-    if(readyToSendBackward() && !validating){
+    if(readyToSendBackward()){
         assert(trainingIndices[sampleIndex] < min_error.size());
         assert(trainingIndices[sampleIndex] < error.size());
-        min_error[trainingIndices[sampleIndex]] = min(training_error,min_error[trainingIndices[sampleIndex]]);
-        error[trainingIndices[sampleIndex]] = training_error;
+        min_error[currSample] = min(training_error,min_error[currSample]);
+        error[currSample] = training_error;
         
-        cout << "Training error sample" << trainingIndices[sampleIndex] << " " << training_error << "\n";
-        cout << "Minimum error sample" << trainingIndices[sampleIndex] << ": " << min_error[trainingIndices[sampleIndex]] << "\n";
-        
-        cout << "\n";
-        cout << "Epoch "<< epochCount << " (targ) " << dataset->training_labels(sampleIndex) << "\n";
-        for(auto i: out)
-            cout << i << " ";
-        cout << "\n\n";
+        Logging::log(1,"Training error sample%d %f\n",currSample,training_error);
+        Logging::log(1,"Minimum error sample%d %f\n",currSample,min_error[currSample]);
+        Logging::log(1,"Epoch %d (targ) %d\n",epochCount,dataset->training_labels(currSample));
+
+        stringstream ss;
+        for(auto i: out) ss << i << " ";
+        Logging::log(1,"Output: %s\n\n",ss.str().c_str()); 
         
         training_error = 0;
 

@@ -41,14 +41,15 @@ public:
     float (*activationFnc)(float);
     
     // Differentiated Activation function
-    float (*deltaActivationFnc)(float);
+    //float (*deltaActivationFnc)(float);
+    Eigen::MatrixXf (*deltaActivationFnc)(Eigen::MatrixXf);
     
     // Flags
     bool update = false;        // flag for updating weight. TODO: update with msgs
     
     BlockNeuralNetworkSettings(){
         activationFnc = &math::activationSig;
-        deltaActivationFnc = &math::deltaActivationSig;
+        deltaActivationFnc = &math::blockDeltaActivationSig; //&math::deltaActivationSig;
         initWeightsFnc = &math::initBlockWeights;
     }
     

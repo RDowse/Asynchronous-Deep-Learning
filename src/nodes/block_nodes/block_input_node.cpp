@@ -49,9 +49,7 @@ bool BlockNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     //Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, output);
     
     // sigmoid calculations
-    for(int col = 0; col < output.cols(); ++col)
-        for(int row = 0; row < output.rows(); ++row)
-            output(row,col) = settings->activationFnc(output(row,col));
+    output = output.unaryExpr(settings->activationFnc);
     
     int blockIndex = 0;        
     
@@ -72,7 +70,7 @@ bool BlockNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     }
     
     // reset output, TODO: refactor if inefficient
-    output.Zero(output.rows(),output.cols());
+    //output.Zero(output.rows(),output.cols());
     
     // reset 
     forwardSeenCount = 0;
@@ -86,6 +84,9 @@ bool BlockNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     
 //    for(int i = 0; i < deltaWeights.size(); ++i)
 //        newWeights[i] += deltaWeights[i]; // update step    
+    
+    auto gradW = deltas*output.transpose();
+    newWeights += gradW.transpose();
     
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );
@@ -113,8 +114,12 @@ void BlockNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
 } 
 
 void BlockNeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
-    int index = dstWeightIndex[msg->src];
-    //deltas[index] = msg->delta;
+    
+    if(!deltas.size()) initDeltas();
+    int index = dstWeightIndex[msg->src];        
+    int blockSize = settings->blockTopology[layer+1][0];
+    
+    deltas.block(index*blockSize,0,blockSize,deltas.cols()) = msg->matDelta;
     backwardSeenCount++;
     
     delete msg;

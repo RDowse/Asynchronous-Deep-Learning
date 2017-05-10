@@ -20,12 +20,12 @@ public:
     TrainingStrategy* trainingStrategy;
     
     // Training param
-    float lr = 0.1;            // learning rate
-    float alpha = 0.5;          // momentum
+    float lr = 0.1;             // learning rate (0.1)
+    float alpha = 0.5;          // momentum (0.5)
     int sample = 0;             // selected sample for predicting
-    int maxEpoch = 100000;           // maximum epochs for training
+    int maxEpoch = 2;       // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
-    int miniBatchSize = 1;
+    
     // Weight initialisation
     void (*initWeightsFnc)(vector<float>& ,int ,int);
     
@@ -34,9 +34,6 @@ public:
     
     // Differentiated Activation function
     float (*deltaActivationFnc)(float);
-    
-    // Flags
-    bool update = false;        // flag for updating weight. TODO: update with msgs
     
     DNNGraphSettings(){
         trainingStrategy = new StochasticMomentumTraining();

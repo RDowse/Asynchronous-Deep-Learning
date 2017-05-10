@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+      <compileType>
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <standard>8</standard>
+          <incDir>
+            <pElem>include</pElem>
+            <pElem>mnist/include</pElem>
+            <pElem>/usr/include/eigen3</pElem>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+          </incDir>
+          <commandLine>-g</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f2</output>
+          <commandLine>-ltbb</commandLine>
+        </linkerTool>
+      </compileType>
+-->
 <configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
@@ -12,7 +37,6 @@
       <itemPath>include/nodes/block_nodes/block_input_node.h</itemPath>
       <itemPath>include/graphs/block_neural_network_settings.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_neural_node.h</itemPath>
-      <itemPath>include/nodes/block_nodes/block_node.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_output_node.h</itemPath>
       <itemPath>include/nodes/block_nodes/block_sync_node.h</itemPath>
       <itemPath>include/tools/clock.h</itemPath>
@@ -31,6 +55,7 @@
       <itemPath>include/messages/message.h</itemPath>
       <itemPath>include/nodes/neural_node.h</itemPath>
       <itemPath>include/nodes/node.h</itemPath>
+      <itemPath>include/misc/node_factory.h</itemPath>
       <itemPath>include/nodes/output_node.h</itemPath>
       <itemPath>include/states/predict_state.h</itemPath>
       <itemPath>include/simulator.h</itemPath>
@@ -71,22 +96,16 @@
       <itemPath>src/training/stochastic_training.cpp</itemPath>
       <itemPath>src/nodes/sync_node.cpp</itemPath>
     </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
                    projectFiles="false"
                    kind="TEST_LOGICAL_FOLDER">
-      <logicalFolder name="f1"
-                     displayName="input_node_tests"
-                     projectFiles="true"
-                     kind="TEST">
-        <itemPath>tests/input_node_tests.cpp</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f2"
-                     displayName="sync_node_tests"
-                     projectFiles="true"
-                     kind="TEST">
-        <itemPath>tests/sync_node_tests.cpp</itemPath>
-      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -95,6 +114,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>include</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -105,48 +127,17 @@
       </toolsSet>
       <compileType>
         <ccTool>
+          <developmentMode>6</developmentMode>
           <standard>8</standard>
           <incDir>
             <pElem>include</pElem>
-            <pElem>mnist/include</pElem>
             <pElem>/usr/include/eigen3</pElem>
           </incDir>
-          <commandLine>-g</commandLine>
         </ccTool>
         <linkerTool>
           <commandLine>-ltbb</commandLine>
         </linkerTool>
       </compileType>
-      <folder path="TestFiles/f1">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-        <linkerTool>
-          <output>${TESTDIR}/TestFiles/f1</output>
-        </linkerTool>
-      </folder>
-      <folder path="TestFiles/f2">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-        <linkerTool>
-          <output>${TESTDIR}/TestFiles/f2</output>
-        </linkerTool>
-      </folder>
       <item path="include/graphs/basic_graph_settings.h"
             ex="false"
             tool="3"
@@ -180,6 +171,8 @@
       </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/node_factory.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/block_nodes/block_hidden_node.h"
@@ -193,11 +186,6 @@
             flavor2="0">
       </item>
       <item path="include/nodes/block_nodes/block_neural_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_node.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -337,10 +325,6 @@
             ex="false"
             tool="1"
             flavor2="0">
-      </item>
-      <item path="tests/input_node_tests.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="tests/sync_node_tests.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -352,9 +336,17 @@
       <compileType>
         <cTool>
           <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>.</pElem>
+            <pElem>.</pElem>
+          </incDir>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -362,37 +354,10 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
-      </compileType>
-      <folder path="TestFiles/f1">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-        <linkerTool>
-          <output>${TESTDIR}/TestFiles/f1</output>
-        </linkerTool>
-      </folder>
-      <folder path="TestFiles/f2">
-        <cTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </cTool>
-        <ccTool>
-          <incDir>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
         <linkerTool>
           <output>${TESTDIR}/TestFiles/f2</output>
         </linkerTool>
-      </folder>
+      </compileType>
       <item path="include/graphs/basic_graph_settings.h"
             ex="false"
             tool="3"
@@ -426,6 +391,8 @@
       </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/node_factory.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/block_nodes/block_hidden_node.h"
@@ -439,11 +406,6 @@
             flavor2="0">
       </item>
       <item path="include/nodes/block_nodes/block_neural_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_node.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -583,10 +545,6 @@
             ex="false"
             tool="1"
             flavor2="0">
-      </item>
-      <item path="tests/input_node_tests.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="tests/sync_node_tests.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

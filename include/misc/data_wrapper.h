@@ -76,7 +76,9 @@ struct XORDataWrapper: public DataWrapper{
         convertVecToVec(tmp_training_labels,training_labels);
         
         convert2dVecToMat(tmp_testing_images,testing_images);
-        convertVecToVec(tmp_testing_labels,testing_labels);    
+        convertVecToVec(tmp_testing_labels,testing_labels);  
+        
+        training_images.transposeInPlace();
     }
 };
 

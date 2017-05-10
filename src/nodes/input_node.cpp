@@ -90,7 +90,7 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     delete msg;
     
     // weight update step
-    if(readyToSendForward() && settings->update)
+    if(readyToSendForward())
         weights = newWeights;
 } 
 

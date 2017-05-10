@@ -32,9 +32,7 @@ bool BlockNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     if(!weights.size()) initWeights();
     
     // sigmoid calculations
-    for(int col = 0; col < output.cols(); ++col)
-        for(int row = 0; row < output.rows(); ++row)
-            output(row,col) = settings->activationFnc(output(row,col));
+    output = output.unaryExpr(settings->activationFnc);
 
     // index for current block of weights to use
     int blockIndex = 0;    
@@ -54,34 +52,25 @@ bool BlockNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     }
     
     // reset
-    output.Zero(output.rows(),output.cols());
+    //output.Zero(output.rows(),output.cols());
     forwardSeenCount = 0;
 }
 
 bool BlockNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
 
-    // perform weight update
-//    float delta_sum = 0;
-//    for(int i = 0; i < weights.size(); ++i)
-//        delta_sum += deltas[i]*weights[i];
-//    
-//    // perform weight update first
-//    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
-//        
-//    for(int i = 0; i < deltaWeights.size(); ++i)
-//        newWeights[i] += deltaWeights[i]; // update step  
-//    
-//    // dispatch msgs, calculating delta for next nodes
-//    auto delta = delta_sum*settings->deltaActivationFnc(output);
-//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-//        auto msg = new BackwardPropagationMessage();
-//        msg->src = m_id;
-//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-//        msg->delta = delta; 
-//        msgs.push_back(msg);
-//    }
+    // add weight update method
+    
+    auto delta = weights*deltas*settings->deltaActivationFnc(output); 
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+        auto msg = new BackwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        
+        msg->matDelta = delta; 
+        msgs.push_back(msg);
+    }
     
     // reset
     backwardSeenCount = 0;
@@ -100,9 +89,12 @@ void BlockNeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
 }
 
 void BlockNeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
-//    int index = dstWeightIndex[msg->src];
-//    deltas[index] = msg->delta;
-//    backwardSeenCount++;
+    if(!deltas.size()) initDeltas();
+    int index = dstWeightIndex[msg->src];        
+    int blockSize = settings->blockTopology[layer+1][0];
+    
+    deltas.block(index*blockSize,0,blockSize,deltas.cols()) = msg->matDelta;
+    backwardSeenCount++;
     
     delete msg;
 }

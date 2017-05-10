@@ -26,6 +26,8 @@
 #include "training/stochastic_momentum_training.h"
 
 #include "tbb/parallel_for.h"
+#include "tbb/concurrent_queue.h"
+#include "tbb/tick_count.h"
 
 #include "tools/clock.h"
 
@@ -53,7 +55,7 @@ private:
     multimap<string, Node*> m_node_map;
     
     list<Edge*> activeEdges;
-    list<Node*> readyNodes;
+    tbb::concurrent_queue<Edge*> edgeQueue;
     
     std::ostream& m_statsDst;
     int m_step;
@@ -61,8 +63,29 @@ private:
     
     string m_command;
     
+    bool step_edge(Edge *e){
+    
+        if(e->msgStatus == 0){
+            return false; // something went wrong
+        }
+        
+        if(e->msgStatus > 1){
+            e->msgStatus = static_cast<Edge::MessageStatus>(int(e->msgStatus)-1);
+            return true;
+        }
+        
+        e->msg->dispatchTo(e->dst);
+        e->msgStatus=Edge::MessageStatus::empty; // The edge is now idle
+        
+        return true;
+    }
+    
     bool step_edge(list<Edge*>::iterator& it){
         Edge* e = (*it);
+        
+        if(e->msgStatus == 0){
+            assert(0); // something went wrong
+        }
         
         if(e->msgStatus > 1){
             e->msgStatus = static_cast<Edge::MessageStatus>(int(e->msgStatus)-1);
@@ -77,29 +100,56 @@ private:
         return true;
     }
     
-    bool step_node(unsigned index, Node* n){
+    bool step_node(Node* n){
         // Not ready to send
         if(!n->readyToSend()){
-            Logging::log(4, "node %u : idle", index);
+            Logging::log(4, "node %u : idle", n->getId());
             return false; // Device doesn't want to send
         }
         
         for(auto p: n->outgoingEdges){
             auto e = p.second;
             if( e->msgStatus>0 ){
-                Logging::log(3, "node %u : blocked on %u->%u", index, 
+                Logging::log(1, "node %u : blocked on %u->%u", n->getId(), 
                         e->src->getId(),
                         e->dst->getId());
                 return true; // One of the outputs is full, so we are blocked
             }
         }
         
-        Logging::log(3, "%s node %u : send", n->getType().c_str(), index);
+        Logging::log(3, "%s node %u : send", n->getType().c_str(), n->getId());
            
         // Get the device to send the message
         vector<Message*> msgs; 
         n->onSend(msgs);
         n->send(msgs, activeEdges);
+        
+        return true;
+    }
+    
+    bool step_node_par(Node* n){
+        // Not ready to send
+        if(!n->readyToSend()){
+            Logging::log(4, "node %u : idle", n->getId());
+            return false; // Device doesn't want to send
+        }
+        
+        for(auto p: n->outgoingEdges){
+            auto e = p.second;
+            if( e->msgStatus>0 ){
+                Logging::log(1, "node %u : blocked on %u->%u", n->getId(), 
+                        e->src->getId(),
+                        e->dst->getId());
+                return true; // One of the outputs is full, so we are blocked
+            }
+        }
+        
+        Logging::log(3, "%s node %u : send", n->getType().c_str(), n->getId());
+           
+        // Get the device to send the message
+        vector<Message*> msgs; 
+        n->onSend(msgs);
+        n->send(msgs, edgeQueue);
         
         return true;
     }
@@ -110,17 +160,38 @@ private:
         list<Edge*>::iterator it = activeEdges.begin();
         while( it != activeEdges.end()){
             active = step_edge(it) || active;
-        }        
-        Logging::log(2, "stepping nodes");
+        }       
+        Logging::log(2, "stepping nodes");  
         for(unsigned i = 0; i < m_nodes.size(); i++){
-            if(step_node(i, m_nodes[i])) active = true;
+            if(step_node(m_nodes[i])) active = true;
         }
-//        tbb::parallel_for(tbb::blocked_range<size_t>(0,m_nodes.size(),2000),[&](tbb::blocked_range<size_t>& r){
-//            for(int i = r.begin(); i != r.end(); ++i)
-//                if(step_node(i, m_nodes[i])) active = true;
-//        },tbb::auto_partitioner());
         return active;
     }
+    
+    bool step_all_parallel(){
+        Logging::log(2, "stepping edges");
+        bool active=false;    
+        list<Edge*>::iterator it = activeEdges.begin();
+        while( it != activeEdges.end()){
+            active = step_edge(it) || active;
+        }       
+        Logging::log(2, "stepping nodes");
+            
+        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
+            [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
+            for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
+                if(step_node_par(*it)) active = true;
+            }
+        });
+        // Put edges into the active list
+        while(!edgeQueue.empty()){
+            Edge* e;
+            edgeQueue.try_pop(e);
+            activeEdges.push_back(e);
+        }
+        return active;
+    }
+    
     
     void reset(){
         Logging::log(2, "resetting nodes");
@@ -188,9 +259,8 @@ public:
             assert(0);
         }
         
-        while(active){
-            active = step_all();
-        }
+        while(active)
+            active = step_all_parallel();
     }
 };
 

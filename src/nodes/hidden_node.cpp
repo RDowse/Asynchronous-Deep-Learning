@@ -44,8 +44,6 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
         msgs.push_back(msg);
     }
     
-    //send(msgs,outgoingForwardEdges);
-    
     // reset
     value = 0;
     forwardSeenCount = 0;
@@ -76,8 +74,6 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    //send(msgs,outgoingBackwardEdges);
-    
     // reset
     backwardSeenCount = 0;
 }
@@ -89,7 +85,7 @@ void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     delete msg;
     
     // weight update step
-    if(readyToSendForward() && settings->update)
+    if(readyToSendForward())
         weights = newWeights;
 }
 

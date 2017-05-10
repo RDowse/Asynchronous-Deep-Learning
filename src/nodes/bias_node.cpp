@@ -22,15 +22,11 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
         msgs.push_back(msg);
     }
     
-    //send(msgs,outgoingForwardEdges);
-    
     forwardSeenCount = 0;
 }
 
 bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
-    
-    deltas[0] /= outgoingForwardEdges.size();
     
     // perform weights update first
     settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
@@ -46,8 +42,6 @@ bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     }
     assert(msgs.size() == 1);
     
-    //send(msgs,outgoingBackwardEdges);
-    
     backwardSeenCount = 0;
 }
 
@@ -59,7 +53,7 @@ void BiasNode::onRecv(ForwardPropagationMessage* msg) {
     delete msg;
     
     // weights update step
-    if(readyToSendForward() && settings->update)
+    if(readyToSendForward())
         weights = newWeights;
 }
 

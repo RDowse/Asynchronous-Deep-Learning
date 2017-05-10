@@ -173,7 +173,6 @@ private:
         
         // Hidden nodes
         for(int i = 0; i < nHLayers; ++i){
-            
             if(bias){
                 // Bias node
                 prev_layer.push_back(new BiasNode(settings));

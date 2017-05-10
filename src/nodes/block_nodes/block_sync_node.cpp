@@ -89,19 +89,19 @@ bool BlockNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     MatrixXf target = MatrixXf::Constant(outputSize,settings->miniBatchSize,actMin);
     target(labels[trainingIndices[sampleIndex]],0) = actMax; // TODO: correct for batchsize
 
-//    msgs.reserve(outgoingBackwardEdges.size());
-//    for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
-//        auto msg = new BackwardPropagationMessage();
-//        msg->src = m_id;
-//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-//        
-//        assert(outgoingBackwardEdges[i]->dst->getType() == "BlockOutput");
-//        int blockSize = settings->blockTopology.back().front();
-//        msg->matTarget = target.block(0,i*blockSize,target.rows(),blockSize);
-//        
-//        msgs.push_back(msg);
-//        cout << "Sending sample" << trainingIndices[sampleIndex] << " " << msg->target << "\n";
-//    }
+    msgs.reserve(outgoingBackwardEdges.size());
+    for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
+        auto msg = new BackwardPropagationMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        
+        assert(outgoingBackwardEdges[i]->dst->getType() == "BlockOutput");
+        int blockSize = settings->blockTopology.back().front();
+        msg->matTarget = target.block(i*blockSize,0,blockSize,target.cols());
+        
+        msgs.push_back(msg);
+        cout << "Sending sample" << trainingIndices[sampleIndex] << " " << msg->target << "\n";
+    }
     
     // reset
     forwardSeenCount = 0;
@@ -128,13 +128,13 @@ void BlockNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
         sampleIndex++;
        
         // end of epoch, all samples in the training set have been passed
-        if(sampleIndex==dataset->training_images.rows()){
+        if(sampleIndex==dataset->training_images.cols()){
             // calulate training error for current epoch
-            float sum = accumulate(error.begin(),error.end(),0.0);
-            if(sum <= 0.01){
-                cout << "final error" << sum << "\n";
-                exit(0);
-            }
+//            float sum = accumulate(error.begin(),error.end(),0.0);
+//            if(sum <= 0.01){
+//                cout << "final error" << sum << "\n";
+//                exit(0);
+//            }
             // allow for sampling without replacement
             std::random_shuffle(trainingIndices.begin(), trainingIndices.end());
             sampleIndex = 0;
@@ -150,7 +150,7 @@ void BlockNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     if(!output.size()) initOutput();
     int index = dstOutputIndex[msg->src];
     int blockSize = settings->blockTopology.back()[0];
-    output.block(0,index*blockSize,output.rows(),blockSize) += msg->matActivation;
+    output.block(index*blockSize,0,blockSize,output.cols()) += msg->matActivation;
     
 //    float target = (dataset->training_labels(trainingIndices[sampleIndex]) == index ? actMax : actMin);
 //    training_error += 0.5*pow((target-msg->activation),2);
@@ -161,11 +161,11 @@ void BlockNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     if(readyToSendBackward() && !validating){
         assert(trainingIndices[sampleIndex] < min_error.size());
         assert(trainingIndices[sampleIndex] < error.size());
-        min_error[trainingIndices[sampleIndex]] = min(training_error,min_error[trainingIndices[sampleIndex]]);
-        error[trainingIndices[sampleIndex]] = training_error;
-        
-        cout << "Training error sample" << trainingIndices[sampleIndex] << " " << training_error << "\n";
-        cout << "Minimum error sample" << trainingIndices[sampleIndex] << ": " << min_error[trainingIndices[sampleIndex]] << "\n";
+//        min_error[trainingIndices[sampleIndex]] = min(training_error,min_error[trainingIndices[sampleIndex]]);
+//        error[trainingIndices[sampleIndex]] = training_error;
+//        
+//        cout << "Training error sample" << trainingIndices[sampleIndex] << " " << training_error << "\n";
+//        cout << "Minimum error sample" << trainingIndices[sampleIndex] << ": " << min_error[trainingIndices[sampleIndex]] << "\n";
         
         cout << "\n";
         cout << "Epoch "<< epochCount << " (targ) " << dataset->training_labels(sampleIndex) << "\n";
