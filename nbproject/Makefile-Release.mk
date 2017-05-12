@@ -58,7 +58,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/tools/clock.o \
 	${OBJECTDIR}/src/tools/dnn_graph.o \
 	${OBJECTDIR}/src/tools/logging.o \
-	${OBJECTDIR}/src/tools/training.o \
 	${OBJECTDIR}/src/training/stochastic_momentum_training.o \
 	${OBJECTDIR}/src/training/stochastic_training.o
 
@@ -201,11 +200,6 @@ ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
-
-${OBJECTDIR}/src/tools/training.o: src/tools/training.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/tools
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/training.o src/tools/training.cpp
 
 ${OBJECTDIR}/src/training/stochastic_momentum_training.o: src/training/stochastic_momentum_training.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/training

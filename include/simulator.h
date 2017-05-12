@@ -153,7 +153,7 @@ private:
         active = true;
     }
     
-    bool step_node_par2(Node* n, bool& active){
+    void step_node_par2(Node* n, bool& active){
         // Not ready to send
         if(!n->readyToSend()){
             Logging::log(4, "node %u : idle", n->getId());

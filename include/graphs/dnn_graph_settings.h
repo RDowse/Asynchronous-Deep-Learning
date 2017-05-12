@@ -23,7 +23,7 @@ public:
     float lr = 0.1;             // learning rate (0.1)
     float alpha = 0.5;          // momentum (0.5)
     int sample = 0;             // selected sample for predicting
-    int maxEpoch = 15;         // maximum epochs for training
+    int maxEpoch = 1000;         // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
     int epoch = 0;
     

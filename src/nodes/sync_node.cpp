@@ -136,8 +136,8 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             std::shuffle(std::begin(trainingIndices), std::end(trainingIndices), engine);
             sampleIndex = 0;
             settings->epoch++;
-            Logging::log(1,"TOTAL ERROR: %f\n",sum);
-            Logging::log(1,"EPOCH: %d\n\n",settings->epoch);
+            Logging::log(0,"TOTAL ERROR: %f\n",sum);
+            Logging::log(0,"EPOCH: %d\n\n",settings->epoch);
         }
     }
 }
