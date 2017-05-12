@@ -41,9 +41,9 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     // calulate output activation
-    output = settings->activationFnc(value);
+    output = value.unaryExpr(settings->activationFnc);
     
-    Logging::log(3, "%s%d forward out: %f", m_type.c_str(), m_id, output);
+    //Logging::log(3, "%s%d forward out: %f", m_type.c_str(), m_id, output);
     
     msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
@@ -56,30 +56,31 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     }
     
     // reset state
-    value = 0;
+    value.setZero(value.size());
     forwardSeenCount = 0;
 }
 
 bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());   
     
-    Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
+    //Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
     
-    msgs.reserve(outgoingBackwardEdges.size());
-    auto delta = (target-output)*settings->deltaActivationFnc(output);
-    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-        auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id;
-        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->delta = delta; 
-        msgs.push_back(msg);
-    }
-    
+//    msgs.reserve(outgoingBackwardEdges.size());
+//    auto delta = (target-output)*settings->deltaActivationFnc(output);
+//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+//        auto msg = backwardMessagePool->getMessage();
+//        msg->src = m_id;
+//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+//        msg->delta = delta; 
+//        msgs.push_back(msg);
+//    }
+//    
     backwardSeenCount = 0;
 }
 
 void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
+    if(!value.size()) value = Eigen::VectorXf::Zero(msg->activation.size());
     value += msg->activation;
     forwardSeenCount++;
     

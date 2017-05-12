@@ -78,7 +78,7 @@ struct XORDataWrapper: public DataWrapper{
         convert2dVecToMat(tmp_testing_images,testing_images);
         convertVecToVec(tmp_testing_labels,testing_labels);  
         
-        training_images.transposeInPlace();
+        //training_images.transposeInPlace();
     }
 };
 
@@ -99,7 +99,7 @@ struct MNISTDataWrapper: public DataWrapper{
         convert2dVecToMat(tmp_testing_images,testing_images);
         convertVecToVec(tmp_testing_labels,testing_labels);      
         
-        training_images.transposeInPlace();
+        //training_images.transposeInPlace();
         training_images.normalize();
         
 //        std::vector<int> indicies(tmp_labels.size());

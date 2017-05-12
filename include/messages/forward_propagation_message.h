@@ -16,7 +16,7 @@ class ForwardPropagationMessage: public Message
 {
 public:
     // individual node value
-    float activation = 0;
+    Eigen::VectorXf activation;
     
     // block node value
     Eigen::MatrixXf matActivation;

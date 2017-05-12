@@ -31,10 +31,10 @@ class NeuralNode::InputNode: public NeuralNode{
     
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
-    vector<float> deltas;
-    vector<float> deltaWeights;     // delta weights, for momentum
-    vector<float> newWeights;       // intermediate updated weights
-    vector<float> weights;
+    Eigen::VectorXf deltas;
+    Eigen::VectorXf deltaWeights;     // delta weights, for momentum
+    Eigen::VectorXf newWeights;       // intermediate updated weights
+    Eigen::VectorXf weights;
 public:
     InputNode(shared_ptr<GraphSettings> graphSettings): NeuralNode(graphSettings){}
     virtual ~InputNode(){}
@@ -44,12 +44,12 @@ public:
     
     void setWeights(const vector<float>& w) override{
         assert(w.size() == outgoingForwardEdges.size());
-        weights = w;
-        newWeights = w; 
+        //weights = Eigen::Map<Eigen::VectorXf>(&w[0],w.size());
+        newWeights = weights; 
         
         // init size of delta values
-        deltas = vector<float>(weights.size());
-        deltaWeights = vector<float>(weights.size());
+        deltas = Eigen::VectorXf::Zero(weights.size());
+        deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
         
     void onRecv(ForwardPropagationMessage* msg) override;
@@ -61,13 +61,13 @@ private:
     // for populating weights map
     int map_index = 0;
     void initWeights(){
-        weights = vector<float>(outgoingForwardEdges.size());
+        weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
         settings->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
         newWeights = weights;    
         
         // init size of delta values
-        deltas = vector<float>(weights.size());
-        deltaWeights = vector<float>(weights.size());
+        deltas = Eigen::VectorXf::Zero(weights.size());
+        deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
 };
 

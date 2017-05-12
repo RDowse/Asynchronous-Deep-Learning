@@ -42,9 +42,11 @@ void NeuralNode::InputNode::addEdge(Edge* e) {
 bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
-    if(weights.empty()) initWeights();
+    if(!weights.size()) initWeights();
     
-    Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, output);
+    //Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, output);
+    
+    MatrixXf mat = output*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -53,7 +55,7 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->activation = output*weights[i];
+        msg->activation = mat.col(i);
         msgs.push_back(msg);
     }
     
@@ -65,20 +67,20 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
             
     // perform weight update first
-    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
-    
-    for(int i = 0; i < deltaWeights.size(); ++i)
-        newWeights[i] += deltaWeights[i]; // update step    
-    
-    msgs.reserve(outgoingBackwardEdges.size());
-    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-        auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id;
-        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msgs.push_back(msg);
-    }
-    assert(msgs.size() == 1);
+//    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
+//    
+//    for(int i = 0; i < deltaWeights.size(); ++i)
+//        newWeights[i] += deltaWeights[i]; // update step    
+//    
+//    msgs.reserve(outgoingBackwardEdges.size());
+//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+//        auto msg = backwardMessagePool->getMessage();
+//        msg->src = m_id;
+//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+//        msgs.push_back(msg);
+//    }
+//    assert(msgs.size() == 1);
     
     // reset
     backwardSeenCount = 0;
@@ -97,7 +99,7 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
 
 void NeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     int index = dstWeightIndex[msg->src];
-    deltas[index] = msg->delta;
+    //deltas[index] = msg->delta;
     backwardSeenCount++;
     
     backwardMessagePool->returnMessage(msg);

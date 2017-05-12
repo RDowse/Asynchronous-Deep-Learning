@@ -12,6 +12,7 @@
 #include "graphs/dnn_graph_settings.h"
 #include "misc/message_pool.h"
 
+#include <eigen3/Eigen/Dense>
 #include <vector>
 #include <memory>
 
@@ -44,7 +45,7 @@ protected:
     int backwardSeenCount = 0;
     
     // node output/activation
-    float output = 0;
+    Eigen::VectorXf output;
 public:
     NeuralNode(shared_ptr<GraphSettings> context): Node(context){        
         try{
@@ -84,7 +85,7 @@ public:
         return (backwardSeenCount == incomingBackwardEdges.size());
     }
     
-    float getOutput() const{ return output; }
+    //float getOutput() const{ return output; }
 };
 
 #endif /* NEURAL_NODE_H */

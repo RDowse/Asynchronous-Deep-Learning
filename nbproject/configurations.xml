@@ -130,7 +130,6 @@
       </toolsSet>
       <compileType>
         <ccTool>
-          <developmentMode>6</developmentMode>
           <standard>8</standard>
           <incDir>
             <pElem>include</pElem>

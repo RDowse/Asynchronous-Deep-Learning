@@ -27,9 +27,9 @@ class NeuralNode::OutputNode: public NeuralNode{
     static NodeRegister<OutputNode> m_reg;
     static std::string m_type;
     
-    float error = 0;
-    float target = 0;
-    float value = 0;
+    Eigen::VectorXf error;
+    Eigen::VectorXf target;
+    Eigen::VectorXf value;
 public:
     OutputNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~OutputNode(){}

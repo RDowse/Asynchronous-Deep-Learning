@@ -14,6 +14,7 @@
 #include "graphs/dnn_graph_settings.h"
 #include "tools/math.h"
 
+#include <eigen3/Eigen/Dense>
 #include <stack>
 #include <string>
 #include <cassert>
@@ -32,13 +33,13 @@ class NeuralNode::HiddenNode: public NeuralNode{
     
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
-    vector<float> deltas;           // store received delta values
-    vector<float> deltaWeights;     // delta weights, for momentum
-    vector<float> newWeights;       // new weights to update
-    vector<float> weights;
+    Eigen::VectorXf deltas;           // store received delta values
+    Eigen::VectorXf deltaWeights;     // delta weights, for momentum
+    Eigen::VectorXf newWeights;       // new weights to update
+    Eigen::VectorXf weights;
    
-    float value = 0;
-    float error = 0;
+    Eigen::VectorXf value;
+    Eigen::VectorXf error;
 public:
     HiddenNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~HiddenNode(){}
@@ -48,12 +49,12 @@ public:
     
     void setWeights(const vector<float>& w) override{
         assert(w.size() == outgoingForwardEdges.size());
-        weights = w;
-        newWeights = w;
+        //weights = Eigen::Map<Eigen::VectorXf>(&w[0],w.size());
+        newWeights = weights; 
         
         // init size of delta values
-        deltas = vector<float>(weights.size());
-        deltaWeights = vector<float>(weights.size());
+        deltas = Eigen::VectorXf(weights.size());
+        deltaWeights = Eigen::VectorXf(weights.size());
     }
 
     void onRecv(ForwardPropagationMessage* msg) override;
@@ -65,13 +66,13 @@ private:
     // for populating weights map
     int map_index = 0;
     void initWeights(){
-        weights = vector<float>(outgoingForwardEdges.size());
+        weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
         settings->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
-        newWeights = weights;
+        newWeights = weights;    
         
         // init size of delta values
-        deltas = vector<float>(weights.size());
-        deltaWeights = vector<float>(weights.size());
+        deltas = Eigen::VectorXf::Zero(weights.size());
+        deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
 };
 

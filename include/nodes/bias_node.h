@@ -23,12 +23,12 @@ class BiasNode : public NeuralNode{
     static NodeRegister<BiasNode> m_reg;
     static std::string m_type;
     
-    vector<float> deltas;
-    vector<float> newWeights;
-    vector<float> deltaWeights;
-    vector<float> weights; 
+    Eigen::VectorXf deltas;
+    Eigen::VectorXf newWeights;
+    Eigen::VectorXf deltaWeights;
+    Eigen::VectorXf weights; 
 public:
-    BiasNode(shared_ptr<GraphSettings> context): NeuralNode(context){ output = 0;};
+    BiasNode(shared_ptr<GraphSettings> context): NeuralNode(context){};
     virtual ~BiasNode(){}
     string getType() override {return BiasNode::m_type;}
     
@@ -61,12 +61,14 @@ public:
     
     void setWeights(const vector<float>& w) override{
         assert(w.size() == 1);
-        weights = w;
-        newWeights = w; 
+        //weights = Eigen::Map<Eigen::VectorXf>(&w[0],w.size());
+        newWeights = weights; 
+        
+        output = Eigen::VectorXf::Ones(weights.size());
         
         // init size of delta values
-        deltas = vector<float>(weights.size());
-        deltaWeights = vector<float>(weights.size());
+        deltas = Eigen::VectorXf(weights.size());
+        deltaWeights = Eigen::VectorXf(weights.size());
     }
     
     void onRecv(ForwardPropagationMessage* msg) override;
@@ -78,13 +80,13 @@ private:
     // for populating weights map
     int map_index = 0;
     void initWeights(){
-        weights = vector<float>(1);
+        weights = Eigen::VectorXf::Zero(1);
         settings->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
         newWeights = weights;    
         
         // init size of delta values
-        deltas = vector<float>(weights.size());
-        deltaWeights = vector<float>(weights.size());
+        deltas = Eigen::VectorXf::Zero(weights.size());
+        deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
 };
 

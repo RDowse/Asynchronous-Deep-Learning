@@ -26,9 +26,11 @@ public:
     int maxEpoch = 1000;         // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
     int epoch = 0;
+    int batchSize = 10;
     
     // Weight initialisation
-    void (*initWeightsFnc)(vector<float>& ,int ,int);
+    //void (*initWeightsFnc)(vector<float>& ,int ,int);
+    void (*initWeightsFnc)(Eigen::VectorXf& ,int ,int);
     
     // Activation function
     float (*activationFnc)(float);

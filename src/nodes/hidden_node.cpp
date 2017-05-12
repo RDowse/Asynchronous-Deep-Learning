@@ -28,10 +28,12 @@ void NeuralNode::HiddenNode::addEdge(Edge* e) {
 bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     assert(readyToSendForward());
     
-    if(weights.empty()) initWeights();
+    if(!weights.size()) initWeights();
     
     // calulate output activation
-    output = settings->activationFnc(value);
+    output = value.unaryExpr(settings->activationFnc);
+    
+    MatrixXf mat = output*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -40,12 +42,12 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->activation = output*weights[i];
+        msg->activation = mat.col(i);
         msgs.push_back(msg);
     }
     
     // reset
-    value = 0;
+    value.setZero(value.size());
     forwardSeenCount = 0;
 }
 
@@ -53,33 +55,34 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
 
     // perform weight update
-    float delta_sum = 0;
-    for(int i = 0; i < weights.size(); ++i)
-        delta_sum += deltas[i]*weights[i];
-    
-    // perform weight update first
-    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
-    
-    for(int i = 0; i < deltaWeights.size(); ++i)
-        newWeights[i] += deltaWeights[i]; // update step  
-    
-    msgs.reserve(outgoingBackwardEdges.size());
-    // dispatch msgs, calculating delta for next nodes
-    auto delta = delta_sum*settings->deltaActivationFnc(output);
-    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-        auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id;
-        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->delta = delta; 
-        msgs.push_back(msg);
-    }
-    
+//    float delta_sum = 0;
+//    for(int i = 0; i < weights.size(); ++i)
+//        delta_sum += deltas[i]*weights[i];
+//    
+//    // perform weight update first
+//    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
+//    
+//    for(int i = 0; i < deltaWeights.size(); ++i)
+//        newWeights[i] += deltaWeights[i]; // update step  
+//    
+//    msgs.reserve(outgoingBackwardEdges.size());
+//    // dispatch msgs, calculating delta for next nodes
+//    auto delta = delta_sum*settings->deltaActivationFnc(output);
+//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+//        auto msg = backwardMessagePool->getMessage();
+//        msg->src = m_id;
+//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+//        msg->delta = delta; 
+//        msgs.push_back(msg);
+//    }
+//    
     // reset
     backwardSeenCount = 0;
 }
 
 void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
+    if(!value.size()) value = Eigen::VectorXf::Zero(msg->activation.size());
     value += msg->activation;
     forwardSeenCount++;
     
@@ -92,7 +95,7 @@ void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
 
 void NeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
     int index = dstWeightIndex[msg->src];
-    deltas[index] = msg->delta;
+    //deltas[index] = msg->delta;
     backwardSeenCount++;
     
     backwardMessagePool->returnMessage(msg);

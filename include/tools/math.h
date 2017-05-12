@@ -58,6 +58,12 @@ namespace math{
             weights[i] = randomFloat(-r, r);
     }
     
+    inline void initWeights(Eigen::VectorXf& weights, int nFanIn, int nFanOut){
+        float r = sqrt(6.0/(float(nFanOut)+float(nFanIn)));
+        for(int i = 0; i < weights.size(); ++i)
+            weights(i) = randomFloat(-r, r);
+    }
+    
     inline void initBlockWeights(Eigen::MatrixXf& weights, int nFanIn, int nFanOut){
         float r = sqrt(6.0/(float(nFanOut)+float(nFanIn)));
         for(int col = 0; col < weights.cols(); ++col){

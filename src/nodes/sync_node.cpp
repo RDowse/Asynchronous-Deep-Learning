@@ -46,7 +46,7 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     
     // TODO: check data size matches the input size
     Logging::log(3, "Sending sample %d", sampleIndex);
-    
+    cout << "send sample\n"; 
     // send out data samples to input nodes
     msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
@@ -54,12 +54,14 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
+        
         // sampling strategy
         if(outgoingForwardEdges[i]->dst->getType() == "Input" 
-                && j < images.rows()){
-            msg->activation = images(j++,trainingIndices[sampleIndex]);
+                && j < images.cols()){
+            //msg->activation = images.block(trainingIndices[sampleIndex],j++,settings->batchSize,1);
+            msg->activation = images.block(sampleIndex,j++,settings->batchSize,1);
         } else if(outgoingForwardEdges[i]->dst->getType() == "Bias"){
-            msg->activation = 0;
+            msg->activation = Eigen::VectorXf::Ones(settings->batchSize);
         } 
         msgs.push_back(msg);
     }
@@ -75,24 +77,24 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     auto& labels = validating ? 
         dataset->validation_labels : dataset->training_labels;
     
-    // TODO: check data size matches the input size
-    Logging::log(3, "Sending sample %d backward", trainingIndices[sampleIndex]);
-    // prepare msgs
-    msgs.reserve(outgoingBackwardEdges.size());
-    for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
-        auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id;
-        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        
-        if(outgoingBackwardEdges[i]->dst->getType() == "Output")
-            if(outgoingBackwardEdges.size() == 1) // binary classification
-                msg->target = (labels(trainingIndices[sampleIndex]) ? actMax : actMin);
-            else // multiclassification
-                msg->target = (labels(trainingIndices[sampleIndex]) == i ? actMax : actMin);
-        else 
-            assert(0); // should not occur
-        msgs.push_back(msg);
-    }
+//    // TODO: check data size matches the input size
+//    Logging::log(3, "Sending sample %d backward", trainingIndices[sampleIndex]);
+//    // prepare msgs
+//    msgs.reserve(outgoingBackwardEdges.size());
+//    for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
+//        auto msg = backwardMessagePool->getMessage();
+//        msg->src = m_id;
+//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+//        
+//        if(outgoingBackwardEdges[i]->dst->getType() == "Output")
+//            if(outgoingBackwardEdges.size() == 1) // binary classification
+//                msg->target = (labels(trainingIndices[sampleIndex]) ? actMax : actMin);
+//            else // multiclassification
+//                msg->target = (labels(trainingIndices[sampleIndex]) == i ? actMax : actMin);
+//        else 
+//            assert(0); // should not occur
+//        msgs.push_back(msg);
+//    }
     
     // reset
     forwardSeenCount = 0;
@@ -122,7 +124,8 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             settings->state = tmpState;
         }
         
-        sampleIndex++;
+        //sampleIndex++;
+        sampleIndex+= settings->batchSize; // todo remainder
        
         // end of epoch, all samples in the training set have been passed
         if(sampleIndex==dataset->training_labels.size()){
@@ -153,9 +156,9 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     } else {
         target = (dataset->training_labels(currSample) == index ? actMax : actMin);
     }
-    training_error += 0.5*pow((target-msg->activation),2);
-    out[index] = msg->activation;
-    
+    //training_error += 0.5*pow((target-msg->activation),2);
+    //out[index] = msg->activation;
+    cout << msg->activation.transpose() << endl;
     forwardMessagePool->returnMessage(msg);
     
     // switch propagation direction

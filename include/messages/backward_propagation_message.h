@@ -16,8 +16,8 @@ class BackwardPropagationMessage: public Message
 {
 public:
     // individual node values
-    float delta = 0;
-    float target = 0;
+    Eigen::VectorXf delta;
+    Eigen::VectorXf target;
     
     // block node values
     Eigen::MatrixXf matDelta;

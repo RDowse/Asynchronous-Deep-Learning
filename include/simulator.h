@@ -305,7 +305,7 @@ public:
         }
         
         while(active)
-            active = step_all_parallel2();
+            active = step_all();
     }
 };
 
