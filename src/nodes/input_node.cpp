@@ -46,11 +46,11 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     
     Logging::log(3, "%s node %d input: %f", m_type.c_str(), m_id, output);
     
-    //msgs.reserve(weights.size());
+    msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
-        auto msg = new ForwardPropagationMessage();
+        auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->activation = output*weights[i];
@@ -70,9 +70,10 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     for(int i = 0; i < deltaWeights.size(); ++i)
         newWeights[i] += deltaWeights[i]; // update step    
     
+    msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-        auto msg = new BackwardPropagationMessage();
+        auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msgs.push_back(msg);
@@ -87,7 +88,7 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     output = msg->activation;
     forwardSeenCount++;
     
-    delete msg;
+    forwardMessagePool->returnMessage(msg);
     
     // weight update step
     if(readyToSendForward())
@@ -99,5 +100,5 @@ void NeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     deltas[index] = msg->delta;
     backwardSeenCount++;
     
-    delete msg;
+    backwardMessagePool->returnMessage(msg);
 }

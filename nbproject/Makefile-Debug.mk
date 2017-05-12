@@ -38,6 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/messages/backward_propagation_message.o \
 	${OBJECTDIR}/src/messages/forward_propagation_message.o \
+	${OBJECTDIR}/src/misc/message_pool.o \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/bias_node.o \
 	${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o \
@@ -46,6 +47,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/nodes/block_nodes/block_sync_node.o \
 	${OBJECTDIR}/src/nodes/hidden_node.o \
 	${OBJECTDIR}/src/nodes/input_node.o \
+	${OBJECTDIR}/src/nodes/neural_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
 	${OBJECTDIR}/src/nodes/output_node.o \
 	${OBJECTDIR}/src/nodes/sync_node.o \
@@ -56,6 +58,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/tools/clock.o \
 	${OBJECTDIR}/src/tools/dnn_graph.o \
 	${OBJECTDIR}/src/tools/logging.o \
+	${OBJECTDIR}/src/tools/training.o \
 	${OBJECTDIR}/src/training/stochastic_momentum_training.o \
 	${OBJECTDIR}/src/training/stochastic_training.o
 
@@ -99,6 +102,11 @@ ${OBJECTDIR}/src/messages/forward_propagation_message.o: src/messages/forward_pr
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message.o src/messages/forward_propagation_message.cpp
 
+${OBJECTDIR}/src/misc/message_pool.o: src/misc/message_pool.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/misc
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/message_pool.o src/misc/message_pool.cpp
+
 ${OBJECTDIR}/src/misc/node_factory.o: src/misc/node_factory.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/misc
 	${RM} "$@.d"
@@ -138,6 +146,11 @@ ${OBJECTDIR}/src/nodes/input_node.o: src/nodes/input_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node.o src/nodes/input_node.cpp
+
+${OBJECTDIR}/src/nodes/neural_node.o: src/nodes/neural_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/neural_node.o src/nodes/neural_node.cpp
 
 ${OBJECTDIR}/src/nodes/node.o: src/nodes/node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
@@ -188,6 +201,11 @@ ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
 	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
+
+${OBJECTDIR}/src/tools/training.o: src/tools/training.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/tools
+	${RM} "$@.d"
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/training.o src/tools/training.cpp
 
 ${OBJECTDIR}/src/training/stochastic_momentum_training.o: src/training/stochastic_momentum_training.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/training

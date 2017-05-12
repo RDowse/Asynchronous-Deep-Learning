@@ -30,7 +30,7 @@ class NeuralNode::HiddenNode: public NeuralNode{
     static NodeRegister<HiddenNode> m_reg;
     static std::string m_type;
     
-    map<int,int> dstWeightIndex;        // map backprop index to the relevant weight
+    unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
     vector<float> deltas;           // store received delta values
     vector<float> deltaWeights;     // delta weights, for momentum

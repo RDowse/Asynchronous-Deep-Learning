@@ -25,10 +25,6 @@ namespace math{
         return 1 / (1 + exp(-x));
     }
     
-    inline float activationFastSig(float x){
-        return 1 / (1 + abs(x));
-    }
-    
     inline float activationTan(float x){
         return 2 / (1 + exp(-2 * x)) - 1;
     }

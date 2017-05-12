@@ -21,6 +21,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <cassert>
 #include <iostream>
 
@@ -35,8 +36,8 @@ class Node{
 protected:
     int m_id;
 public:
-    map<int, Edge*> incomingEdges;  // map of edges indexed by their src
-    map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
+    unordered_map<int, Edge*> incomingEdges;  // map of edges indexed by their src
+    unordered_map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
     
     Node(shared_ptr<GraphSettings> settings){m_id = curr_id++;}
     
@@ -51,6 +52,9 @@ public:
     
     // handle sending of messages and routing for the node
     virtual bool onSend(vector<Message*>& msgs)=0;
+
+    // send messages to the corresponding node id, while check validity
+    void send(vector<Message*>& msgs);
     
     // send messages to the corresponding node id, while check validity
     void send(vector<Message*>& msgs, list<Edge*>& activeEdges);

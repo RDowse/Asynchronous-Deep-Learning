@@ -10,6 +10,7 @@
 
 #include "nodes/node.h"
 #include "graphs/dnn_graph_settings.h"
+#include "misc/message_pool.h"
 
 #include <vector>
 #include <memory>
@@ -27,6 +28,9 @@ public:
     class OutputNode;
     class SyncNode;
 protected:
+    static MessagePool<ForwardPropagationMessage>* forwardMessagePool;
+    static MessagePool<BackwardPropagationMessage>* backwardMessagePool;
+    
     shared_ptr<DNNGraphSettings> settings;
     
     // sorted edges

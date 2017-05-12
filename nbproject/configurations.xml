@@ -45,6 +45,7 @@
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
       <itemPath>include/misc/edge.h</itemPath>
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
+      <itemPath>include/misc/forward_propagation_message_pool.h</itemPath>
       <itemPath>include/states/forward_train_state.h</itemPath>
       <itemPath>include/graphs/graph_settings.h</itemPath>
       <itemPath>include/nodes/hidden_node.h</itemPath>
@@ -53,6 +54,7 @@
       <itemPath>include/tools/logging.h</itemPath>
       <itemPath>include/tools/math.h</itemPath>
       <itemPath>include/messages/message.h</itemPath>
+      <itemPath>include/misc/message_pool.h</itemPath>
       <itemPath>include/nodes/neural_node.h</itemPath>
       <itemPath>include/nodes/node.h</itemPath>
       <itemPath>include/misc/node_factory.h</itemPath>
@@ -63,6 +65,7 @@
       <itemPath>include/training/stochastic_momentum_training.h</itemPath>
       <itemPath>include/training/stochastic_training.h</itemPath>
       <itemPath>include/nodes/sync_node.h</itemPath>
+      <itemPath>include/tools/training.h</itemPath>
       <itemPath>include/training/training_strategy.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -87,6 +90,8 @@
       <itemPath>src/nodes/input_node.cpp</itemPath>
       <itemPath>src/tools/logging.cpp</itemPath>
       <itemPath>src/main.cpp</itemPath>
+      <itemPath>src/misc/message_pool.cpp</itemPath>
+      <itemPath>src/nodes/neural_node.cpp</itemPath>
       <itemPath>src/nodes/node.cpp</itemPath>
       <itemPath>src/misc/node_factory.cpp</itemPath>
       <itemPath>src/nodes/output_node.cpp</itemPath>
@@ -95,6 +100,7 @@
       <itemPath>src/training/stochastic_momentum_training.cpp</itemPath>
       <itemPath>src/training/stochastic_training.cpp</itemPath>
       <itemPath>src/nodes/sync_node.cpp</itemPath>
+      <itemPath>src/tools/training.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -171,6 +177,13 @@
       </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/forward_propagation_message_pool.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/misc/message_pool.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/misc/node_factory.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
@@ -238,6 +251,8 @@
       </item>
       <item path="include/tools/math.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tools/training.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/training/stochastic_momentum_training.h"
             ex="false"
             tool="3"
@@ -264,6 +279,8 @@
             ex="false"
             tool="1"
             flavor2="0">
+      </item>
+      <item path="src/misc/message_pool.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -293,6 +310,8 @@
       </item>
       <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/nodes/neural_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
@@ -315,6 +334,8 @@
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tools/training.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/training/stochastic_momentum_training.cpp"
             ex="false"
@@ -391,6 +412,13 @@
       </item>
       <item path="include/misc/edge.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/forward_propagation_message_pool.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/misc/message_pool.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/misc/node_factory.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
@@ -458,6 +486,8 @@
       </item>
       <item path="include/tools/math.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/tools/training.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/training/stochastic_momentum_training.h"
             ex="false"
             tool="3"
@@ -484,6 +514,8 @@
             ex="false"
             tool="1"
             flavor2="0">
+      </item>
+      <item path="src/misc/message_pool.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -513,6 +545,8 @@
       </item>
       <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/nodes/neural_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
@@ -535,6 +569,8 @@
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/tools/training.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/training/stochastic_momentum_training.cpp"
             ex="false"

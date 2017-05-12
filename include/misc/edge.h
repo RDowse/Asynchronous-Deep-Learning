@@ -16,18 +16,13 @@ class Node;
 class Edge{ 
     unsigned delay;
 public:
-    enum MessageStatus{
-        empty,
-        ready,    
-        inflight
-    };
     Message* msg;
     Node* dst;
     Node* src;
-    MessageStatus msgStatus;
+    unsigned msgStatus; // empty -> ready -> inflight 
     
     Edge(Node* src, Node* dst, unsigned delay) :
-    dst(dst), src(src), delay(delay), msgStatus(MessageStatus::empty) {
+    dst(dst), src(src), delay(delay), msgStatus(0) {
     }
 
     unsigned getDelay()const {

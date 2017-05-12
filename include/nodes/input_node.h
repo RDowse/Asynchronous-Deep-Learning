@@ -29,7 +29,7 @@ class NeuralNode::InputNode: public NeuralNode{
     static NodeRegister<InputNode> m_reg;
     static std::string m_type;
     
-    map<int,int> dstWeightIndex;        // map of weights associated to dst ids
+    unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
     vector<float> deltas;
     vector<float> deltaWeights;     // delta weights, for momentum
@@ -56,7 +56,7 @@ public:
     void onRecv(BackwardPropagationMessage* msg) override;
 
     bool sendForwardMsgs(vector<Message*>& msgs) override;
-    bool sendBackwardMsgs(vector<Message*>& msgs) override;
+    bool sendBackwardMsgs(vector<Message*>& msgs) override;    
 private:
     // for populating weights map
     int map_index = 0;

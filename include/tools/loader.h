@@ -104,6 +104,8 @@ public:
                     err<<"At line "<<lineNumber<<" : Couldn't read edge";
                     throw std::runtime_error(err.str());              
                 }
+                int d = rand() % 3 + 1;
+                //sim.addEdge(srcIndex,dstIndex,d);
                 sim.addEdge(srcIndex,dstIndex,delay);
             }
             expect(lineNumber,src,"EndEdges");

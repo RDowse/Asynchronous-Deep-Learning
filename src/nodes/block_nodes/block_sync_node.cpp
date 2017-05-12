@@ -117,7 +117,7 @@ bool BlockNeuralNode::SyncNode::readyToSendBackward(){
 void BlockNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     backwardSeenCount++;
     
-    delete msg;
+    //delete msg;
     
     // update flags and indexes once all data is received
     if(readyToSendForward() && !validating){
@@ -155,7 +155,7 @@ void BlockNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
 //    float target = (dataset->training_labels(trainingIndices[sampleIndex]) == index ? actMax : actMin);
 //    training_error += 0.5*pow((target-msg->activation),2);
     
-    delete msg;
+    //delete msg;
     
     // switch propagation direction
     if(readyToSendBackward() && !validating){

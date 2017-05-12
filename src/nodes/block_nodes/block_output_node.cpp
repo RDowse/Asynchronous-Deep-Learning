@@ -85,7 +85,7 @@ void BlockNeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
     output += msg->matActivation;
     forwardSeenCount++;
     
-    delete msg;
+    //delete msg;
 }
 
 void BlockNeuralNode::OutputNode::onRecv(BackwardPropagationMessage* msg) {
@@ -93,5 +93,5 @@ void BlockNeuralNode::OutputNode::onRecv(BackwardPropagationMessage* msg) {
     target = msg->matTarget;
     backwardSeenCount++;
     
-    delete msg;
+    //delete msg;
 }

@@ -44,12 +44,11 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     output = settings->activationFnc(value);
     
     Logging::log(3, "%s%d forward out: %f", m_type.c_str(), m_id, output);
-    //cout << "Out: " << output << "\n"; 
     
-    auto msg = new ForwardPropagationMessage();
+    msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
-        auto msg = new ForwardPropagationMessage();
+        auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->activation = output;
@@ -66,10 +65,11 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
     
+    msgs.reserve(outgoingBackwardEdges.size());
     auto delta = (target-output)*settings->deltaActivationFnc(output);
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-        auto msg = new BackwardPropagationMessage();
+        auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->delta = delta; 
@@ -83,12 +83,12 @@ void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
     value += msg->activation;
     forwardSeenCount++;
     
-    delete msg;
+    forwardMessagePool->returnMessage(msg);
 }
 
 void NeuralNode::OutputNode::onRecv(BackwardPropagationMessage* msg) {
     target = msg->target;
     backwardSeenCount++;
     
-    delete msg;
+    backwardMessagePool->returnMessage(msg);
 }

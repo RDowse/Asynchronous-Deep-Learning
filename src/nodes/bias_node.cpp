@@ -11,11 +11,11 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     
     if(weights.empty()) initWeights();
     
-    //msgs.reserve(weights.size());
+    msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == 1);
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
-        auto msg = new ForwardPropagationMessage();
+        auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->activation = output*weights[0];
@@ -30,12 +30,13 @@ bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     // perform weights update first
     settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
-
+    
     newWeights[0] += deltaWeights[0]; // update step  
     
+    msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );        
-        auto msg = new BackwardPropagationMessage();
+        auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msgs.push_back(msg);
@@ -50,7 +51,7 @@ void BiasNode::onRecv(ForwardPropagationMessage* msg) {
     // notifying msg from sync node
     forwardSeenCount++;
 
-    delete msg;
+    forwardMessagePool->returnMessage(msg);
     
     // weights update step
     if(readyToSendForward())
@@ -61,5 +62,5 @@ void BiasNode::onRecv(BackwardPropagationMessage* msg) {
     deltas[0] += msg->delta;
     backwardSeenCount++;
     
-    delete msg;
+    backwardMessagePool->returnMessage(msg);
 }

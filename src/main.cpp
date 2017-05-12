@@ -69,16 +69,17 @@ void simulate(const string& path){
         }
         Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
         
-        Simulator<TNode> sim(1,nNodes,nEdges,*stats);
+        Simulator<TNode> sim(0,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
         printf("Loading data\n");
         MNISTDataWrapper data("mnist/mnist_train_100.csv","mnist/mnist_test_10.csv");
         //XORDataWrapper data("xor_train.csv","xor_train.csv");
-        //printData(data);
         sim.loadInput(&data);
         sim.run("train");
+        
+        cout << "Final epoch " << std::static_pointer_cast<DNNGraphSettings>(settings)->epoch << "\n";
     } else {
         printf("Unable to open file %s\n",path.c_str());
         return;

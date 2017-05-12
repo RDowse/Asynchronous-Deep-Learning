@@ -81,7 +81,7 @@ void BlockNeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     output += msg->matActivation;
     forwardSeenCount++;
     
-    delete msg;
+    //delete msg;
     
     // weight update step
 //    if(readyToSendForward() && settings->update)
@@ -96,5 +96,5 @@ void BlockNeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
     deltas.block(index*blockSize,0,blockSize,deltas.cols()) = msg->matDelta;
     backwardSeenCount++;
     
-    delete msg;
+    //delete msg;
 }

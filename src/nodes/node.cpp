@@ -14,38 +14,38 @@ void Node::addEdge(Edge* e){
     }
 }
 
+void Node::send(vector<Message*>& msgs){
+    for(unsigned i = 0; i < msgs.size(); ++i){
+        Edge* e = outgoingEdges[msgs[i]->dst];
+        assert( e != NULL );
+        assert( 0 == e->msgStatus );
+        e->msg = msgs[i]; // Copy message into channel
+        e->msgStatus = 1 + e->getDelay(); // How long until it is ready?
+    }
+}
+
 void Node::send(vector<Message*>& msgs, list<Edge*>& activeEdges){
     for(unsigned i = 0; i < msgs.size(); ++i){
         Edge* e = outgoingEdges[msgs[i]->dst];
-        if(e != NULL){
-            assert( 0 == e->msgStatus );
-            e->msg = msgs[i]; // Copy message into channel
-            e->msgStatus = 
-                static_cast<Edge::MessageStatus>(1 + e->getDelay()); // How long until it is ready?
-            
-            // add edge to the list of active edges
-            activeEdges.push_back(e);
-        } else {
-            cout << "Node " << m_id << " is not connect to node id " << msgs[i]->dst << "\n";
-            assert( e == NULL );
-        }
+        assert( e != NULL );
+        assert( 0 == e->msgStatus );
+        e->msg = msgs[i]; // Copy message into channel
+        e->msgStatus = 1 + e->getDelay(); // How long until it is ready?
+
+        // add edge to the list of active edges
+        activeEdges.push_back(e);
     }
 }
 
 void Node::send(vector<Message*>& msgs, tbb::concurrent_queue<Edge*>& activeEdges){
     for(unsigned i = 0; i < msgs.size(); ++i){
         Edge* e = outgoingEdges[msgs[i]->dst];
-        if(e != NULL){
-            assert( 0 == e->msgStatus );
-            e->msg = msgs[i]; // Copy message into channel
-            e->msgStatus = 
-                static_cast<Edge::MessageStatus>(1 + e->getDelay()); // How long until it is ready?
-            
-            // add edge to the list of active edges
-            activeEdges.push(e);
-        } else {
-            cout << "Node " << m_id << " is not connect to node id " << msgs[i]->dst << "\n";
-            assert( e == NULL );
-        }
+        assert( e != NULL );
+        assert( 0 == e->msgStatus );
+        e->msg = msgs[i]; // Copy message into channel
+        e->msgStatus = 1 + e->getDelay(); // How long until it is ready?
+
+        // add edge to the list of active edges
+        activeEdges.push(e);
     }
 }

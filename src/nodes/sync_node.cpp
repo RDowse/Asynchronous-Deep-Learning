@@ -48,9 +48,10 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     Logging::log(3, "Sending sample %d", sampleIndex);
     
     // send out data samples to input nodes
+    msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
-        auto msg = new ForwardPropagationMessage();
+        auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         // sampling strategy
@@ -79,7 +80,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     // prepare msgs
     msgs.reserve(outgoingBackwardEdges.size());
     for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
-        auto msg = new BackwardPropagationMessage();
+        auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         
@@ -98,7 +99,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
 }
 
 bool NeuralNode::SyncNode::readyToSendForward(){
-    return ((backwardSeenCount == incomingBackwardEdges.size()) && epochCount<=settings->maxEpoch) || tick; 
+    return ((backwardSeenCount == incomingBackwardEdges.size()) && settings->epoch<=settings->maxEpoch) || tick; 
 }
 bool NeuralNode::SyncNode::readyToSendBackward(){
     return (forwardSeenCount == incomingForwardEdges.size());
@@ -107,13 +108,20 @@ bool NeuralNode::SyncNode::readyToSendBackward(){
 void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     backwardSeenCount++;
     
-    delete msg;
+    backwardMessagePool->returnMessage(msg);
     
     // update flags and indexes once all data is received
     if(readyToSendForward()){
         // start forward pass on the next sample
-        delete settings->state;
-        settings->state = new ForwardTrainState();
+        
+        if(!lastState){
+            settings->state = new ForwardTrainState();
+        } else {
+            State* tmpState = lastState;
+            lastState = settings->state;
+            settings->state = tmpState;
+        }
+        
         sampleIndex++;
        
         // end of epoch, all samples in the training set have been passed
@@ -126,11 +134,10 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             }
             // allow for sampling without replacement
             std::shuffle(std::begin(trainingIndices), std::end(trainingIndices), engine);
-            //std::random_shuffle(trainingIndices.begin(), trainingIndices.end());
             sampleIndex = 0;
-            epochCount++;
-            Logging::log(0,"TOTAL ERROR: %f\n",sum);
-            Logging::log(0,"EPOCH: %d\n\n",epochCount);
+            settings->epoch++;
+            Logging::log(1,"TOTAL ERROR: %f\n",sum);
+            Logging::log(1,"EPOCH: %d\n\n",settings->epoch);
         }
     }
 }
@@ -149,7 +156,7 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     training_error += 0.5*pow((target-msg->activation),2);
     out[index] = msg->activation;
     
-    delete msg;
+    forwardMessagePool->returnMessage(msg);
     
     // switch propagation direction
     if(readyToSendBackward()){
@@ -160,15 +167,20 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
         
         Logging::log(1,"Training error sample%d %f\n",currSample,training_error);
         Logging::log(1,"Minimum error sample%d %f\n",currSample,min_error[currSample]);
-        Logging::log(1,"Epoch %d (targ) %d\n",epochCount,dataset->training_labels(currSample));
+        Logging::log(1,"Epoch %d (targ) %d\n",settings->epoch,dataset->training_labels(currSample));
 
         stringstream ss;
-        for(auto i: out) ss << i << " ";
-        Logging::log(1,"Output: %s\n\n",ss.str().c_str()); 
+        //for(auto i: out) ss << i << " ";
+        //Logging::log(1,"Output: %s\n\n",ss.str().c_str()); 
         
         training_error = 0;
-
-        delete settings->state;
-        settings->state = new BackwardTrainState();
+        
+        if(!lastState){
+            settings->state = new BackwardTrainState();
+        } else {
+            State* tmpState = lastState;
+            lastState = settings->state;
+            settings->state = tmpState;
+        }
     }
 }

@@ -15,6 +15,7 @@
 
 #include "misc/data_wrapper.h"
 
+#include <unordered_map>
 #include <stack>
 #include <string>
 #include <cassert>
@@ -31,18 +32,19 @@ class NeuralNode::SyncNode: public NeuralNode{
     
     DataWrapper* dataset;
     
+    State* lastState;           // tmp fix for deleting states
+    
     bool tick = true;           // trigger initial message propagation
     bool validating = false;    // flag for propagating validation set
   
     int sampleIndex = 0;
-    int epochCount = 0;
     
     vector<float> min_error; 
     vector<float> error;
     
     vector<int> trainingIndices;
     
-    map<int,int> dstOutputIndex;        // map backprop index to output
+    unordered_map<int,int> dstOutputIndex;        // map backprop index to output
     vector<float> out;
     
     float actMax = settings->activationFnc(5);
@@ -55,7 +57,9 @@ class NeuralNode::SyncNode: public NeuralNode{
 public:
     static std::string m_type;
     SyncNode(shared_ptr<GraphSettings> settings): NeuralNode(settings){}
-    virtual ~SyncNode(){}
+    virtual ~SyncNode(){
+        if(lastState) delete lastState;
+    }
     
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){

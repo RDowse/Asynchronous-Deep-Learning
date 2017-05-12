@@ -33,11 +33,11 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     // calulate output activation
     output = settings->activationFnc(value);
     
-    //msgs.reserve(weights.size());
+    msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
-        auto msg = new ForwardPropagationMessage();
+        auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->activation = output*weights[i];
@@ -59,15 +59,16 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     // perform weight update first
     settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
-        
+    
     for(int i = 0; i < deltaWeights.size(); ++i)
         newWeights[i] += deltaWeights[i]; // update step  
     
+    msgs.reserve(outgoingBackwardEdges.size());
     // dispatch msgs, calculating delta for next nodes
     auto delta = delta_sum*settings->deltaActivationFnc(output);
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-        auto msg = new BackwardPropagationMessage();
+        auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->delta = delta; 
@@ -82,7 +83,7 @@ void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     value += msg->activation;
     forwardSeenCount++;
     
-    delete msg;
+    forwardMessagePool->returnMessage(msg);
     
     // weight update step
     if(readyToSendForward())
@@ -94,5 +95,5 @@ void NeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
     deltas[index] = msg->delta;
     backwardSeenCount++;
     
-    delete msg;
+    backwardMessagePool->returnMessage(msg);
 }
