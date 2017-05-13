@@ -69,7 +69,7 @@ void simulate(const string& path){
         }
         Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
         
-        Simulator<TNode> sim(0,nNodes,nEdges,*stats);
+        Simulator<TNode> sim(-1,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         

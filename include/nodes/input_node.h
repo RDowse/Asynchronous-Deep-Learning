@@ -36,7 +36,7 @@ class NeuralNode::InputNode: public NeuralNode{
     Eigen::VectorXf newWeights;       // intermediate updated weights
     Eigen::VectorXf weights;
 public:
-    InputNode(shared_ptr<GraphSettings> graphSettings): NeuralNode(graphSettings){}
+    InputNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}
 
@@ -62,7 +62,7 @@ private:
     int map_index = 0;
     void initWeights(){
         weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
-        settings->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
+        context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
         newWeights = weights;    
         
         // init size of delta values

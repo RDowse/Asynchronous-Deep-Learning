@@ -18,7 +18,7 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->activation = Eigen::VectorXf::Ones(settings->batchSize)*weights(0); // TODO adjust for remainder
+        msg->activation = Eigen::VectorXf::Ones(context->batchSize)*weights(0); // TODO adjust for remainder
         msgs.push_back(msg);
     }
     
@@ -28,20 +28,25 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
 bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
     
-    // perform weights update first
-//    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
-//    
-//    newWeights[0] += deltaWeights[0]; // update step  
-//    
-//    msgs.reserve(outgoingBackwardEdges.size());
-//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );        
-//        auto msg = backwardMessagePool->getMessage();
-//        msg->src = m_id;
-//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-//        msgs.push_back(msg);
-//    }
-//    assert(msgs.size() == 1);
+    // perform weight update first
+    MatrixXf mat = deltas*output.transpose();
+    VectorXf tmp(mat.rows());
+    for(int i = 0; i < tmp.size(); ++i)
+        tmp(i) = mat.row(i).sum();
+    
+    deltaWeights = context->lr*tmp + context->alpha*deltaWeights;
+
+    newWeights(0) += deltaWeights(0); // update step  
+    
+    msgs.reserve(outgoingBackwardEdges.size());
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );        
+        auto msg = backwardMessagePool->getMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        msgs.push_back(msg);
+    }
+    assert(msgs.size() == 1);
     
     backwardSeenCount = 0;
 }
@@ -59,7 +64,7 @@ void BiasNode::onRecv(ForwardPropagationMessage* msg) {
 }
 
 void BiasNode::onRecv(BackwardPropagationMessage* msg) {
-    //deltas[0] += msg->delta;
+    deltas(0) += msg->delta.sum();
     backwardSeenCount++;
     
     backwardMessagePool->returnMessage(msg);

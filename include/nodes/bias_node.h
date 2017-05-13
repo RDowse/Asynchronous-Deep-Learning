@@ -81,7 +81,7 @@ private:
     int map_index = 0;
     void initWeights(){
         weights = Eigen::VectorXf::Zero(1);
-        settings->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
+        context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
         newWeights = weights;    
         
         // init size of delta values

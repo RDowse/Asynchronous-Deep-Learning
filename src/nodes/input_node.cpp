@@ -67,20 +67,24 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
             
     // perform weight update first
-//    settings->trainingStrategy->computeDeltaWeights(settings,output,deltas,deltaWeights);
-//    
-//    for(int i = 0; i < deltaWeights.size(); ++i)
-//        newWeights[i] += deltaWeights[i]; // update step    
-//    
-//    msgs.reserve(outgoingBackwardEdges.size());
-//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-//        auto msg = backwardMessagePool->getMessage();
-//        msg->src = m_id;
-//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-//        msgs.push_back(msg);
-//    }
-//    assert(msgs.size() == 1);
+    MatrixXf mat = deltas*output.transpose();
+    VectorXf tmp(mat.rows());
+    for(int i = 0; i < tmp.size(); ++i)
+        tmp(i) = mat.row(i).sum();
+    
+    deltaWeights = context->lr*tmp + context->alpha*deltaWeights;
+
+    newWeights += deltaWeights; // update step  
+    
+    msgs.reserve(outgoingBackwardEdges.size());
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+        auto msg = backwardMessagePool->getMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        
+        msgs.push_back(msg);
+    }
     
     // reset
     backwardSeenCount = 0;
@@ -99,7 +103,7 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
 
 void NeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     int index = dstWeightIndex[msg->src];
-    //deltas[index] = msg->delta;
+    deltas(index) = msg->delta.sum();
     backwardSeenCount++;
     
     backwardMessagePool->returnMessage(msg);

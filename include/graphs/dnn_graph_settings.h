@@ -23,10 +23,10 @@ public:
     float lr = 0.1;             // learning rate (0.1)
     float alpha = 0.5;          // momentum (0.5)
     int sample = 0;             // selected sample for predicting
-    int maxEpoch = 1000;         // maximum epochs for training
+    int maxEpoch = 30;         // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
     int epoch = 0;
-    int batchSize = 10;
+    int batchSize = 20;
     
     // Weight initialisation
     //void (*initWeightsFnc)(vector<float>& ,int ,int);

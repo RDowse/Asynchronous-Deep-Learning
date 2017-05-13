@@ -47,16 +47,14 @@ class NeuralNode::SyncNode: public NeuralNode{
     unordered_map<int,int> dstOutputIndex;        // map backprop index to output
     vector<float> out;
     
-    float actMax = settings->activationFnc(5);
-    float actMin = settings->activationFnc(-5);
-    
     float training_error = 0;
     
     // random number generation
     std::default_random_engine engine = std::default_random_engine{};
 public:
     static std::string m_type;
-    SyncNode(shared_ptr<GraphSettings> settings): NeuralNode(settings){}
+    SyncNode(shared_ptr<GraphSettings> context): NeuralNode(context){
+    }
     virtual ~SyncNode(){
         if(lastState) delete lastState;
     }

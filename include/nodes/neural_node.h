@@ -32,7 +32,7 @@ protected:
     static MessagePool<ForwardPropagationMessage>* forwardMessagePool;
     static MessagePool<BackwardPropagationMessage>* backwardMessagePool;
     
-    shared_ptr<DNNGraphSettings> settings;
+    shared_ptr<DNNGraphSettings> context;
     
     // sorted edges
     vector<Edge*> incomingForwardEdges;
@@ -49,7 +49,7 @@ protected:
 public:
     NeuralNode(shared_ptr<GraphSettings> context): Node(context){        
         try{
-            settings = std::static_pointer_cast<DNNGraphSettings>(context);
+            this->context = std::static_pointer_cast<DNNGraphSettings>(context);
         } catch (const std::bad_cast& e) {
             std::cout << e.what() << "\n";
         }
@@ -62,13 +62,13 @@ public:
     }
     
     virtual bool readyToSend(){
-        if(!settings->state) assert(0);
-        settings->state->readyToSend(this);
+        assert(context->state);
+        context->state->readyToSend(this);
     }  
     
     // Handle sending of messages and routing for the node
     virtual bool onSend(vector<Message*>& msgs){
-        settings->state->onSend(this, msgs);
+        context->state->onSend(this, msgs);
     }
     
     // Handle message receiving

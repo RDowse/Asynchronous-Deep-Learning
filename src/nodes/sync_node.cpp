@@ -46,7 +46,7 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     
     // TODO: check data size matches the input size
     Logging::log(3, "Sending sample %d", sampleIndex);
-    cout << "send sample\n"; 
+    
     // send out data samples to input nodes
     msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
@@ -58,10 +58,9 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         // sampling strategy
         if(outgoingForwardEdges[i]->dst->getType() == "Input" 
                 && j < images.cols()){
-            //msg->activation = images.block(trainingIndices[sampleIndex],j++,settings->batchSize,1);
-            msg->activation = images.block(sampleIndex,j++,settings->batchSize,1);
+            msg->activation = images.block(sampleIndex,j++,context->batchSize,1);
         } else if(outgoingForwardEdges[i]->dst->getType() == "Bias"){
-            msg->activation = Eigen::VectorXf::Ones(settings->batchSize);
+            msg->activation = Eigen::VectorXf::Ones(context->batchSize);
         } 
         msgs.push_back(msg);
     }
@@ -77,31 +76,39 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     auto& labels = validating ? 
         dataset->validation_labels : dataset->training_labels;
     
-//    // TODO: check data size matches the input size
-//    Logging::log(3, "Sending sample %d backward", trainingIndices[sampleIndex]);
-//    // prepare msgs
-//    msgs.reserve(outgoingBackwardEdges.size());
-//    for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
-//        auto msg = backwardMessagePool->getMessage();
-//        msg->src = m_id;
-//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-//        
-//        if(outgoingBackwardEdges[i]->dst->getType() == "Output")
-//            if(outgoingBackwardEdges.size() == 1) // binary classification
-//                msg->target = (labels(trainingIndices[sampleIndex]) ? actMax : actMin);
-//            else // multiclassification
-//                msg->target = (labels(trainingIndices[sampleIndex]) == i ? actMax : actMin);
-//        else 
-//            assert(0); // should not occur
-//        msgs.push_back(msg);
-//    }
+    // TODO: check data size matches the input size
+    Logging::log(3, "Sending sample %d backward", trainingIndices[sampleIndex]);
+    
+    float actMax = context->activationFnc(5);
+    float actMin = context->activationFnc(-5);
+    
+    int currSample = trainingIndices[sampleIndex];
+    auto batchLabels = dataset->training_labels.block(currSample,0,context->batchSize,1);
+    
+    msgs.reserve(outgoingBackwardEdges.size());
+    for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
+        auto msg = backwardMessagePool->getMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        
+        Eigen::VectorXf target(context->batchSize);
+        for(int j = 0; j < context->batchSize; ++j)
+            target(j) = (batchLabels(j) == i ? actMax : actMin);
+        
+        assert(outgoingBackwardEdges[i]->dst->getType() == "Output");
+        if(outgoingBackwardEdges.size() == 1) // binary classification
+            assert(0); //msg->target = (labels(trainingIndices[sampleIndex]) ? actMax : actMin);
+        else // multiclassification
+            msg->target = target;
+        msgs.push_back(msg);
+    }
     
     // reset
     forwardSeenCount = 0;
 }
 
 bool NeuralNode::SyncNode::readyToSendForward(){
-    return ((backwardSeenCount == incomingBackwardEdges.size()) && settings->epoch<=settings->maxEpoch) || tick; 
+    return ((backwardSeenCount == incomingBackwardEdges.size()) && context->epoch<=context->maxEpoch) || tick; 
 }
 bool NeuralNode::SyncNode::readyToSendBackward(){
     return (forwardSeenCount == incomingForwardEdges.size());
@@ -117,30 +124,29 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
         // start forward pass on the next sample
         
         if(!lastState){
-            settings->state = new ForwardTrainState();
+            context->state = new ForwardTrainState();
         } else {
             State* tmpState = lastState;
-            lastState = settings->state;
-            settings->state = tmpState;
+            lastState = context->state;
+            context->state = tmpState;
         }
         
         //sampleIndex++;
-        sampleIndex+= settings->batchSize; // todo remainder
-       
+        sampleIndex+= context->batchSize; // todo remainder
+        
         // end of epoch, all samples in the training set have been passed
         if(sampleIndex==dataset->training_labels.size()){
-            // calulate training error for current epoch
-            float sum = accumulate(error.begin(),error.end(),0.0);
-            if(sum <= 0.01){
-                cout << "final error" << sum << "\n";
+            if(training_error <= 0.01){
+                cout << "final error" << training_error << "\n";
                 exit(0);
             }
             // allow for sampling without replacement
-            std::shuffle(std::begin(trainingIndices), std::end(trainingIndices), engine);
+            //std::shuffle(std::begin(trainingIndices), std::end(trainingIndices), engine);
             sampleIndex = 0;
-            settings->epoch++;
-            Logging::log(0,"TOTAL ERROR: %f\n",sum);
-            Logging::log(0,"EPOCH: %d\n\n",settings->epoch);
+            context->epoch++;
+            Logging::log(0,"TOTAL ERROR: %f\n",training_error);
+            Logging::log(0,"EPOCH: %d\n\n",context->epoch);
+            training_error = 0;
         }
     }
 }
@@ -150,15 +156,26 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     
     int currSample = trainingIndices[sampleIndex]; // refactor to member variable
     int index = dstOutputIndex[msg->src];
-    float target = 0;
-    if(outgoingBackwardEdges.size() == 1) {
-        target = (dataset->training_labels(currSample) ? actMax : actMin);
-    } else {
-        target = (dataset->training_labels(currSample) == index ? actMax : actMin);
-    }
-    //training_error += 0.5*pow((target-msg->activation),2);
-    //out[index] = msg->activation;
-    cout << msg->activation.transpose() << endl;
+    
+    float actMax = context->activationFnc(5);
+    float actMin = context->activationFnc(-5);
+    
+    auto batchLabels = dataset->training_labels.block(currSample,0,context->batchSize,1);
+    
+    Eigen::VectorXf target(msg->activation.size());
+    assert(target.size() == batchLabels.size());
+    for(int i = 0; i < target.size(); ++i)
+        target(i) = (batchLabels(i) == index ? actMax : actMin);
+    
+//    if(outgoingBackwardEdges.size() == 1) {
+//        target = (dataset->training_labels(currSample) ? actMax : actMin);
+//    } else {
+//        target = (dataset->training_labels(currSample) == index ? actMax : actMin);
+//    }
+    Eigen::VectorXf diff = target - msg->activation;
+    auto tmp = float(diff.transpose()*diff);
+    training_error += 0.5*(tmp);
+    
     forwardMessagePool->returnMessage(msg);
     
     // switch propagation direction
@@ -166,24 +183,17 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
         assert(trainingIndices[sampleIndex] < min_error.size());
         assert(trainingIndices[sampleIndex] < error.size());
         min_error[currSample] = min(training_error,min_error[currSample]);
-        error[currSample] = training_error;
         
         Logging::log(1,"Training error sample%d %f\n",currSample,training_error);
         Logging::log(1,"Minimum error sample%d %f\n",currSample,min_error[currSample]);
-        Logging::log(1,"Epoch %d (targ) %d\n",settings->epoch,dataset->training_labels(currSample));
-
-        stringstream ss;
-        //for(auto i: out) ss << i << " ";
-        //Logging::log(1,"Output: %s\n\n",ss.str().c_str()); 
-        
-        training_error = 0;
+        Logging::log(1,"Epoch %d (targ) %d\n",context->epoch,dataset->training_labels(currSample));
         
         if(!lastState){
-            settings->state = new BackwardTrainState();
+            context->state = new BackwardTrainState();
         } else {
             State* tmpState = lastState;
-            lastState = settings->state;
-            settings->state = tmpState;
+            lastState = context->state;
+            context->state = tmpState;
         }
     }
 }

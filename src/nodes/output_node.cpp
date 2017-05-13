@@ -41,7 +41,7 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     // calulate output activation
-    output = value.unaryExpr(settings->activationFnc);
+    output = value.unaryExpr(context->activationFnc);
     
     //Logging::log(3, "%s%d forward out: %f", m_type.c_str(), m_id, output);
     
@@ -65,17 +65,19 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     //Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
     
-//    msgs.reserve(outgoingBackwardEdges.size());
-//    auto delta = (target-output)*settings->deltaActivationFnc(output);
-//    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-//        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-//        auto msg = backwardMessagePool->getMessage();
-//        msg->src = m_id;
-//        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-//        msg->delta = delta; 
-//        msgs.push_back(msg);
-//    }
-//    
+    msgs.reserve(outgoingBackwardEdges.size());
+    Eigen::VectorXf diff = (target-output);
+    Eigen::VectorXf delta = diff.transpose()*output.unaryExpr(context->deltaActivationFnc);
+    for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
+        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+        auto msg = backwardMessagePool->getMessage();
+        msg->src = m_id;
+        msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        
+        msg->delta = delta; 
+        msgs.push_back(msg);
+    }
+    
     backwardSeenCount = 0;
 }
 
