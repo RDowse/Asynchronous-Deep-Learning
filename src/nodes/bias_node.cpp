@@ -29,7 +29,7 @@ bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
     
     // perform weight update first
-    MatrixXf mat = deltas*output.transpose();
+    MatrixXf mat = deltas*activation.transpose();
     VectorXf tmp(mat.rows());
     for(int i = 0; i < tmp.size(); ++i)
         tmp(i) = mat.row(i).sum();

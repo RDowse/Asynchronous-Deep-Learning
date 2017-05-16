@@ -69,7 +69,7 @@ void simulate(const string& path){
         }
         Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
         
-        Simulator<TNode> sim(-1,nNodes,nEdges,*stats);
+        Simulator<TNode> sim(0,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
@@ -88,7 +88,7 @@ void simulate(const string& path){
 }
 
 template<typename T>
-void buildGraph(string name, int nHidden, int nInput, int nOutput, bool bias, int nCPU=4){
+void buildGraph(string name, int nHLayers, int nHidden, int nInput, int nOutput, bool bias, int nCPU=4){
     DNNGraphBuilder<T> dnngraph(1,nHidden,nInput,nOutput,bias,nCPU);
     stringstream ss1, ss2;
     ss1 << "w/" << name << ".graph";
@@ -119,13 +119,14 @@ int main(int argc, char** argv) {
 //    }
     
     std::ostream *stats=&std::cout;
-    //buildGraph<NeuralNode>("net",10,28*28,10,true);
-    //buildGraph<NeuralNode>("xor",2,2,1,true); // correct so it works with 0 hidden nodes
-    //buildGraph<BlockNeuralNode>("test",10,28*28,10,false,2);
+    //buildGraph<NeuralNode>("net",1,10,28*28,10,true);
+    //buildGraph<NeuralNode>("net2",2,10,28*28,10,true);
+    //buildGraph<NeuralNode>("xor",1,2,2,1,true); 
+    //buildGraph<NeuralNode>("test2",2,3,3,2,true); 
     
-    simulate<NeuralNode>("w/net.graph");
+    //simulate<NeuralNode>("w/net.graph");
+    simulate<NeuralNode>("w/net2.graph");
     //simulate<NeuralNode>("w/xor.graph");
-    //simulate<BlockNeuralNode>("w/test.graph"); 
     
     return 0;
 }

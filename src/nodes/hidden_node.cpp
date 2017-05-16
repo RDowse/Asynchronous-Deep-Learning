@@ -31,9 +31,9 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     if(!weights.size()) initWeights();
     
     // calulate output activation
-    output = value.unaryExpr(context->activationFnc);
+    activation = input.unaryExpr(context->activationFnc);
     
-    MatrixXf mat = output*weights.transpose();
+    MatrixXf mat = activation*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -47,7 +47,7 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     }
     
     // reset
-    value.setZero(value.size());
+    input.setZero(input.size());
     forwardSeenCount = 0;
 }
 
@@ -58,7 +58,7 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     float delta_sum = deltas.transpose()*weights;
     
     // perform weight update first
-    MatrixXf mat = deltas*output.transpose();
+    MatrixXf mat = deltas*activation.transpose();
     VectorXf tmp(mat.rows());
     for(int i = 0; i < tmp.size(); ++i)
         tmp(i) = mat.row(i).sum();
@@ -67,7 +67,7 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
 
     newWeights += deltaWeights; // update step  
     
-    Eigen::VectorXf delta = delta_sum*output.unaryExpr(context->deltaActivationFnc);
+    Eigen::VectorXf delta = delta_sum*activation.unaryExpr(context->deltaActivationFnc);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -85,8 +85,8 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
 }
 
 void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
-    if(!value.size()) value = Eigen::VectorXf::Zero(msg->activation.size());
-    value += msg->activation;
+    if(!input.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
+    input += msg->activation;
     forwardSeenCount++;
     
     forwardMessagePool->returnMessage(msg);

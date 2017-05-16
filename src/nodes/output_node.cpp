@@ -41,22 +41,20 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     // calulate output activation
-    output = value.unaryExpr(context->activationFnc);
-    
-    //Logging::log(3, "%s%d forward out: %f", m_type.c_str(), m_id, output);
+    activation = input.unaryExpr(context->activationFnc);
     
     msgs.reserve(outgoingForwardEdges.size());
-    for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
+    for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->activation = output;
+        msg->activation = activation;
         msgs.push_back(msg);
     }
     
     // reset state
-    value.setZero(value.size());
+    input.setZero(input.size());
     forwardSeenCount = 0;
 }
 
@@ -66,8 +64,8 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     //Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
     
     msgs.reserve(outgoingBackwardEdges.size());
-    Eigen::VectorXf diff = (target-output);
-    Eigen::VectorXf delta = diff.transpose()*output.unaryExpr(context->deltaActivationFnc);
+    Eigen::VectorXf diff = (target-activation);
+    Eigen::VectorXf delta = diff.transpose()*activation.unaryExpr(context->deltaActivationFnc);
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );
         auto msg = backwardMessagePool->getMessage();
@@ -82,8 +80,8 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
 }
 
 void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
-    if(!value.size()) value = Eigen::VectorXf::Zero(msg->activation.size());
-    value += msg->activation;
+    if(!input.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
+    input += msg->activation;
     forwardSeenCount++;
     
     forwardMessagePool->returnMessage(msg);

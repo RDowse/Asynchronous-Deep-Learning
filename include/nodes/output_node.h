@@ -29,7 +29,7 @@ class NeuralNode::OutputNode: public NeuralNode{
     
     Eigen::VectorXf error;
     Eigen::VectorXf target;
-    Eigen::VectorXf value;
+    Eigen::VectorXf input;
 public:
     OutputNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~OutputNode(){}

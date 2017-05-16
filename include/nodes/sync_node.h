@@ -37,17 +37,18 @@ class NeuralNode::SyncNode: public NeuralNode{
     bool tick = true;           // trigger initial message propagation
     bool validating = false;    // flag for propagating validation set
   
+    // sampling
     int sampleIndex = 0;
-    
-    vector<float> min_error; 
-    vector<float> error;
-    
     vector<int> trainingIndices;
     
     unordered_map<int,int> dstOutputIndex;        // map backprop index to output
-    vector<float> out;
     
+    // Error calculations
+    Eigen::MatrixXf out;
     float training_error = 0;
+    float accuracy = 0;
+    vector<float> min_error; 
+    vector<float> error;
     
     // random number generation
     std::default_random_engine engine = std::default_random_engine{};

@@ -38,7 +38,7 @@ class NeuralNode::HiddenNode: public NeuralNode{
     Eigen::VectorXf newWeights;       // new weights to update
     Eigen::VectorXf weights;
    
-    Eigen::VectorXf value;
+    Eigen::VectorXf input;
     Eigen::VectorXf error;
 public:
     HiddenNode(shared_ptr<GraphSettings> context): NeuralNode(context){}

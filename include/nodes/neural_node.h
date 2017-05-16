@@ -45,7 +45,7 @@ protected:
     int backwardSeenCount = 0;
     
     // node output/activation
-    Eigen::VectorXf output;
+    Eigen::VectorXf activation;
 public:
     NeuralNode(shared_ptr<GraphSettings> context): Node(context){        
         try{

@@ -64,7 +64,7 @@ public:
         //weights = Eigen::Map<Eigen::VectorXf>(&w[0],w.size());
         newWeights = weights; 
         
-        output = Eigen::VectorXf::Ones(weights.size());
+        activation = Eigen::VectorXf::Ones(weights.size());
         
         // init size of delta values
         deltas = Eigen::VectorXf(weights.size());
