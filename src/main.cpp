@@ -74,7 +74,7 @@ void simulate(const string& path){
         printf("Loaded graph to sim\n");
         
         printf("Loading data\n");
-        MNISTDataWrapper data("mnist/mnist_train_100.csv","mnist/mnist_test_10.csv");
+        MNISTDataWrapper data("dataset/mnist_train_100.csv","dataset/mnist_test_10.csv");
         //XORDataWrapper data("xor_train.csv","xor_train.csv");
         sim.loadInput(&data);
         sim.run("train");
