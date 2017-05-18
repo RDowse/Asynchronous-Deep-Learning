@@ -1,0 +1,12 @@
+command: run
+logLevel: 0
+netPath: w/xor.graph
+datasetTrainingPath: dataset/xor_train.csv
+datasetTestingPath: dataset/xor_test.csv
+dataset: xor
+settings:
+    lr: 0.1
+    alpha: 0.5 
+    batchSize: 1
+    maxEpoch: 100000
+    minError: 0.01

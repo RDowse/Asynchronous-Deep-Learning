@@ -11,25 +11,46 @@
 #include "graphs/graph_settings.h"
 #include "training/training_strategy.h"
 #include "training/stochastic_momentum_training.h"
+#include "training/dropout.h"
 
 // Note: context design pattern, maintains and shared information for the system 
 class DNNGraphSettings: public GraphSettings{
 public:
     
+    // Debugging log level
+    int logLevel;
+    string command;
+    
+    // Path params
+    string netPath;
+    string netType;
+    string datasetTrainingPath;
+    string datasetTestingPath;
+    string datasetType;
+
+    // Graph structure and build params
+    int nHLayers;
+    int nHidden;
+    int nInput;
+    int nOutput;
+    
+    // Current epoch
+    int epoch = 0;
+    
     // Training method
     TrainingStrategy* trainingStrategy;
     
-    // Training param
-    float lr = 0.1;             // learning rate (0.1)
+    // Dropout strategy
+    Dropout* dropoutStrategy;
+    
+    // Training parameters
+    float lr = 0.01;             // learning rate (0.1)
     float alpha = 0.5;          // momentum (0.5)
-    int sample = 0;             // selected sample for predicting
-    int maxEpoch = 1500;         // maximum epochs for training
+    int batchSize = 1;          // training set must be divisible batch size 
+    int maxEpoch = 1000;         // maximum epochs for training
     float minError = 0.01;      // minimum error to stop training
-    int epoch = 0;
-    int batchSize = 10;
     
     // Weight initialisation
-    //void (*initWeightsFnc)(vector<float>& ,int ,int);
     void (*initWeightsFnc)(Eigen::VectorXf& ,int ,int);
     
     // Activation function
@@ -40,13 +61,18 @@ public:
     
     DNNGraphSettings(){
         trainingStrategy = new StochasticMomentumTraining();
+        dropoutStrategy = new Dropout();
         activationFnc = &math::activationSig;
         deltaActivationFnc = &math::deltaActivationSig;
         initWeightsFnc = &math::initWeights;
     }
     
     void setParameters(vector<int>& params) override {
-
+        assert(params.size() == 4);
+        nHLayers = params[0];
+        nHidden = params[1];
+        nInput = params[2];
+        nOutput = params[3];
     }
 };
 

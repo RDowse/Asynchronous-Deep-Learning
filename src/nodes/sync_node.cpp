@@ -90,14 +90,16 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         
         Eigen::VectorXf target(context->batchSize);
-        for(int j = 0; j < context->batchSize; ++j)
-            target(j) = (batchLabels(j) == i ? actMax : actMin);
+        if(outgoingBackwardEdges.size() == 1){ // binary classification
+            for(int j = 0; j < context->batchSize; ++j)
+                target(j) = (batchLabels(j) ? actMax : actMin);
+        } else { // multi classification
+            for(int j = 0; j < context->batchSize; ++j)
+                target(j) = (batchLabels(j) == i ? actMax : actMin);
+        }
         
         assert(outgoingBackwardEdges[i]->dst->getType() == "Output");
-        if(outgoingBackwardEdges.size() == 1) // binary classification
-            assert(0); //msg->target = (labels(trainingIndices[sampleIndex]) ? actMax : actMin);
-        else // multiclassification
-            msg->target = target;
+        msg->target = target;
         msgs.push_back(msg);
     }
     
@@ -177,9 +179,14 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     auto batchLabels = dataset->training_labels.block(currSample,0,context->batchSize,1);    
     Eigen::VectorXf target(msg->activation.size());
     assert(target.size() == batchLabels.size());
-    for(int i = 0; i < target.size(); ++i)
-        target(i) = (batchLabels(i) == index ? actMax : actMin);
-
+    if(outgoingBackwardEdges.size() == 1){ // binary classifications
+        for(int i = 0; i < target.size(); ++i)
+            target(i) = batchLabels(i) ? actMax : actMin;
+    } else {    // multi classification
+        for(int i = 0; i < target.size(); ++i)
+            target(i) = (batchLabels(i) == index ? actMax : actMin);
+    }
+    
     // network output
     out.row(index) = msg->activation;
     

@@ -30,17 +30,20 @@ using namespace std;
 class NeuralNode::HiddenNode: public NeuralNode{
     static NodeRegister<HiddenNode> m_reg;
     static std::string m_type;
-    
+
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
     Eigen::VectorXf deltas;           // store received delta values
     Eigen::VectorXf deltaWeights;     // delta weights, for momentum
     Eigen::VectorXf newWeights;       // new weights to update
-    Eigen::VectorXf weights;
+    Eigen::VectorXf weights;          // current weights
    
     Eigen::VectorXf input;
     Eigen::VectorXf error;
-public:
+public:    
+    int layer;
+    int layerPos;
+    
     HiddenNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~HiddenNode(){}
     string getType() override {return HiddenNode::m_type;}

@@ -27,10 +27,12 @@ class BlockNeuralNode::HiddenNode: public BlockNeuralNode{
     Eigen::MatrixXf deltaWeights;     // delta weights, for momentum
     Eigen::MatrixXf newWeights;       // new weights to update
     Eigen::MatrixXf weights;
-   
+
     float value = 0;
     float error = 0;
-public:
+public:   
+    int layer;
+    int layerPos;
     HiddenNode(shared_ptr<GraphSettings> context): BlockNeuralNode(context){
         layer = 1;
     }

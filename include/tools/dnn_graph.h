@@ -90,8 +90,14 @@ public:
             file<<"EndHeader\n";   
             
             file<<"BeginNodes\n";
-            for(auto n: nodes)
-                file<<n->getType()<<" "<<n->getId()<<"\n";
+            for(auto n: nodes){
+                file<< n->getType() << " " << n->getId();
+                if(n->getType() == "Hidden"){
+                    HiddenNode* h = dynamic_cast<HiddenNode*>(n);
+                    file << " " << h->layer << " " << h->layerPos;
+                }
+                file << "\n";
+            }
             file<<"EndNodes\n";
             
             file<<"BeginEdges\n";
@@ -182,7 +188,10 @@ private:
                 
             // Layer
             for(int j = 0; j < nHidden; ++j){
-                curr_layer.push_back(new HiddenNode(settings));    
+                auto h = new HiddenNode(settings);
+                h->layer = i;
+                h->layerPos = j;
+                curr_layer.push_back(h);    
             }
             
             // Connect Edges

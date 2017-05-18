@@ -59,11 +59,11 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     // perform weight update first
     MatrixXf mat = deltas*activation.transpose();
-    VectorXf tmp(mat.rows());
-    for(int i = 0; i < tmp.size(); ++i)
-        tmp(i) = mat.row(i).sum();
+    VectorXf deltaVec(mat.rows());
+    for(int i = 0; i < deltaVec.size(); ++i)
+        deltaVec(i) = mat.row(i).sum();
     
-    deltaWeights = context->lr*tmp + context->alpha*deltaWeights;
+    deltaWeights = context->lr*deltaVec + context->alpha*deltaWeights; // with momentum
 
     newWeights += deltaWeights; // update step  
     

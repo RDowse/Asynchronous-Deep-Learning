@@ -43,6 +43,7 @@
       <itemPath>include/misc/data_wrapper.h</itemPath>
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
+      <itemPath>include/training/dropout.h</itemPath>
       <itemPath>include/misc/edge.h</itemPath>
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
       <itemPath>include/states/forward_train_state.h</itemPath>
@@ -65,6 +66,7 @@
       <itemPath>include/training/stochastic_training.h</itemPath>
       <itemPath>include/nodes/sync_node.h</itemPath>
       <itemPath>include/training/training_strategy.h</itemPath>
+      <itemPath>include/misc/yaml_reader.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -138,7 +140,7 @@
           </incDir>
         </ccTool>
         <linkerTool>
-          <commandLine>-ltbb</commandLine>
+          <commandLine>-ltbb -lyaml-cpp</commandLine>
         </linkerTool>
       </compileType>
       <item path="include/graphs/basic_graph_settings.h"
@@ -177,6 +179,8 @@
       <item path="include/misc/message_pool.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/misc/node_factory.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/misc/yaml_reader.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -242,6 +246,8 @@
       <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/math.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/training/dropout.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/training/stochastic_momentum_training.h"
             ex="false"
@@ -404,6 +410,8 @@
       </item>
       <item path="include/misc/node_factory.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/misc/yaml_reader.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/block_nodes/block_hidden_node.h"
@@ -468,6 +476,8 @@
       <item path="include/tools/logging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/math.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/training/dropout.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/training/stochastic_momentum_training.h"
             ex="false"

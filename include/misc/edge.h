@@ -19,7 +19,7 @@ public:
     Message* msg;
     Node* dst;
     Node* src;
-    unsigned msgStatus; // empty -> ready -> inflight 
+    unsigned msgStatus = 0; // empty -> ready -> inflight 
     
     Edge(Node* src, Node* dst, unsigned delay) :
     dst(dst), src(src), delay(delay), msgStatus(0) {

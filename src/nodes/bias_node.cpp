@@ -30,11 +30,11 @@ bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     // perform weight update first
     MatrixXf mat = deltas*activation.transpose();
-    VectorXf tmp(mat.rows());
-    for(int i = 0; i < tmp.size(); ++i)
-        tmp(i) = mat.row(i).sum();
+    VectorXf delta_sum(mat.rows());
+    for(int i = 0; i < delta_sum.size(); ++i)
+        delta_sum(i) = mat.row(i).sum();
     
-    deltaWeights = context->lr*tmp + context->alpha*deltaWeights;
+    deltaWeights = context->lr*delta_sum + context->alpha*deltaWeights;
 
     newWeights(0) += deltaWeights(0); // update step  
     
