@@ -108,7 +108,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
 }
 
 bool NeuralNode::SyncNode::readyToSendForward(){
-    return ((backwardSeenCount == incomingBackwardEdges.size()) && context->epoch<=context->maxEpoch) || tick; 
+    return ((backwardSeenCount == incomingBackwardEdges.size()) && context->epoch <= context->maxEpoch) || tick; 
 }
 bool NeuralNode::SyncNode::readyToSendBackward(){
     return (forwardSeenCount == incomingForwardEdges.size());

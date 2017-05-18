@@ -26,13 +26,6 @@ void usage(){
     cout << "Usage: enter yaml path for configuration\n";
 }
 
-void printData(const DataWrapper& data){
-    cout << "Images: " << endl;
-    cout << data.training_images << "\n";
-    cout << "Labels: " << endl;
-    cout << data.training_labels << "\n";
-}
-
 void simulate(shared_ptr<DNNGraphSettings> settings){
     printf("Starting sim...\n");
     Logging::m_logLevel = 5;

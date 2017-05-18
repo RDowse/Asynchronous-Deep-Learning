@@ -30,7 +30,13 @@ struct DataWrapper{
     VectorXi testing_labels;
     MatrixXf testing_images;
 
-    DataWrapper(){}    
+    DataWrapper(){}  
+    void print(){
+        cout << "Images: " << endl;
+        cout << training_images << "\n";
+        cout << "Labels: " << endl;
+        cout << training_labels << "\n";
+    }
 protected:
     void readCSV(const string& path, vector<int>& label, vector< vector<float> >& data){
        ifstream file (path);
@@ -77,8 +83,6 @@ struct XORDataWrapper: public DataWrapper{
         
         convert2dVecToMat(tmp_testing_images,testing_images);
         convertVecToVec(tmp_testing_labels,testing_labels);  
-        
-        //training_images.transposeInPlace();
     }
 };
 
@@ -99,7 +103,6 @@ struct MNISTDataWrapper: public DataWrapper{
         convert2dVecToMat(tmp_testing_images,testing_images);
         convertVecToVec(tmp_testing_labels,testing_labels);      
         
-        //training_images.transposeInPlace();
         training_images.normalize();
         
 //        std::vector<int> indicies(tmp_labels.size());

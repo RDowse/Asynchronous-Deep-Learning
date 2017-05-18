@@ -5,7 +5,7 @@ datasetTrainingPath: dataset/xor_train.csv
 datasetTestingPath: dataset/xor_test.csv
 dataset: xor
 settings:
-    lr: 0.1
+    lr: 0.01
     alpha: 0.5 
     batchSize: 1
     maxEpoch: 100000
