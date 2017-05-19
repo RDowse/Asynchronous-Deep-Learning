@@ -39,8 +39,8 @@ class NeuralNode::SyncNode: public NeuralNode{
   
     // sampling
     int sampleIndex = 0;
-    vector<int> trainingIndices;
     
+    int map_index = 0;
     unordered_map<int,int> dstOutputIndex;        // map backprop index to output
     
     // Error calculations
@@ -49,9 +49,6 @@ class NeuralNode::SyncNode: public NeuralNode{
     float accuracy = 0;
     vector<float> min_error; 
     vector<float> error;
-    
-    // random number generation
-    std::default_random_engine engine = std::default_random_engine{};
 public:
     static std::string m_type;
     SyncNode(shared_ptr<GraphSettings> context): NeuralNode(context){
@@ -63,9 +60,6 @@ public:
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;
-        trainingIndices.reserve(dataset->training_labels.size());
-        for(int i = 0; i < dataset->training_labels.size(); ++i)
-            trainingIndices.push_back(i);
         min_error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
         error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
     }
@@ -79,9 +73,6 @@ public:
     
     bool sendBackwardMsgs(vector<Message*>& msgs);
     bool sendForwardMsgs(vector<Message*>& msgs);
-    
-private:
-    int map_index = 0;
 };
 
 #endif /* SYNC_NODE_H */

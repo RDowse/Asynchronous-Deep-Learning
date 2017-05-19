@@ -6,19 +6,48 @@
 std::string BiasNode::m_type = "Bias";
 NodeRegister<BiasNode> BiasNode::m_reg(BiasNode::m_type);
 
+void BiasNode::addEdge(Edge* e){
+    // add to original edge sets
+    Node::addEdge(e);
+    // check edge belongs to this node
+    if(e->src->getId() == m_id){
+        if(e->dst->getType() == "Sync"){
+            outgoingBackwardEdges.push_back(e);
+        } else if(e->dst->getType() == "Hidden"
+                || e->dst->getType() == "Output"){
+            outgoingForwardEdges.push_back(e);
+            dstWeightIndex[e->dst->getId()] = map_index++;
+        } else {
+            cout << "Unknown type " << e->dst->getType() << "\n";
+            assert(0);
+        }
+    } else if(e->dst->getId() == m_id){
+        if(e->src->getType() == "Sync"){
+            incomingForwardEdges.push_back(e);
+        } else if(e->src->getType() == "Hidden"
+                || e->src->getType() == "Output"){
+            incomingBackwardEdges.push_back(e);
+        } else {
+            cout << "Unknown type " << e->src->getType() << "\n";
+            assert(0);
+        }
+    } 
+}
+
 bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     if(!weights.size()) initWeights();
     
+    MatrixXf mat = input*weights.transpose();
+    
     msgs.reserve(outgoingForwardEdges.size());
-    assert(weights.size() == 1);
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->activation = Eigen::VectorXf::Ones(context->batchSize)*weights(0); // TODO adjust for remainder
+        msg->activation = mat.col(i);
         msgs.push_back(msg);
     }
     
@@ -28,15 +57,9 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
 bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
     
-    // perform weight update first
-    MatrixXf mat = deltas*activation.transpose();
-    VectorXf delta_sum(mat.rows());
-    for(int i = 0; i < delta_sum.size(); ++i)
-        delta_sum(i) = mat.row(i).sum();
-    
-    deltaWeights = context->lr*delta_sum + context->alpha*deltaWeights;
+    deltaWeights = context->lr*(receivedDelta * input) + context->alpha*deltaWeights;
 
-    newWeights(0) += deltaWeights(0); // update step  
+    newWeights -= deltaWeights; // update step  
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -55,7 +78,10 @@ bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
 void BiasNode::onRecv(ForwardPropagationMessage* msg) {
     // notifying msg from sync node
     forwardSeenCount++;
-
+    input = msg->activation;
+    
+    assert(input.sum() == input.size()); // check all values are 1
+    
     forwardMessagePool->returnMessage(msg);
     
     // weights update step
@@ -63,8 +89,10 @@ void BiasNode::onRecv(ForwardPropagationMessage* msg) {
         weights = newWeights;
 }
 
-void BiasNode::onRecv(BackwardPropagationMessage* msg) {
-    deltas(0) += msg->delta.sum();
+void BiasNode::onRecv(BackwardPropagationMessage* msg) {  
+    if(!receivedDelta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),context->batchSize);
+    int index = dstWeightIndex[msg->src];
+    receivedDelta.row(index) = msg->delta;
     backwardSeenCount++;
     
     backwardMessagePool->returnMessage(msg);

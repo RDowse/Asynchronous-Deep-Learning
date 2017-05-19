@@ -64,12 +64,12 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     //Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
     
     msgs.reserve(outgoingBackwardEdges.size());
-    Eigen::VectorXf diff = (target-activation);
-    Eigen::VectorXf delta = diff.transpose()*activation.unaryExpr(context->deltaActivationFnc);
+    Eigen::VectorXf diff = -(target-activation);
+    Eigen::VectorXf delta = diff.array() * activation.unaryExpr(context->deltaActivationFnc).array();
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );
         auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id;
+        msg->src = m_id; 
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         
         msg->delta = delta; 

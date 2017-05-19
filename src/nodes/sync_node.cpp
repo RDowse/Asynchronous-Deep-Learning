@@ -75,13 +75,12 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         dataset->validation_labels : dataset->training_labels;
     
     // TODO: check data size matches the input size
-    Logging::log(3, "Sending sample %d backward", trainingIndices[sampleIndex]);
+    Logging::log(3, "Sending sample %d backward", sampleIndex);
     
     float actMax = context->activationFnc(5);
     float actMin = context->activationFnc(-5);
     
-    int currSample = trainingIndices[sampleIndex];
-    auto batchLabels = dataset->training_labels.block(currSample,0,context->batchSize,1);
+    auto batchLabels = dataset->training_labels.block(sampleIndex,0,context->batchSize,1);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
@@ -121,8 +120,35 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     
     // update flags and indexes once all data is received
     if(readyToSendForward()){
-        // start forward pass on the next sample
+        sampleIndex+= context->batchSize; // todo remainder
         
+        int nTrainingSamples = dataset->training_labels.size();
+        
+        // end of epoch, all samples in the training set have been passed
+        if(sampleIndex==nTrainingSamples){
+            
+            dataset->shuffle();
+            
+            // next epoch
+            context->epoch++;
+            
+            Logging::log(0,"ACCURACY: %f\n",accuracy/nTrainingSamples);
+            Logging::log(0,"TOTAL ERROR: %f\n",training_error);
+            Logging::log(0,"EPOCH: %d\n\n",context->epoch);            
+            
+            // terminate rule
+            if(training_error <= 0.01 || accuracy/nTrainingSamples == 1){
+                cout << "final error" << training_error << "\n";
+                exit(0);
+            }
+            
+            // reset
+            sampleIndex = 0;
+            training_error = 0;
+            accuracy = 0;
+        }
+        
+        // swap state
         if(!lastState){
             context->state = new ForwardTrainState();
         } else {
@@ -130,53 +156,20 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             lastState = context->state;
             context->state = tmpState;
         }
-        
-        sampleIndex+= context->batchSize; // todo remainder
-        
-        // end of epoch, all samples in the training set have been passed
-        if(sampleIndex==dataset->training_labels.size()){
-            if(training_error <= 0.01){
-                cout << "final error" << training_error << "\n";
-                exit(0);
-            }
-            
-            // allow for sampling without replacement
-            auto& images = dataset->training_images;
-            auto& labels = dataset->training_labels;
-            PermutationMatrix<Dynamic,Dynamic> perm(images.rows());
-            perm.setIdentity();
-            std::random_shuffle(perm.indices().data(), perm.indices().data()+perm.indices().size());
-            images = perm * images; // permute rows
-            labels = perm * labels;
-            
-            // next epoch
-            context->epoch++;
-            
-            Logging::log(0,"ACCURACY: %f\n",accuracy/images.rows());
-            Logging::log(0,"TOTAL ERROR: %f\n",training_error);
-            Logging::log(0,"EPOCH: %d\n\n",context->epoch);            
-            
-            // reset
-            sampleIndex = 0;
-            training_error = 0;
-            accuracy = 0;
-        }
     }
 }
 
 void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     forwardSeenCount++;    
     
-    if(!out.size()) out = Eigen::MatrixXf(outgoingBackwardEdges.size(),context->batchSize);
+    if(!out.size()) out = Eigen::MatrixXf(context->batchSize,outgoingBackwardEdges.size());
     
-    int currSample = trainingIndices[sampleIndex]; // TODO: refactor to member variable
     int index = dstOutputIndex[msg->src];
     
     float actMax = context->activationFnc(5);
     float actMin = context->activationFnc(-5);
     
-    // set target (TODO FIX FOR XOR BINARY CLASSIFICATION)
-    auto batchLabels = dataset->training_labels.block(currSample,0,context->batchSize,1);    
+    auto batchLabels = dataset->training_labels.block(sampleIndex,0,context->batchSize,1);    
     Eigen::VectorXf target(msg->activation.size());
     assert(target.size() == batchLabels.size());
     if(outgoingBackwardEdges.size() == 1){ // binary classifications
@@ -188,33 +181,36 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     }
     
     // network output
-    out.row(index) = msg->activation;
+    out.col(index) = msg->activation;
     
     // mse error
     Eigen::VectorXf diff = target - msg->activation;
-    auto tmp = float(diff.transpose()*diff);
+    auto tmp = float(diff.transpose()*diff); // square
     training_error += 0.5*(tmp);
     
     forwardMessagePool->returnMessage(msg);
     
     // switch propagation direction
     if(readyToSendBackward()){
-        assert(trainingIndices[sampleIndex] < min_error.size());
-        assert(trainingIndices[sampleIndex] < error.size());
-        min_error[currSample] = min(training_error,min_error[currSample]);
-        
-        Logging::log(1,"Training error sample%d %f\n",currSample,training_error);
-        Logging::log(1,"Minimum error sample%d %f\n",currSample,min_error[currSample]);
-        Logging::log(1,"Epoch %d (targ) %d\n",context->epoch,dataset->training_labels(currSample));
+        Logging::log(1,"Training error sample%d %f\n",sampleIndex,training_error);
+        //Logging::log(1,"Minimum error sample%d %f\n",currSample,min_error[currSample]);
+        Logging::log(1,"Epoch %d (targ) %d\n",context->epoch,dataset->training_labels(sampleIndex));
         
         // for accuracy predicition, should really be in a separate forward pass
         MatrixXf::Index maxIndex[context->batchSize];
         VectorXf maxVal(context->batchSize);
         for(int i=0;i<context->batchSize;++i){
-            maxVal(i) = out.col(i).maxCoeff( &maxIndex[i] );
-            if(maxIndex[i]==batchLabels(i)) accuracy += 1;
+            if(outgoingBackwardEdges.size() == 1){ 
+                auto mid = (actMax - actMin) / 2;
+                if((out(i) > mid)==batchLabels(i)) accuracy++;
+                cout <<"result "<< out(i) << " " << batchLabels(i) << endl;
+            } else {
+                maxVal(i) = out.row(i).maxCoeff( &maxIndex[i] );
+                if(maxIndex[i]==batchLabels(i)) accuracy++;
+            }
         }
         
+        // Swap state
         if(!lastState){
             context->state = new BackwardTrainState();
         } else {

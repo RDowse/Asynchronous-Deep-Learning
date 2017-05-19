@@ -44,11 +44,11 @@ public:
     Dropout* dropoutStrategy;
     
     // Training parameters
-    float lr = 0.01;             // learning rate (0.1)
-    float alpha = 0.5;          // momentum (0.5)
-    int batchSize = 1;          // training set must be divisible batch size 
-    int maxEpoch = 1000;         // maximum epochs for training
-    float minError = 0.01;      // minimum error to stop training
+    float lr;             // learning rate (0.1)
+    float alpha;          // momentum (0.5)
+    int batchSize;          // training set must be divisible batch size 
+    int maxEpoch;         // maximum epochs for training
+    float minError;      // minimum error to stop training
     
     // Weight initialisation
     void (*initWeightsFnc)(Eigen::VectorXf& ,int ,int);
@@ -73,6 +73,15 @@ public:
         nHidden = params[1];
         nInput = params[2];
         nOutput = params[3];
+    }
+    
+    void printParameters(){
+        cout << "Hyperparameters\n"; 
+        cout << "lr "    << lr;
+        cout << " alpha " << alpha;
+        cout << " batchsize " << batchSize;
+        cout << " maxEpoch "  << maxEpoch;  
+        cout << " minError "  << minError << endl;
     }
 };
 

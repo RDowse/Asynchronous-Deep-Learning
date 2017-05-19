@@ -54,20 +54,14 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
 bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
 
-    // perform weight update
-    float delta_sum = deltas.transpose()*weights;
-    
     // perform weight update first
-    MatrixXf mat = deltas*activation.transpose();
-    VectorXf deltaVec(mat.rows());
-    for(int i = 0; i < deltaVec.size(); ++i)
-        deltaVec(i) = mat.row(i).sum();
-    
-    deltaWeights = context->lr*deltaVec + context->alpha*deltaWeights; // with momentum
+    deltaWeights = context->lr*(receivedDelta * activation) + context->alpha*deltaWeights; // with momentum
 
-    newWeights += deltaWeights; // update step  
+    newWeights -= deltaWeights; // update step  
     
-    Eigen::VectorXf delta = delta_sum*activation.unaryExpr(context->deltaActivationFnc);
+    // Calculate next delta value
+    Eigen::VectorXf tmp = weights.transpose()*receivedDelta;
+    Eigen::VectorXf delta2 = tmp.array()*activation.unaryExpr(context->deltaActivationFnc).array();
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -76,7 +70,7 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         
-        msg->delta = delta; 
+        msg->delta = delta2; 
         msgs.push_back(msg);
     }
     
@@ -97,8 +91,9 @@ void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
 }
 
 void NeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
+    if(!receivedDelta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),context->batchSize);
     int index = dstWeightIndex[msg->src];
-    deltas(index) = msg->delta.sum();
+    receivedDelta.row(index) = msg->delta;
     backwardSeenCount++;
     
     backwardMessagePool->returnMessage(msg);

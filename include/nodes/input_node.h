@@ -31,7 +31,7 @@ class NeuralNode::InputNode: public NeuralNode{
     
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
-    Eigen::VectorXf deltas;
+    Eigen::MatrixXf receivedDelta;
     Eigen::VectorXf deltaWeights;     // delta weights, for momentum
     Eigen::VectorXf newWeights;       // intermediate updated weights
     Eigen::VectorXf weights;
@@ -48,7 +48,7 @@ public:
         newWeights = weights; 
         
         // init size of delta values
-        deltas = Eigen::VectorXf::Zero(weights.size());
+        receivedDelta = Eigen::VectorXf::Zero(weights.size());
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
         
@@ -66,7 +66,6 @@ private:
         newWeights = weights;    
         
         // init size of delta values
-        deltas = Eigen::VectorXf::Zero(weights.size());
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
 };

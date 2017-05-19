@@ -83,11 +83,14 @@ int main(int argc, char** argv) {
         usage();
         return 0;
     }
+    srand(time(NULL));
     
     string yamlPath = argv[1];
     YamlReader yamlReader(yamlPath);
     auto settings = make_shared<DNNGraphSettings>();
     yamlReader.readConfig(settings);
+    
+    settings->printParameters();
     
     if(settings->command == "build"){
         buildGraph<NeuralNode>(settings->netPath, settings->nHLayers, settings->nHidden,

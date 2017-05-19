@@ -1,0 +1,9 @@
+command: build
+logLevel: 0
+netPath: w/net2
+netType: neural
+topology:
+    nHiddenLayers: 2
+    nHidden: 30
+    nInput: 784
+    nOutput: 10

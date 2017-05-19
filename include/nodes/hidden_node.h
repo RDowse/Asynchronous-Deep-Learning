@@ -31,9 +31,11 @@ class NeuralNode::HiddenNode: public NeuralNode{
     static NodeRegister<HiddenNode> m_reg;
     static std::string m_type;
 
+    // for populating weights map
+    int map_index = 0;
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
-    Eigen::VectorXf deltas;           // store received delta values
+    Eigen::MatrixXf receivedDelta;    // store received delta values
     Eigen::VectorXf deltaWeights;     // delta weights, for momentum
     Eigen::VectorXf newWeights;       // new weights to update
     Eigen::VectorXf weights;          // current weights
@@ -56,8 +58,8 @@ public:
         newWeights = weights; 
         
         // init size of delta values
-        deltas = Eigen::VectorXf(weights.size());
-        deltaWeights = Eigen::VectorXf(weights.size());
+        receivedDelta = Eigen::VectorXf::Zero(weights.size());
+        deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
 
     void onRecv(ForwardPropagationMessage* msg) override;
@@ -66,15 +68,12 @@ public:
     bool sendForwardMsgs(vector<Message*>& msgs) override;
     bool sendBackwardMsgs(vector<Message*>& msgs) override;
 private:
-    // for populating weights map
-    int map_index = 0;
     void initWeights(){
         weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
         context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
         newWeights = weights;    
         
         // init size of delta values
-        deltas = Eigen::VectorXf::Zero(weights.size());
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
 };

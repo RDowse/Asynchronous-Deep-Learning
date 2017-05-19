@@ -37,6 +37,15 @@ struct DataWrapper{
         cout << "Labels: " << endl;
         cout << training_labels << "\n";
     }
+    void shuffle(){
+        auto& images = training_images;
+        auto& labels = training_labels;
+        PermutationMatrix<Dynamic,Dynamic> perm(images.rows());
+        perm.setIdentity();
+        std::random_shuffle(perm.indices().data(), perm.indices().data()+perm.indices().size());
+        images = perm * images; // permute rows
+        labels = perm * labels;
+    }
 protected:
     void readCSV(const string& path, vector<int>& label, vector< vector<float> >& data){
        ifstream file (path);
