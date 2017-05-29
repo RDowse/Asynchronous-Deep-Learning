@@ -9,6 +9,7 @@
 #ifndef BLOCK_NEURAL_NETWORK_SETTINGS_H
 #define BLOCK_NEURAL_NETWORK_SETTINGS_H
 
+#include "misc/weight_initialisers.h"
 #include "graphs/graph_settings.h"
 #include "training/training_strategy.h"
 #include "states/state.h"
@@ -50,7 +51,7 @@ public:
     BlockNeuralNetworkSettings(){
         activationFnc = &math::activationSig;
         deltaActivationFnc = &math::blockDeltaActivationSig; //&math::deltaActivationSig;
-        initWeightsFnc = &math::initBlockWeights;
+        initWeightsFnc = &weight_init::initBlockWeights;
     }
     
     void setParameters(vector<int>& params) override {

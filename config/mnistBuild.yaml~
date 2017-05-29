@@ -3,7 +3,7 @@ logLevel: 0
 netPath: w/net
 netType: neural
 topology:
-    nHiddenLayers: 1
-    nHidden: 10
+    nHiddenLayers: 2
+    nHidden: 300
     nInput: 784
-    nOutput: 1
+    nOutput: 10

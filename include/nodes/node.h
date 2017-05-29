@@ -35,11 +35,12 @@ class Node{
     static int curr_id;
 protected:
     int m_id;
+    int time;
 public:
     unordered_map<int, Edge*> incomingEdges;  // map of edges indexed by their src
     unordered_map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
     
-    Node(shared_ptr<GraphSettings> settings){m_id = curr_id++;}
+    Node(shared_ptr<GraphSettings> settings):time(0){m_id = curr_id++;}
     
     int getId() const{ return m_id;}
     virtual string getType()=0;

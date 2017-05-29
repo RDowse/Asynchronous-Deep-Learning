@@ -56,7 +56,6 @@ public:
     virtual ~SyncNode(){
         if(lastState) delete lastState;
     }
-    
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;

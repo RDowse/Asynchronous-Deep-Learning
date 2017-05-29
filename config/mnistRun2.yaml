@@ -5,8 +5,9 @@ datasetTrainingPath: dataset/mnist_train_100.csv
 datasetTestingPath: dataset/mnist_test_10.csv
 dataset: mnist
 settings:
-    lr: 0.1
-    alpha: 0.1 
-    batchSize: 10
-    maxEpoch: 3000
+    lr: 0.01
+    alpha: 0.5 
+    batchSize: 15
+    maxEpoch: 1000
     minError: 0.01
+strategy: dropoutbitset

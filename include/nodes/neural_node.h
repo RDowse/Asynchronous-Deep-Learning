@@ -12,6 +12,11 @@
 #include "graphs/dnn_graph_settings.h"
 #include "misc/message_pool.h"
 
+#include "training/dropout_strategy.h"
+#include "training/dropout_null.h"
+
+#include "common.h"
+
 #include <eigen3/Eigen/Dense>
 #include <vector>
 #include <memory>
@@ -34,6 +39,10 @@ protected:
     
     shared_ptr<DNNGraphSettings> context;
     
+    DataSetType dataSetType;
+    
+    DropoutStrategy* dropout = NULL;
+    
     // sorted edges
     vector<Edge*> incomingForwardEdges;
     vector<Edge*> incomingBackwardEdges;
@@ -47,7 +56,8 @@ protected:
     // node output/activation
     Eigen::VectorXf activation;
 public:
-    NeuralNode(shared_ptr<GraphSettings> context): Node(context){        
+    NeuralNode(shared_ptr<GraphSettings> context): Node(context){   
+        dropout = new DropoutNull();
         try{
             this->context = std::static_pointer_cast<DNNGraphSettings>(context);
         } catch (const std::bad_cast& e) {
@@ -59,6 +69,11 @@ public:
     
     virtual void setWeights(const vector<float>& w){
         cout << "setWeights not implemented for this node, " << m_id << "\n";
+    }
+
+    void setDropoutStrategy(DropoutStrategy* d){
+        if(dropout) delete dropout;
+        dropout = d;
     }
     
     virtual bool readyToSend(){
@@ -79,13 +94,13 @@ public:
     virtual bool sendForwardMsgs(vector<Message*>& msgs)=0;
     
     virtual bool readyToSendForward(){
+        if(!dropout->unset()) return dropout->readyToSendForward(forwardSeenCount);
         return (forwardSeenCount == incomingForwardEdges.size()); 
     }
     virtual bool readyToSendBackward(){
+        if(!dropout->unset()) return dropout->readyToSendBackward(backwardSeenCount);
         return (backwardSeenCount == incomingBackwardEdges.size());
     }
-    
-    //float getOutput() const{ return output; }
 };
 
 #endif /* NEURAL_NODE_H */

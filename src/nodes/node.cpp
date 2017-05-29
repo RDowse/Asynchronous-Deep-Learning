@@ -18,7 +18,7 @@ void Node::send(vector<Message*>& msgs){
     for(unsigned i = 0; i < msgs.size(); ++i){
         Edge* e = outgoingEdges[msgs[i]->dst];
         assert( e != NULL );
-        assert( 0 == e->msgStatus );
+        //assert( 0 == e->msgStatus );
         e->msg = msgs[i]; // Copy message into channel
         e->msgStatus = 1 + e->getDelay(); // How long until it is ready?
     }

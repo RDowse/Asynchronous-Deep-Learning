@@ -9,12 +9,16 @@
 #define FORWARD_PROPAGATION_MESSAGE_H
 
 #include "messages/message.h"
+#include "common.h"
 
 #include <Eigen/Dense>
 
 class ForwardPropagationMessage: public Message
 {
 public:
+    // training/validation/testing data
+    DataSetType dataSetType = DataSetType::training;
+    
     // individual node value
     Eigen::VectorXf activation;
     

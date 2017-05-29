@@ -9,9 +9,11 @@
 #define HIDDEN_NODE_H
 
 #include "nodes/neural_node.h"
-#include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
+
 #include "graphs/dnn_graph_settings.h"
+#include "graphs/graph_settings.h"
+
 #include "tools/math.h"
 
 #include <eigen3/Eigen/Dense>
@@ -30,7 +32,7 @@ using namespace std;
 class NeuralNode::HiddenNode: public NeuralNode{
     static NodeRegister<HiddenNode> m_reg;
     static std::string m_type;
-
+    
     // for populating weights map
     int map_index = 0;
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
@@ -43,9 +45,6 @@ class NeuralNode::HiddenNode: public NeuralNode{
     Eigen::VectorXf input;
     Eigen::VectorXf error;
 public:    
-    int layer;
-    int layerPos;
-    
     HiddenNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~HiddenNode(){}
     string getType() override {return HiddenNode::m_type;}

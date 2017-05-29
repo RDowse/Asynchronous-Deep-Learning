@@ -12,6 +12,7 @@
 
 #include "tools/loader.h"
 #include "tools/logging.h"
+#include "tools/strategy_loader.h"
 
 #include "messages/message.h"
 
@@ -125,35 +126,7 @@ private:
         return true;
     }
     
-    void step_node_par(Node* n, tbb::concurrent_queue<Edge*>& edgeQueue, bool& active){
-        // Not ready to send
-        if(!n->readyToSend()){
-            Logging::log(4, "node %u : idle", n->getId());
-            return;
-        }
-        
-        for(auto p: n->outgoingEdges){
-            auto e = p.second;
-            if( e->msgStatus > 0 ){
-                Logging::log(1, "node %u : blocked on %u->%u", n->getId(), 
-                        e->src->getId(),
-                        e->dst->getId());
-                active = true;
-                return;
-            }
-        }
-        
-        Logging::log(3, "%s node %u : send", n->getType().c_str(), n->getId());
-           
-        // Get the device to send the message
-        vector<Message*> msgs; 
-        n->onSend(msgs);
-        n->send(msgs, edgeQueue);
-        
-        active = true;
-    }
-    
-    void step_node_par2(Node* n, bool& active){
+    void step_node_par(Node* n, bool& active){
         // Not ready to send
         if(!n->readyToSend()){
             Logging::log(4, "node %u : idle", n->getId());
@@ -199,44 +172,21 @@ private:
     bool step_all_parallel(){
         Logging::log(2, "stepping edges");
         bool active=false;    
-        list<Edge*>::iterator it = activeEdges.begin();
-        while( it != activeEdges.end()){
-            active = step_edge(it) || active;
-        }       
-        
-        Logging::log(2, "stepping nodes");
-        tbb::concurrent_queue<Edge*> edgeQueue;
-        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
-            [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
-            for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
-                step_node_par(*it,edgeQueue,active);
-            }
-        },tbb::auto_partitioner());
-        // Put edges into the active list
-        while(!edgeQueue.empty()){
-            Edge* e;
-            edgeQueue.try_pop(e);
-            activeEdges.push_back(e);
-        }
-        return active;
-    }
-    
-    bool step_all_parallel2(){
-        Logging::log(2, "stepping edges");
-        bool active=false;    
         for(auto& e: m_edges){
             active = step_edge(e) || active;
         }
         
         Logging::log(2, "stepping nodes");
-        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
+        int k = m_nodes.size()/4;
+        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end(),k),
             [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
             for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
-                step_node_par2(*it,active);
+                step_node_par(*it,active);
             }
         },tbb::auto_partitioner());
+        
         return active;
-    }
+    }    
     
     void reset(){
         Logging::log(2, "resetting nodes");
@@ -264,6 +214,13 @@ public:
         for(auto it = m_edges.begin(); it != m_edges.end(); it++)
             delete (*it);
         m_edges.clear();
+    }
+    
+    // strategy config from YAML file
+    void setStrategies(vector<string> config){
+        StrategyLoader stratLoader(m_settings,&m_nodes);
+        stratLoader.setConfig(config);
+        stratLoader.load();
     }
         
     void setGraphSettings(shared_ptr<GraphSettings> settings){
@@ -305,7 +262,7 @@ public:
         }
         
         while(active)
-            active = step_all_parallel2();
+            active = step_all();
     }
 };
 

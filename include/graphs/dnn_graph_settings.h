@@ -8,10 +8,13 @@
 #ifndef DNN_GRAPH_SETTINGS_H
 #define DNN_GRAPH_SETTINGS_H
 
+#include "tools/math.h"
+#include "misc/weight_initialisers.h"
+
 #include "graphs/graph_settings.h"
+
 #include "training/training_strategy.h"
 #include "training/stochastic_momentum_training.h"
-#include "training/dropout.h"
 
 // Note: context design pattern, maintains and shared information for the system 
 class DNNGraphSettings: public GraphSettings{
@@ -20,6 +23,7 @@ public:
     // Debugging log level
     int logLevel;
     string command;
+    int seed = 0;
     
     // Path params
     string netPath;
@@ -40,15 +44,18 @@ public:
     // Training method
     TrainingStrategy* trainingStrategy;
     
-    // Dropout strategy
-    Dropout* dropoutStrategy;
+    string dropout;
     
     // Training parameters
     float lr;             // learning rate (0.1)
     float alpha;          // momentum (0.5)
-    int batchSize;          // training set must be divisible batch size 
+    int batchSize;        // training set must be divisible batch size 
     int maxEpoch;         // maximum epochs for training
-    float minError;      // minimum error to stop training
+    float minError;       // minimum error to stop training
+    
+    // Error values
+    float accuracy;
+    float training_error;
     
     // Weight initialisation
     void (*initWeightsFnc)(Eigen::VectorXf& ,int ,int);
@@ -61,10 +68,9 @@ public:
     
     DNNGraphSettings(){
         trainingStrategy = new StochasticMomentumTraining();
-        dropoutStrategy = new Dropout();
-        activationFnc = &math::activationSig;
-        deltaActivationFnc = &math::deltaActivationSig;
-        initWeightsFnc = &math::initWeights;
+        activationFnc = &math::activationTanH;
+        deltaActivationFnc = &math::deltaActivationTanH;
+        initWeightsFnc = &weight_init::initWeights;
     }
     
     void setParameters(vector<int>& params) override {

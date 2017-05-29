@@ -96,6 +96,10 @@ private:
         settings->batchSize = config["settings"]["batchSize"].as<int>();
         settings->maxEpoch = config["settings"]["maxEpoch"].as<int>();
         settings->minError = config["settings"]["minError"].as<float>();
+        
+        // Strategy
+        if(config["strategy"].IsDefined())
+            settings->dropout = config["strategy"].as<std::string>();
     }
 };
 

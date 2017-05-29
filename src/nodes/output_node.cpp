@@ -49,6 +49,8 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
+        msg->time = time;
+        
         msg->activation = activation;
         msgs.push_back(msg);
     }
@@ -61,28 +63,39 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
 bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());   
     
-    //Logging::log(3, "%s%d backward: (out) %f (targ) %f", m_type.c_str(), m_id, output, target);
-    
     msgs.reserve(outgoingBackwardEdges.size());
     Eigen::VectorXf diff = -(target-activation);
     Eigen::VectorXf delta = diff.array() * activation.unaryExpr(context->deltaActivationFnc).array();
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
-        assert( 0 == outgoingBackwardEdges[i]->msgStatus );
-        auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id; 
-        msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        
-        msg->delta = delta; 
-        msgs.push_back(msg);
+        if(dropout->isPrevLayerNodeActive(i)){
+            assert( 0 == outgoingBackwardEdges[i]->msgStatus );
+            auto msg = backwardMessagePool->getMessage();
+            msg->src = m_id; 
+            msg->dst = outgoingBackwardEdges[i]->dst->getId();
+            msg->time = time;
+
+            msg->delta = delta; 
+            msgs.push_back(msg);
+        }
     }
     
     backwardSeenCount = 0;
 }
 
 void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
-    if(!input.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
+    if(input.size() != msg->activation.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
     input += msg->activation;
-    forwardSeenCount++;
+    forwardSeenCount++;    
+    
+    dataSetType = msg->dataSetType;
+    
+    if(dataSetType==DataSetType::training) dropout->setEnabled(true);
+    else dropout->setEnabled(false);
+    
+    if(!dropout->unset() && msg->time > time){
+        dropout->nextStep(msg->time);
+        time = msg->time;
+    }
     
     forwardMessagePool->returnMessage(msg);
 }

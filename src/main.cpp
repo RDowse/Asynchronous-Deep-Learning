@@ -38,9 +38,13 @@ void simulate(shared_ptr<DNNGraphSettings> settings){
         
         Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
         
+        cout << settings->logLevel << endl;
         Simulator<NeuralNode> sim(settings->logLevel,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
+        
+        vector<string> conf = {settings->dropout};
+        sim.setStrategies(conf);
         
         printf("Loading data\n");
         DataWrapper* data;
@@ -55,11 +59,12 @@ void simulate(shared_ptr<DNNGraphSettings> settings){
         
         // basic check for data size
         assert(data->training_images.cols() < nNodes);
-        
         sim.loadInput(data);
         sim.run("train");
         
-        cout << "Final epoch " << std::static_pointer_cast<DNNGraphSettings>(settings)->epoch << "\n";
+        auto s = std::static_pointer_cast<DNNGraphSettings>(settings);
+        cout << "Final epoch " << s->epoch << endl;
+        cout << "training error: " << s->training_error << ", accuracy: " << s->accuracy << endl;
     } else {
         cout << "Unable to open file "<< settings->netPath << "\n";
         return;

@@ -43,12 +43,17 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     
     msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
-        assert( 0 == outgoingForwardEdges[i]->msgStatus );
-        auto msg = forwardMessagePool->getMessage();
-        msg->src = m_id;
-        msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->activation = mat.col(i);
-        msgs.push_back(msg);
+        if(dropout->isNextLayerNodeActive(i)){
+            assert( 0 == outgoingForwardEdges[i]->msgStatus );
+            auto msg = forwardMessagePool->getMessage();
+            msg->src = m_id;
+            msg->dst = outgoingForwardEdges[i]->dst->getId();
+            msg->time = time;
+            msg->dataSetType = dataSetType;
+            
+            msg->activation = mat.col(i);
+            msgs.push_back(msg);
+        }
     }
     
     forwardSeenCount = 0;
@@ -67,6 +72,7 @@ bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
+        msg->time = time;
         msgs.push_back(msg);
     }
     assert(msgs.size() == 1);
@@ -79,8 +85,17 @@ void BiasNode::onRecv(ForwardPropagationMessage* msg) {
     // notifying msg from sync node
     forwardSeenCount++;
     input = msg->activation;
-    
     assert(input.sum() == input.size()); // check all values are 1
+    
+    dataSetType = msg->dataSetType;
+    
+    if(dataSetType==DataSetType::training) dropout->setEnabled(true);
+    else dropout->setEnabled(false);
+    
+    if(!dropout->unset() && msg->time > time){
+        dropout->nextStep(msg->time);
+        time = msg->time;
+    }
     
     forwardMessagePool->returnMessage(msg);
     
@@ -90,7 +105,7 @@ void BiasNode::onRecv(ForwardPropagationMessage* msg) {
 }
 
 void BiasNode::onRecv(BackwardPropagationMessage* msg) {  
-    if(!receivedDelta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),context->batchSize);
+    if(!receivedDelta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;
     backwardSeenCount++;

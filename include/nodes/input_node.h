@@ -12,6 +12,7 @@
 #include "misc/node_factory.h"
 #include "tools/logging.h"
 #include "tools/math.h"
+#include "common.h"
 
 #include <stack>
 #include <string>

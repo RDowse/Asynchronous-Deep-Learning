@@ -6,7 +6,7 @@ datasetTestingPath: dataset/mnist_test_10.csv
 dataset: mnist
 settings:
     lr: 0.01
-    alpha: 0.5 
-    batchSize: 5
-    maxEpoch: 2000
+    alpha: 0.8 
+    batchSize: 15
+    maxEpoch: 100
     minError: 0.01
