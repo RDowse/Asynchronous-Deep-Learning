@@ -30,7 +30,7 @@ using namespace std;
 class ParallelDataNeuralNode::SyncNode: public ParallelDataNeuralNode{
     DataWrapper* dataset;
     
-    State* lastState;           // tmp fix for deleting states
+    State<ParallelDataNeuralNode>* lastState;           // tmp fix for deleting states
     
     bool tick = true;           // trigger initial message propagation
     bool validating = false;    // flag for propagating validation set
@@ -76,11 +76,11 @@ private:
     template<typename TState>
     void swapState(){
         if(!lastState){
-            context->state = new TState();
+            state = new TState();
         } else {
-            State* tmpState = lastState;
-            lastState = context->state;
-            context->state = tmpState;
+            auto tmpState = lastState;
+            lastState = state;
+            state = tmpState;
         }
     }
 };

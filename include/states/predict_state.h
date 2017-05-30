@@ -10,13 +10,11 @@
 
 #include "states/state.h"
 
-class PredictState: public State{
+template<typename TNode>
+class PredictState: public State<TNode>{
     public:
-    void onSend(NeuralNode* n, vector<Message*>& msgs) override;
-    bool readyToSend(NeuralNode* n) override;
-        
-//    void onSend(BlockNeuralNode* n, vector<Message*>& msgs) override;
-//    bool readyToSend(BlockNeuralNode* n) override;
+    void onSend(TNode* n, vector<Message*>& msgs) override;
+    bool readyToSend(TNode* n) override;
 };
 
 #endif /* PREDICT_STATE_H */

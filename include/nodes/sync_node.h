@@ -28,11 +28,7 @@
 using namespace std;
 
 class NeuralNode::SyncNode: public NeuralNode{
-    //static NodeRegister<SyncNode> m_reg;
-    
     DataWrapper* dataset;
-    
-    State* lastState;           // tmp fix for deleting states
     
     bool tick = true;           // trigger initial message propagation
     bool validating = false;    // flag for propagating validation set
@@ -54,9 +50,6 @@ class NeuralNode::SyncNode: public NeuralNode{
 public:
     static std::string m_type;
     SyncNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
-    virtual ~SyncNode(){
-        if(lastState) delete lastState;
-    }
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;
@@ -73,18 +66,6 @@ public:
     
     bool sendBackwardMsgs(vector<Message*>& msgs);
     bool sendForwardMsgs(vector<Message*>& msgs);
-    
-private:
-    template<typename TState>
-    void swapState(){
-        if(!lastState){
-            context->state = new TState();
-        } else {
-            State* tmpState = lastState;
-            lastState = context->state;
-            context->state = tmpState;
-        }
-    }
 };
 
 #endif /* SYNC_NODE_H */

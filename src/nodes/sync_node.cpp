@@ -7,7 +7,6 @@
 #include "states/forward_train_state.h"
 
 std::string NeuralNode::SyncNode::m_type = "Sync";
-//NodeRegister<NeuralNode::SyncNode> NeuralNode::SyncNode::m_reg(NeuralNode::SyncNode::m_type);
 
 void NeuralNode::SyncNode::addEdge(Edge* e) {
     Node::addEdge(e);
@@ -155,7 +154,7 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
         } 
         
         // swap state
-        swapState<ForwardTrainState>();
+        swapState<ForwardTrainState<NeuralNode>>();
     }
 }
 
@@ -199,7 +198,7 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
         }
 
         // Swap state
-        if(!validating) swapState<BackwardTrainState>();
+        if(!validating) swapState<BackwardTrainState<NeuralNode>>();
         
         if(validating){
             Logging::log(0,"VALIDATION ACCURACY: %f\n\n",accuracy/dataset->validation_labels.size());

@@ -15,6 +15,8 @@
 #include "training/dropout_strategy.h"
 #include "training/dropout_null.h"
 
+#include "states/forward_train_state.h"
+
 #include "common.h"
 
 #include <eigen3/Eigen/Dense>
@@ -23,7 +25,7 @@
 
 using namespace std;
 
-class State;
+template<typename TNode> class State;
 class ForwardPropagationMessage;
 class BackwardPropagationMessage;
 
@@ -39,6 +41,8 @@ protected:
     static MessagePool<BackwardPropagationMessage>* backwardMessagePool;
     
     shared_ptr<DNNGraphSettings> context;
+    
+    State<NeuralNode>* state;
     
     DataSetType dataSetType;
     
@@ -59,17 +63,27 @@ protected:
 public:
     NeuralNode(shared_ptr<GraphSettings> context): Node(context){   
         dropout = new DropoutNull();
+        state = new ForwardTrainState<NeuralNode>();
         try{
             this->context = std::static_pointer_cast<DNNGraphSettings>(context);
         } catch (const std::bad_cast& e) {
             std::cout << e.what() << "\n";
         }
     }
+    ~NeuralNode(){
+        delete dropout;
+        delete state;
+    }
     
     virtual string getType()=0;
     
     virtual void setWeights(const vector<float>& w){
         cout << "setWeights not implemented for this node, " << m_id << "\n";
+    }
+    
+    void setState(State<NeuralNode>* _state){
+        if(state) delete state;
+        state = _state;
     }
 
     void setDropoutStrategy(DropoutStrategy* d){
@@ -78,14 +92,14 @@ public:
     }
     
     virtual bool readyToSend(){
-        assert(context->state);
-        context->state->readyToSend(this);
+        assert(state);
+        return state->readyToSend(this);
     }  
     
     // Handle sending of messages and routing for the node
     virtual bool onSend(vector<Message*>& msgs){
-        assert(context->state);
-        context->state->onSend(this, msgs);
+        assert(state);
+        state->onSend(this, msgs);
     }
     
     // Handle message receiving
@@ -102,6 +116,12 @@ public:
     virtual bool readyToSendBackward(){
         if(!dropout->unset()) return dropout->readyToSendBackward(backwardSeenCount);
         return (backwardSeenCount == incomingBackwardEdges.size());
+    }
+protected:
+    template<typename TState>
+    void swapState(){
+        delete state;
+        state = new TState(); 
     }
 };
 

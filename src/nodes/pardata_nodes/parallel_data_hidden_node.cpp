@@ -33,7 +33,7 @@ bool ParallelDataNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs)
     // calulate output activation
     activation = input.unaryExpr(context->activationFnc);
     
-    MatrixXf mat;
+    Eigen::MatrixXf mat;
     if(dataSetType == DataSetType::validation && !dropout->unset() && dropout->isEnabled())
         mat = 0.5*activation*weights.transpose(); // for dropout based on probability, TODO correct for prime (adjustable probability)
     else 
@@ -58,6 +58,7 @@ bool ParallelDataNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs)
     // reset
     input.setZero(input.size());
     forwardSeenCount = 0;
+    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<ParallelDataNeuralNode>>();
 }
 
 bool ParallelDataNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
@@ -89,6 +90,7 @@ bool ParallelDataNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs
     
     // reset
     backwardSeenCount = 0;
+    swapState<ForwardTrainState<ParallelDataNeuralNode>>();
 }
 
 void ParallelDataNeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {

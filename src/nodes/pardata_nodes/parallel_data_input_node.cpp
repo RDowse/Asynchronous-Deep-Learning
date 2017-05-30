@@ -43,7 +43,7 @@ bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     
     if(!weights.size()) initWeights();
     
-    MatrixXf mat = activation*weights.transpose();
+    Eigen::MatrixXf mat = activation*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -63,6 +63,7 @@ bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     
     // reset 
     forwardSeenCount = 0;
+    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<ParallelDataNeuralNode>>();
 }
 
 bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
@@ -87,6 +88,7 @@ bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs)
     
     // reset
     backwardSeenCount = 0;
+    swapState<ForwardTrainState<ParallelDataNeuralNode>>();
 }
 
 void ParallelDataNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){

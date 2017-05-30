@@ -9,8 +9,8 @@
 #define HIDDEN_NODE_H
 
 #include "nodes/neural_node.h"
-#include "misc/node_factory.h"
-
+#include "states/backward_train_state.h"
+#include "states/forward_train_state.h"
 #include "graphs/dnn_graph_settings.h"
 #include "graphs/graph_settings.h"
 
@@ -30,8 +30,6 @@
 using namespace std;
 
 class NeuralNode::HiddenNode: public NeuralNode{
-    static NodeRegister<HiddenNode> m_reg;
-    
     // for populating weights map
     int map_index = 0;
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids

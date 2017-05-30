@@ -10,7 +10,6 @@
 
 #include "nodes/neural_node.h"
 #include "nodes/pardata_nodes/parallel_data_neural_node.h"
-//#include "nodes/block_nodes/block_neural_node.h"
 
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"

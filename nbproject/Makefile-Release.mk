@@ -56,12 +56,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/states/backward_train_state.o \
 	${OBJECTDIR}/src/states/forward_train_state.o \
 	${OBJECTDIR}/src/states/predict_state.o \
-	${OBJECTDIR}/src/states/state.o \
 	${OBJECTDIR}/src/tools/clock.o \
 	${OBJECTDIR}/src/tools/dnn_graph.o \
-	${OBJECTDIR}/src/tools/logging.o \
-	${OBJECTDIR}/src/training/stochastic_momentum_training.o \
-	${OBJECTDIR}/src/training/stochastic_training.o
+	${OBJECTDIR}/src/tools/logging.o
 
 # Test Directory
 TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
@@ -204,11 +201,6 @@ ${OBJECTDIR}/src/states/predict_state.o: src/states/predict_state.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/predict_state.o src/states/predict_state.cpp
 
-${OBJECTDIR}/src/states/state.o: src/states/state.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/states
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/state.o src/states/state.cpp
-
 ${OBJECTDIR}/src/tools/clock.o: src/tools/clock.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
@@ -223,16 +215,6 @@ ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
-
-${OBJECTDIR}/src/training/stochastic_momentum_training.o: src/training/stochastic_momentum_training.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/training
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/training/stochastic_momentum_training.o src/training/stochastic_momentum_training.cpp
-
-${OBJECTDIR}/src/training/stochastic_training.o: src/training/stochastic_training.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/training
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/training/stochastic_training.o src/training/stochastic_training.cpp
 
 # Subprojects
 .build-subprojects:
@@ -529,19 +511,6 @@ ${OBJECTDIR}/src/states/predict_state_nomain.o: ${OBJECTDIR}/src/states/predict_
 	    ${CP} ${OBJECTDIR}/src/states/predict_state.o ${OBJECTDIR}/src/states/predict_state_nomain.o;\
 	fi
 
-${OBJECTDIR}/src/states/state_nomain.o: ${OBJECTDIR}/src/states/state.o src/states/state.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src/states
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/states/state.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/state_nomain.o src/states/state.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/states/state.o ${OBJECTDIR}/src/states/state_nomain.o;\
-	fi
-
 ${OBJECTDIR}/src/tools/clock_nomain.o: ${OBJECTDIR}/src/tools/clock.o src/tools/clock.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/tools/clock.o`; \
@@ -579,32 +548,6 @@ ${OBJECTDIR}/src/tools/logging_nomain.o: ${OBJECTDIR}/src/tools/logging.o src/to
 	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging_nomain.o src/tools/logging.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/tools/logging.o ${OBJECTDIR}/src/tools/logging_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/training/stochastic_momentum_training_nomain.o: ${OBJECTDIR}/src/training/stochastic_momentum_training.o src/training/stochastic_momentum_training.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src/training
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/training/stochastic_momentum_training.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/training/stochastic_momentum_training_nomain.o src/training/stochastic_momentum_training.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/training/stochastic_momentum_training.o ${OBJECTDIR}/src/training/stochastic_momentum_training_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/training/stochastic_training_nomain.o: ${OBJECTDIR}/src/training/stochastic_training.o src/training/stochastic_training.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src/training
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/training/stochastic_training.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/training/stochastic_training_nomain.o src/training/stochastic_training.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/training/stochastic_training.o ${OBJECTDIR}/src/training/stochastic_training_nomain.o;\
 	fi
 
 # Run Test Targets

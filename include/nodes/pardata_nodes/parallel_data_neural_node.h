@@ -15,6 +15,9 @@
 #include "training/dropout_strategy.h"
 #include "training/dropout_null.h"
 
+#include "states/backward_train_state.h"
+#include "states/forward_train_state.h"
+
 #include "common.h"
 
 #include <eigen3/Eigen/Dense>
@@ -23,7 +26,7 @@
 
 using namespace std;
 
-class State;
+template<typename TNode> class State;
 class ForwardPropagationMessage;
 class BackwardPropagationMessage;
 
@@ -39,6 +42,8 @@ protected:
     static MessagePool<BackwardPropagationMessage>* backwardMessagePool;
     
     shared_ptr<DNNGraphSettings> context;
+    
+    State<ParallelDataNeuralNode>* state;
     
     DataSetType dataSetType;
     
@@ -77,15 +82,20 @@ public:
         dropout = d;
     }
     
+    void setState(State<ParallelDataNeuralNode>* _state){
+        if(state) delete state;
+        state = _state;
+    }
+    
     virtual bool readyToSend(){
-        assert(context->state);
-        context->state->readyToSend(this);
+        assert(state);
+        state->readyToSend(this);
     }  
     
     // Handle sending of messages and routing for the node
     virtual bool onSend(vector<Message*>& msgs){
-        assert(context->state);
-        context->state->onSend(this, msgs);
+        assert(state);
+        state->onSend(this, msgs);
     }
     
     // Handle message receiving
@@ -102,6 +112,12 @@ public:
     virtual bool readyToSendBackward(){
         if(!dropout->unset()) return dropout->readyToSendBackward(backwardSeenCount);
         return (backwardSeenCount == incomingBackwardEdges.size());
+    }
+protected:
+    template<typename TState>
+    void swapState(){
+        delete state;
+        state = new TState(); 
     }
 };
 

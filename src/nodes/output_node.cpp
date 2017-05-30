@@ -6,7 +6,6 @@
 #include "tools/math.h"
 
 std::string NeuralNode::OutputNode::m_type = "Output";
-//NodeRegister<NeuralNode::OutputNode> NeuralNode::OutputNode::m_reg(NeuralNode::OutputNode::m_type);
 
 void NeuralNode::OutputNode::addEdge(Edge* e) {
     // add to original edge sets
@@ -58,6 +57,7 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     // reset state
     input.setZero(input.size());
     forwardSeenCount = 0;
+    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<NeuralNode>>();
 }
 
 bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
@@ -80,6 +80,7 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     }
     
     backwardSeenCount = 0;
+    swapState<ForwardTrainState<NeuralNode>>();
 }
 
 void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {

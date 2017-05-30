@@ -11,7 +11,6 @@
 
 #include "misc/weight_initialisers.h"
 #include "graphs/graph_settings.h"
-#include "training/training_strategy.h"
 #include "states/state.h"
 
 // Note: context design pattern, maintains and shared information for the system 
@@ -23,9 +22,6 @@ public:
     // arangement of blocks (number of nodes in each block)
     // eg. inputSizes -> hiddenSizes -> outputSizes
     vector< vector<int> > blockTopology;    
-    
-    // Training method
-    TrainingStrategy* trainingStrategy;
     
     // Training param
     float lr = 0.1;            // learning rate

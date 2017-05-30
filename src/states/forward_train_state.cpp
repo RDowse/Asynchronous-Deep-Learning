@@ -1,21 +1,21 @@
 
 #include "states/forward_train_state.h"
 #include "nodes/neural_node.h"
-//#include "nodes/block_nodes/block_neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 
-void ForwardTrainState::onSend(NeuralNode* n, vector<Message*>& msgs){
+template<> void ForwardTrainState<NeuralNode>::onSend(NeuralNode* n, vector<Message*>& msgs){
     n->sendForwardMsgs(msgs);
 }
 
-bool ForwardTrainState::readyToSend(NeuralNode* n){
+template<> bool ForwardTrainState<NeuralNode>::readyToSend(NeuralNode* n){
     return n->readyToSendForward();
 }
 
+template<> void ForwardTrainState<ParallelDataNeuralNode>::onSend(ParallelDataNeuralNode* n, vector<Message*>& msgs){
+    n->sendForwardMsgs(msgs);
+}
 
-//void ForwardTrainState::onSend(BlockNeuralNode* n, vector<Message*>& msgs){
-//    n->sendForwardMsgs(msgs);
-//}
-//
-//bool ForwardTrainState::readyToSend(BlockNeuralNode* n){
-//    return n->readyToSendForward();
-//}
+template<> bool ForwardTrainState<ParallelDataNeuralNode>::readyToSend(ParallelDataNeuralNode* n){
+    return n->readyToSendForward();
+}
+

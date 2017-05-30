@@ -12,16 +12,17 @@
 #include "misc/node_factory.h"
 #include "graphs/graph_settings.h"
 #include "graphs/dnn_graph_settings.h"
+#include "states/backward_train_state.h"
+#include "states/forward_train_state.h"
 #include "tools/math.h"
 
+#include <Eigen/Dense>
 #include <stack>
 #include <cassert>
 
 using namespace std;
 
 class NeuralNode::BiasNode : public NeuralNode{
-    //static NodeRegister<BiasNode> m_reg;
-    
     // for populating weights map
     int map_index = 0;
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids

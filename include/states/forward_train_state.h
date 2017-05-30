@@ -11,13 +11,11 @@
 
 #include "states/state.h"
 
-class ForwardTrainState: public State{
+template<typename TNode>
+class ForwardTrainState: public State<TNode>{
     public:  
-    void onSend(NeuralNode* n, vector<Message*>& msgs) override;
-    bool readyToSend(NeuralNode* n) override;
-    
-//    void onSend(BlockNeuralNode* n, vector<Message*>& msgs) override;  
-//    bool readyToSend(BlockNeuralNode* n) override;
+    void onSend(TNode* n, vector<Message*>& msgs) override;
+    bool readyToSend(TNode* n) override;
 };
 
 #endif /* FORWARD_TRAIN_STATE_H */

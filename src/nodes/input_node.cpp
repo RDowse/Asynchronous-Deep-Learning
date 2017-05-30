@@ -44,7 +44,7 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     
     if(!weights.size()) initWeights();
     
-    MatrixXf mat = activation*weights.transpose();
+    Eigen::MatrixXf mat = activation*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -64,6 +64,7 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     
     // reset 
     forwardSeenCount = 0;
+    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<NeuralNode>>();
 }
 
 bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
@@ -88,6 +89,7 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     // reset
     backwardSeenCount = 0;
+    swapState<ForwardTrainState<NeuralNode>>();
 }
 
 void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){

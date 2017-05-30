@@ -11,27 +11,19 @@
 #include <iostream>
 #include <vector>
 
-class BlockNeuralNode;
-class NeuralNode;
 class Node;
 class Message;
 
 using namespace std;
 
-//template<typename TNode>
+template<typename TNode>
 class State{
 public:
     State(){}
-    //virtual void onSend(BlockNeuralNode* n, vector<Message*>& msgs);
-    virtual void onSend(NeuralNode* n, vector<Message*>& msgs);
-    virtual void onSend(Node* n, vector<Message*>& msgs);
-
-    //virtual bool readyToSend(BlockNeuralNode* n);    
-    virtual bool readyToSend(NeuralNode* n);
-    virtual bool readyToSend(Node* n);
     
-    // Default call if method not overridden
-    void notImplemented(){ std::cout << "State onSend not implemented for this type";  }
+    virtual void onSend(TNode* n, vector<Message*>& msgs)=0;
+    
+    virtual bool readyToSend(TNode* n)=0;
 };
 
 #endif /* STATE_H */

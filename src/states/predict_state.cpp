@@ -1,21 +1,20 @@
 
 #include "states/predict_state.h"
 #include "nodes/neural_node.h"
-//#include "nodes/block_nodes/block_neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 
-void PredictState::onSend(NeuralNode* n, vector<Message*>& msgs){
+template<> void PredictState<NeuralNode>::onSend(NeuralNode* n, vector<Message*>& msgs){
     n->sendForwardMsgs(msgs);
 }
 
-bool PredictState::readyToSend(NeuralNode* n){
+template<> bool PredictState<NeuralNode>::readyToSend(NeuralNode* n){
     return n->readyToSendForward();
 }
 
+template<> void PredictState<ParallelDataNeuralNode>::onSend(ParallelDataNeuralNode* n, vector<Message*>& msgs){
+    n->sendForwardMsgs(msgs);
+}
 
-//void PredictState::onSend(BlockNeuralNode* n, vector<Message*>& msgs){
-//    n->sendForwardMsgs(msgs);
-//}
-//
-//bool PredictState::readyToSend(BlockNeuralNode* n){
-//    return n->readyToSendForward();
-//}
+template<> bool PredictState<ParallelDataNeuralNode>::readyToSend(ParallelDataNeuralNode* n){
+    return n->readyToSendForward();
+}

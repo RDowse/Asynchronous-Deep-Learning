@@ -58,6 +58,7 @@ bool ParallelDataNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs)
     // reset state
     input.setZero(input.size());
     forwardSeenCount = 0;
+    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<ParallelDataNeuralNode>>();
 }
 
 bool ParallelDataNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
@@ -80,6 +81,7 @@ bool ParallelDataNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs
     }
     
     backwardSeenCount = 0;
+    swapState<ForwardTrainState<ParallelDataNeuralNode>>();
 }
 
 void ParallelDataNeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {

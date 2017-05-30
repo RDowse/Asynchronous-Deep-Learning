@@ -13,8 +13,9 @@
 
 #include "graphs/graph_settings.h"
 
-#include "training/training_strategy.h"
-#include "training/stochastic_momentum_training.h"
+#include <iostream>
+
+using namespace std;
 
 // Note: context design pattern, maintains and shared information for the system 
 class DNNGraphSettings: public GraphSettings{
@@ -40,9 +41,6 @@ public:
     
     // Current epoch
     int epoch = 0;
-    
-    // Training method
-    TrainingStrategy* trainingStrategy;
     
     string dropout;
     
@@ -71,7 +69,6 @@ public:
     float (*deltaActivationFnc)(float);
     
     DNNGraphSettings(){
-        trainingStrategy = new StochasticMomentumTraining();
         activationFnc = &math::activationTanH;
         deltaActivationFnc = &math::deltaActivationTanH;
         initWeightsFnc = &weight_init::initWeights;

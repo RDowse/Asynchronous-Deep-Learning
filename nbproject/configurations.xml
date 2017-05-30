@@ -67,11 +67,8 @@
       <itemPath>include/states/predict_state.h</itemPath>
       <itemPath>include/simulator.h</itemPath>
       <itemPath>include/states/state.h</itemPath>
-      <itemPath>include/training/stochastic_momentum_training.h</itemPath>
-      <itemPath>include/training/stochastic_training.h</itemPath>
       <itemPath>include/tools/strategy_loader.h</itemPath>
       <itemPath>include/nodes/sync_node.h</itemPath>
-      <itemPath>include/training/training_strategy.h</itemPath>
       <itemPath>include/misc/weight_initialisers.h</itemPath>
       <itemPath>include/misc/yaml_reader.h</itemPath>
     </logicalFolder>
@@ -105,9 +102,6 @@
       <itemPath>src/nodes/pardata_nodes/parallel_data_output_node.cpp</itemPath>
       <itemPath>src/nodes/pardata_nodes/parallel_data_sync_node.cpp</itemPath>
       <itemPath>src/states/predict_state.cpp</itemPath>
-      <itemPath>src/states/state.cpp</itemPath>
-      <itemPath>src/training/stochastic_momentum_training.cpp</itemPath>
-      <itemPath>src/training/stochastic_training.cpp</itemPath>
       <itemPath>src/nodes/sync_node.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -322,21 +316,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="include/training/stochastic_momentum_training.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/training/stochastic_training.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/training/training_strategy.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/messages/backward_propagation_message.cpp"
@@ -406,23 +385,11 @@
       </item>
       <item path="src/states/predict_state.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/states/state.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/tools/clock.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/training/stochastic_momentum_training.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/training/stochastic_training.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
       </item>
       <item path="tests/dropout_tests.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -611,21 +578,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="include/training/stochastic_momentum_training.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/training/stochastic_training.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/training/training_strategy.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/messages/backward_propagation_message.cpp"
@@ -695,23 +647,11 @@
       </item>
       <item path="src/states/predict_state.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/states/state.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="src/tools/clock.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/dnn_graph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/tools/logging.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/training/stochastic_momentum_training.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/training/stochastic_training.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
       </item>
       <item path="tests/dropout_tests.cpp" ex="false" tool="1" flavor2="0">
       </item>

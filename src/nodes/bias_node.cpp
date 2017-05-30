@@ -4,7 +4,6 @@
 #include "messages/backward_propagation_message.h"
 
 std::string NeuralNode::BiasNode::m_type = "Bias";
-//NodeRegister<NeuralNode::BiasNode> NeuralNode::BiasNode::m_reg(NeuralNode::BiasNode::m_type);
 
 void NeuralNode::BiasNode::addEdge(Edge* e){
     // add to original edge sets
@@ -39,7 +38,7 @@ bool NeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     
     if(!weights.size()) initWeights();
     
-    MatrixXf mat = input*weights.transpose();
+    Eigen::MatrixXf mat = input*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
@@ -57,6 +56,7 @@ bool NeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     }
     
     forwardSeenCount = 0;
+    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<NeuralNode>>();
 }
 
 bool NeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
@@ -79,6 +79,7 @@ bool NeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(msgs.size() == 1);
     
     backwardSeenCount = 0;
+    swapState<ForwardTrainState<NeuralNode>>();
 }
 
 

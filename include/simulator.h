@@ -224,6 +224,12 @@ public:
         stratLoader.load();
     }
         
+    template<typename TState>
+    void setState(){
+        for(auto n: m_nodes)
+            dynamic_cast<TNode*>(n)->setState(new TState());
+    }
+    
     void setGraphSettings(shared_ptr<GraphSettings> settings){
         m_settings = settings;
     }
@@ -255,9 +261,9 @@ public:
         bool active=true;
         
         if("predict"==command){
-            m_settings->state = new PredictState();
+            setState<PredictState<TNode>>();
         } else if("train"== command){
-            m_settings->state = new ForwardTrainState();
+            setState<ForwardTrainState<TNode>>();
         } else {
             assert(0);
         }

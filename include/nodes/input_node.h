@@ -9,7 +9,8 @@
 #define INPUT_NODE_H
 
 #include "nodes/neural_node.h"
-#include "misc/node_factory.h"
+#include "states/backward_train_state.h"
+#include "states/forward_train_state.h"
 #include "tools/logging.h"
 #include "tools/math.h"
 #include "common.h"
@@ -27,8 +28,6 @@
 using namespace std;
 
 class NeuralNode::InputNode: public NeuralNode{
-    //static NodeRegister<InputNode> m_reg;
-    
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
     Eigen::MatrixXf receivedDelta;

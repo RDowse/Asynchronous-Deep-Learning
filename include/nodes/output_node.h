@@ -10,7 +10,8 @@
 
 #include "nodes/neural_node.h"
 #include "graphs/graph_settings.h"
-#include "misc/node_factory.h"
+#include "states/backward_train_state.h"
+#include "states/forward_train_state.h"
 #include "graphs/dnn_graph_settings.h"
 #include "tools/logging.h"
 
@@ -24,8 +25,6 @@
 using namespace std;
 
 class NeuralNode::OutputNode: public NeuralNode{
-    //static NodeRegister<OutputNode> m_reg;
-    
     Eigen::VectorXf error;
     Eigen::VectorXf target;
     Eigen::VectorXf input;

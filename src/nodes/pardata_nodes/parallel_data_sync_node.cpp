@@ -154,7 +154,7 @@ void ParallelDataNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
         } 
         
         // swap state
-        swapState<ForwardTrainState>();
+        swapState<ForwardTrainState<ParallelDataNeuralNode>>();
     }
 }
 
@@ -198,7 +198,7 @@ void ParallelDataNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
         }
 
         // Swap state
-        if(!validating) swapState<BackwardTrainState>();
+        if(!validating) swapState<BackwardTrainState<ParallelDataNeuralNode>>();
         
         if(validating){
             Logging::log(0,"VALIDATION ACCURACY: %f\n\n",accuracy/dataset->validation_labels.size());
