@@ -7,7 +7,6 @@
 #include "states/forward_train_state.h"
 
 std::string ParallelDataNeuralNode::SyncNode::m_type = "Sync";
-//NodeRegister<ParallelDataNeuralNode::SyncNode> ParallelDataNeuralNode::SyncNode::m_reg(ParallelDataNeuralNode::SyncNode::m_type);
 
 void ParallelDataNeuralNode::SyncNode::addEdge(Edge* e) {
     Node::addEdge(e);

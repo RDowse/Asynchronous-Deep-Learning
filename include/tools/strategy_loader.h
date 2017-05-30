@@ -15,6 +15,12 @@
 #include "nodes/output_node.h"
 #include "nodes/input_node.h"
 
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_bias_node.h"
+#include "nodes/pardata_nodes/parallel_data_hidden_node.h"
+#include "nodes/pardata_nodes/parallel_data_output_node.h"
+#include "nodes/pardata_nodes/parallel_data_input_node.h"
+
 #include "training/dropout.h"
 #include "training/dropout_bitset.h"
 

@@ -5,7 +5,6 @@
 #include "tools/math.h"
 
 std::string ParallelDataNeuralNode::InputNode::m_type = "Input";
-//NodeRegister<ParallelDataNeuralNode::InputNode> ParallelDataNeuralNode::InputNode::m_reg(ParallelDataNeuralNode::InputNode::m_type);
 
 void ParallelDataNeuralNode::InputNode::addEdge(Edge* e) {
      // add to original edge sets

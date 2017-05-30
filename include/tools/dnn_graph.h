@@ -19,6 +19,13 @@
 #include "nodes/output_node.h"
 #include "nodes/hidden_node.h"
 
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_bias_node.h"
+#include "nodes/pardata_nodes/parallel_data_hidden_node.h"
+#include "nodes/pardata_nodes/parallel_data_output_node.h"
+#include "nodes/pardata_nodes/parallel_data_input_node.h"
+#include "nodes/pardata_nodes/parallel_data_sync_node.h"
+
 //#include "nodes/block_nodes/block_input_node.h"
 //#include "nodes/block_nodes/block_hidden_node.h"
 //#include "nodes/block_nodes/block_output_node.h"

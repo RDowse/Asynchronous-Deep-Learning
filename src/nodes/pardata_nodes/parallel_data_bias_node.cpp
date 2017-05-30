@@ -4,7 +4,6 @@
 #include "messages/backward_propagation_message.h"
 
 std::string ParallelDataNeuralNode::BiasNode::m_type = "Bias";
-//NodeRegister<BiasNode> ParallelDataNeuralNode::BiasNode::m_reg(ParallelDataNeuralNode::BiasNode::m_type);
 
 void ParallelDataNeuralNode::BiasNode::addEdge(Edge* e){
     // add to original edge sets

@@ -18,6 +18,7 @@ class Message;
 
 using namespace std;
 
+//template<typename TNode>
 class State{
 public:
     State(){}

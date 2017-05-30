@@ -29,11 +29,7 @@
 
 using namespace std;
 
-class ParallelDataNeuralNode::HiddenNode: public ParallelDataNeuralNode{
-    static NodeRegister<HiddenNode> m_reg;
-    static std::string m_type;
-    
-    // for populating weights map
+class ParallelDataNeuralNode::HiddenNode: public ParallelDataNeuralNode{// for populating weights map
     int map_index = 0;
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
@@ -45,6 +41,7 @@ class ParallelDataNeuralNode::HiddenNode: public ParallelDataNeuralNode{
     Eigen::VectorXf input;
     Eigen::VectorXf error;
 public:    
+    static std::string m_type;
     HiddenNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
     virtual ~HiddenNode(){}
     string getType() override {return HiddenNode::m_type;}

@@ -24,13 +24,11 @@
 using namespace std;
 
 class ParallelDataNeuralNode::OutputNode: public ParallelDataNeuralNode{
-    static NodeRegister<OutputNode> m_reg;
-    static std::string m_type;
-    
     Eigen::VectorXf error;
     Eigen::VectorXf target;
     Eigen::VectorXf input;
 public:
+    static std::string m_type;
     OutputNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
     virtual ~OutputNode(){}
     string getType() override{return OutputNode::m_type;}

@@ -9,6 +9,7 @@
 #include "misc/data_wrapper.h"
 
 #include "nodes/neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 //#include "nodes/block_nodes/block_neural_node.h"
 
 #include "tools/loader.h"
@@ -76,9 +77,9 @@ void simulate(shared_ptr<DNNGraphSettings> settings){
     file.close();
 }
 
-template<typename T>
+template<typename TNode>
 void buildGraph(string name, int nHLayers, int nHidden, int nInput, int nOutput, bool bias, int nCPU=4){
-    DNNGraphBuilder<T> dnngraph(nHLayers,nHidden,nInput,nOutput,bias,nCPU);
+    DNNGraphBuilder<TNode> dnngraph(nHLayers,nHidden,nInput,nOutput,bias,nCPU);
     stringstream ss1, ss2;
     ss1 << name << ".graph";
     ss2 << name << ".dot";
@@ -117,7 +118,7 @@ int main(int argc, char** argv) {
     if("neural" == settings->netType){
         run<NeuralNode>(settings);
     } else if("parallel_data_neural" == settings->netType){
-        //run<>
+        run<ParallelDataNeuralNode>(settings);
     } else {
         cout << "Net type " << settings->netType << "not recognised" << endl;
     }

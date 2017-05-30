@@ -23,8 +23,9 @@
 #include "nodes/output_node.h"
 #include "nodes/sync_node.h"
 
-#include "training/stochastic_training.h"
-#include "training/stochastic_momentum_training.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_sync_node.h"
+#include "nodes/pardata_nodes/parallel_data_output_node.h"
 
 #include "tbb/parallel_for.h"
 #include "tbb/concurrent_queue.h"

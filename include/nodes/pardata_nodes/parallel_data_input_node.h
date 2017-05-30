@@ -27,9 +27,6 @@
 using namespace std;
 
 class ParallelDataNeuralNode::InputNode: public ParallelDataNeuralNode{
-    static NodeRegister<InputNode> m_reg;
-    static std::string m_type;
-    
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
     Eigen::MatrixXf receivedDelta;
@@ -37,6 +34,7 @@ class ParallelDataNeuralNode::InputNode: public ParallelDataNeuralNode{
     Eigen::VectorXf newWeights;       // intermediate updated weights
     Eigen::VectorXf weights;
 public:
+    static std::string m_type;
     InputNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}

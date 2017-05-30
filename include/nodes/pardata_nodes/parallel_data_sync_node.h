@@ -28,8 +28,6 @@
 using namespace std;
 
 class ParallelDataNeuralNode::SyncNode: public ParallelDataNeuralNode{
-    static NodeRegister<SyncNode> m_reg;
-    
     DataWrapper* dataset;
     
     State* lastState;           // tmp fix for deleting states
