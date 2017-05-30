@@ -13,7 +13,7 @@
 
 class DropoutNull: public DropoutStrategy{
 public:
-    DropoutNull(){}
+    DropoutNull():DropoutStrategy(false){}
     bool unset(){return true;};
     void nextStep(int currTime){}
     bool isActive(){return true;}

@@ -28,17 +28,14 @@ void NeuralNode::HiddenNode::addEdge(Edge* e) {
 bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     assert(readyToSendForward());
     
-    //cout << m_id << " ACTIVE\n";
-   
-    
     if(!weights.size()) initWeights();
     
     // calulate output activation
     activation = input.unaryExpr(context->activationFnc);
     
     MatrixXf mat;
-    if(dataSetType == DataSetType::validation && dropout->isEnabled())
-        mat = 0.5*activation*weights.transpose(); // for dropout based on probability
+    if(dataSetType == DataSetType::validation && !dropout->unset() && dropout->isEnabled())
+        mat = 0.5*activation*weights.transpose(); // for dropout based on probability, TODO correct for prime (adjustable probability)
     else 
         mat = activation*weights.transpose();
         
@@ -67,13 +64,14 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
 
     // perform weight update first
-    deltaWeights = context->lr*(receivedDelta * activation) + context->alpha*deltaWeights; // with momentum
+    int batchSize = receivedDelta.cols();
+    deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights; // with momentum
 
     newWeights -= deltaWeights; // update step  
     
     // Calculate next delta value
     Eigen::VectorXf tmp = weights.transpose()*receivedDelta;
-    Eigen::VectorXf delta2 = tmp.array()*activation.unaryExpr(context->deltaActivationFnc).array();
+    Eigen::VectorXf delta2 = tmp.array() * activation.unaryExpr(context->deltaActivationFnc).array();
 
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -115,8 +113,10 @@ void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
 }
 
 void NeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
-    if(!receivedDelta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
+    assert(!dropout->isEnabled() || dropout->isActive());
+    if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];
+    
     receivedDelta.row(index) = msg->delta;
     backwardSeenCount++;
     

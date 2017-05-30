@@ -83,6 +83,7 @@ public:
     
     // Handle sending of messages and routing for the node
     virtual bool onSend(vector<Message*>& msgs){
+        assert(context->state);
         context->state->onSend(this, msgs);
     }
     

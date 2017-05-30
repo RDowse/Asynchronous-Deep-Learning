@@ -57,6 +57,10 @@ public:
     float accuracy;
     float training_error;
     
+    // Activation values
+    float actMax;
+    float actMin;
+    
     // Weight initialisation
     void (*initWeightsFnc)(Eigen::VectorXf& ,int ,int);
     
@@ -71,6 +75,9 @@ public:
         activationFnc = &math::activationTanH;
         deltaActivationFnc = &math::deltaActivationTanH;
         initWeightsFnc = &weight_init::initWeights;
+        
+        actMax = activationFnc(5);
+        actMin = activationFnc(-5);
     }
     
     void setParameters(vector<int>& params) override {

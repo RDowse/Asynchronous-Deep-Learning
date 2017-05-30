@@ -40,19 +40,20 @@ class NeuralNode::SyncNode: public NeuralNode{
     // sampling
     int sampleIndex = 0;
     
+    int batchSize = 0;
+    
     int map_index = 0;
     unordered_map<int,int> dstOutputIndex;        // map backprop index to output
     
     // Error calculations
-    Eigen::MatrixXf out;
+    Eigen::MatrixXf receivedOutput;
     float training_error = 0;
     float accuracy = 0;
     vector<float> min_error; 
     vector<float> error;
 public:
     static std::string m_type;
-    SyncNode(shared_ptr<GraphSettings> context): NeuralNode(context){
-    }
+    SyncNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~SyncNode(){
         if(lastState) delete lastState;
     }
@@ -72,6 +73,18 @@ public:
     
     bool sendBackwardMsgs(vector<Message*>& msgs);
     bool sendForwardMsgs(vector<Message*>& msgs);
+    
+private:
+    template<typename TState>
+    void swapState(){
+        if(!lastState){
+            context->state = new TState();
+        } else {
+            State* tmpState = lastState;
+            lastState = context->state;
+            context->state = tmpState;
+        }
+    }
 };
 
 #endif /* SYNC_NODE_H */

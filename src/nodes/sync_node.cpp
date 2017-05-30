@@ -45,7 +45,15 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     auto& images = validating ? 
         dataset->validation_images : dataset->training_images;
     
-    int batchSize = validating ? dataset->validation_labels.size() : context->batchSize;
+    //int batchSize = 0;
+    if(validating){
+        batchSize = dataset->validation_labels.size(); 
+    }else{
+        if( sampleIndex + context->batchSize > dataset->training_labels.size() ) 
+            batchSize = dataset->training_labels.size() - sampleIndex;
+        else
+            batchSize = context->batchSize;
+    }
     
     // TODO: check data size matches the input size
     Logging::log(3, "Sending sample %d", sampleIndex);
@@ -80,10 +88,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     Logging::log(3, "Sending sample %d backward", sampleIndex);
     
-    float actMax = context->activationFnc(5);
-    float actMin = context->activationFnc(-5);
-    
-    auto batchLabels = dataset->training_labels.block(sampleIndex,0,context->batchSize,1);
+    auto batchLabels = dataset->training_labels.block(sampleIndex,0,batchSize,1);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
@@ -92,15 +97,14 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->time = time;
         
-        Eigen::VectorXf target(context->batchSize);
+        Eigen::VectorXf target(batchSize);
         if(outgoingBackwardEdges.size() == 1){ // binary classification
-            for(int j = 0; j < context->batchSize; ++j)
-                target(j) = (batchLabels(j) ? actMax : actMin);
+            for(int j = 0; j < batchSize; ++j)
+                target(j) = (batchLabels(j) ? context->actMax : context->actMin);
         } else { // multi classification
-            for(int j = 0; j < context->batchSize; ++j)
-                target(j) = (batchLabels(j) == i ? actMax : actMin);
+            for(int j = 0; j < batchSize; ++j)
+                target(j) = (batchLabels(j) == i ? context->actMax : context->actMin);
         }
-        
         assert(outgoingBackwardEdges[i]->dst->getType() == "Output");
         msg->target = target;
         msgs.push_back(msg);
@@ -124,7 +128,7 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     // update flags and indexes once all data is received
     if(readyToSendForward()){
         
-        sampleIndex+= context->batchSize;
+        sampleIndex += batchSize;
         
         int nTrainingSamples = dataset->training_labels.size();
         
@@ -134,14 +138,14 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             
             // next epoch
             context->epoch++;
-            
-            Logging::log(0,"ACCURACY: %f\n",accuracy/nTrainingSamples);
-            Logging::log(0,"TOTAL ERROR: %f\n",training_error);
-            Logging::log(0,"EPOCH: %d\n",context->epoch);            
-            
+                        
             context->accuracy = accuracy/nTrainingSamples;
-            context->training_error = training_error;
+            context->training_error = training_error/nTrainingSamples;
             
+            Logging::log(0,"ACCURACY: %f\n",context->accuracy);
+            Logging::log(0,"AVERAGE ERROR: %f\n",context->training_error);
+            Logging::log(0,"EPOCH: %d\n",context->epoch);            
+
             validating = true;
             
             // reset
@@ -151,86 +155,61 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
         } 
         
         // swap state
-        if(!lastState){
-            context->state = new ForwardTrainState();
-        } else {
-            State* tmpState = lastState;
-            lastState = context->state;
-            context->state = tmpState;
-        }
+        swapState<ForwardTrainState>();
     }
 }
 
 void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     forwardSeenCount++;    
     
+    if(!receivedOutput.size() || batchSize != receivedOutput.rows()) 
+        receivedOutput = Eigen::MatrixXf(batchSize,outgoingBackwardEdges.size());
+    
     int index = dstOutputIndex[msg->src];
-    float actMax = context->activationFnc(5);
-    float actMin = context->activationFnc(-5);
-
-    int batchSize = !validating ? context->batchSize : dataset->validation_labels.size();
-    auto batchLabels = !validating ? dataset->training_labels.block(sampleIndex,0,context->batchSize,1):
-        dataset->validation_labels;  
-    
-    if(!out.size() || batchSize != out.rows()) 
-        out = Eigen::MatrixXf(batchSize,outgoingBackwardEdges.size());
-    
-    Eigen::VectorXf target(msg->activation.size());
-    assert(target.size() == batchLabels.size());
-    if(outgoingBackwardEdges.size() == 1){ // binary classifications
-        for(int i = 0; i < target.size(); ++i)
-            target(i) = batchLabels(i) ? actMax : actMin;
-    } else {    // multi classification
-        for(int i = 0; i < target.size(); ++i)
-            target(i) = (batchLabels(i) == index ? actMax : actMin);
-    }
     
     // network output
-    out.col(index) = msg->activation;
-    
-    // mse error
-    Eigen::VectorXf diff = target - msg->activation;
-    auto tmp = float(diff.transpose()*diff); // square
-    training_error += 0.5*(tmp);
+    receivedOutput.col(index) = msg->activation;
     
     forwardMessagePool->returnMessage(msg);
     
     // switch propagation direction
     if(readyToSendBackward()){
+        // training error
+        if(outgoingBackwardEdges.size() == 1){ assert(0); }// todo implement binary version
+        
+        auto batchLabels = !validating ? dataset->training_labels.block(sampleIndex,0,batchSize,1):
+            dataset->validation_labels; 
+        
+        Eigen::MatrixXf target = Eigen::MatrixXf::Constant(batchSize,outgoingBackwardEdges.size(),context->actMin);
+        for(int i = 0; i < batchSize; ++i)
+            target( i, (int)batchLabels(i) ) = context->actMax;
+        training_error += math::mse(target,receivedOutput);
+        
         // for accuracy predicition, should really be in a separate forward pass
         MatrixXf::Index maxIndex[batchSize];
         VectorXf maxVal(batchSize);
-        for(int i=0;i<batchSize;++i){
+        for(int i = 0; i < batchSize; ++i){
             if(outgoingBackwardEdges.size() == 1){ // binary classification
-                auto mid = (actMax - actMin) / 2;
-                if((out(i) > mid)==batchLabels(i)) accuracy++;
+                auto mid = (context->actMax - context->actMin) / 2;
+                if((receivedOutput(i) > mid)==batchLabels(i)) accuracy++;
             } else { // multi-classification
-                maxVal(i) = out.row(i).maxCoeff( &maxIndex[i] );
+                maxVal(i) = receivedOutput.row(i).maxCoeff( &maxIndex[i] );
                 if(maxIndex[i]==batchLabels(i)) accuracy++;
             }
         }
 
         // Swap state
-        if(!validating){
-            if(!lastState){
-                context->state = new BackwardTrainState();
-            } else {
-                State* tmpState = lastState;
-                lastState = context->state;
-                context->state = tmpState;
-            }
-        }
-                
+        if(!validating) swapState<BackwardTrainState>();
+        
         if(validating){
             Logging::log(0,"VALIDATION ACCURACY: %f\n\n",accuracy/dataset->validation_labels.size());
             
-            validating = false;
-            
             // trigger next wave
+            validating = false;
             backwardSeenCount = incomingBackwardEdges.size();
-            forwardSeenCount = 0;
-            
+
             // reset
+            forwardSeenCount = 0;
             sampleIndex = 0;
             training_error = 0;
             accuracy = 0;

@@ -97,25 +97,6 @@ struct XORDataWrapper: public DataWrapper{
 };
 
 struct MNISTDataWrapper: public DataWrapper{   
-//    MNISTDataWrapper(const string& training_path, const string& testing_path){
-//        vector< vector<float> > tmp_training_images;
-//        vector<int> tmp_training_labels;
-//        
-//        vector< vector<float> > tmp_testing_images;
-//        vector<int> tmp_testing_labels;
-//        
-//        readCSV(training_path,tmp_training_labels,tmp_training_images);
-//        readCSV(testing_path,tmp_testing_labels,tmp_testing_images);
-//        
-//        convert2dVecToMat(tmp_training_images,training_images);
-//        convertVecToVec(tmp_training_labels,training_labels);
-//        
-//        convert2dVecToMat(tmp_testing_images,testing_images);
-//        convertVecToVec(tmp_testing_labels,testing_labels);      
-//        
-//        training_images.normalize();
-//    }
-    
     MNISTDataWrapper(const string& training_path, const string& testing_path){
         // test set
         vector< vector<float> > tmp_testing_images;
@@ -143,27 +124,30 @@ struct MNISTDataWrapper: public DataWrapper{
         vector<int> training, validation;
         kf.getFold(folds, back_inserter(training), back_inserter(validation));
 
-        cout << "Fold " << 1 << " Training Data" << "\n";
+        //cout << "Fold " << 1 << " Training Data" << "\n";
         for(auto x: training){
             tmp_training_labels.push_back(tmp_labels[x]);
             tmp_training_images.push_back(tmp_images[x]);
-            cout << tmp_labels[x] << " ";
+            //cout << tmp_labels[x] << " ";
         }
-        cout << "\n";        
+        //cout << "\n";        
         convert2dVecToMat(tmp_training_images,training_images);
-        convertVecToVec(tmp_training_labels,training_labels);
-        training_images.normalize();        
+        convertVecToVec(tmp_training_labels,training_labels);    
+        training_images = training_images/255;
         
-        cout << "Fold " << folds << " Validation Data" << "\n";
+        //cout << "Fold " << folds << " Validation Data" << "\n";
         for(auto x: validation){
             tmp_validation_labels.push_back(tmp_labels[x]);
             tmp_validation_images.push_back(tmp_images[x]);
-            cout << tmp_labels[x] << " ";
+            //cout << tmp_labels[x] << " ";
         }
-        cout << "\n";
+        //cout << "\n";
         convert2dVecToMat(tmp_validation_images,validation_images);
         convertVecToVec(tmp_validation_labels,validation_labels);
-        validation_images.normalize();
+        validation_images = validation_images/255;
+        
+        validation_images = training_images;
+        validation_labels = training_labels;
     }
 };
 

@@ -60,6 +60,7 @@ void simulate(shared_ptr<DNNGraphSettings> settings){
         // basic check for data size
         assert(data->training_images.cols() < nNodes);
         sim.loadInput(data);
+        cout << "Starting run\n";
         sim.run("train");
         
         auto s = std::static_pointer_cast<DNNGraphSettings>(settings);

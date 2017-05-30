@@ -50,7 +50,7 @@ public:
     DropoutBitset(NodeType _type, int _seed, float _dropRate, 
             int _prevLayerSize, int _nextLayerSize, int _hiddenLayerSize, 
             int _numLayers, int _layerIndex, int _nodeIndex):
-        seed(_seed), type(_type), dropRate(_dropRate), numLayers(_numLayers), 
+        DropoutStrategy(true), seed(_seed), type(_type), dropRate(_dropRate), numLayers(_numLayers), 
         prevLayerSize(_prevLayerSize), nextLayerSize(_nextLayerSize), hiddenLayerSize(_hiddenLayerSize),
         layerIndex(_layerIndex), nodeIndex(_nodeIndex) 
     {
@@ -97,11 +97,11 @@ public:
         return currbitset[nodeIndex];
     }
     bool isPrevLayerNodeActive(int i){
-        if(firstLayer || i == prevLayerSize || !enabled) return true;
+        if(firstLayer || i == prevLayerSize || !enabled || prevLayerSize == -1) return true;
         return prevbitset[i];
     }
     bool isNextLayerNodeActive(int i){
-        if(lastLayer || !enabled) return true;
+        if(lastLayer || !enabled || nextLayerSize == -1) return true;
         return nextbitset[i];
     }
     bool readyToSendForward(int forwardSeenCount){

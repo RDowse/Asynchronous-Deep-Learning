@@ -71,7 +71,6 @@ TESTFILES= \
 
 # Test Object Files
 TESTOBJECTFILES= \
-	${TESTDIR}/include/tests/dropoutbitset_test.o \
 	${TESTDIR}/tests/dropout_tests.o
 
 # C Compiler Flags
@@ -230,19 +229,13 @@ ${OBJECTDIR}/src/training/stochastic_training.o: src/training/stochastic_trainin
 .build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
 .build-tests-subprojects:
 
-${TESTDIR}/TestFiles/f1: ${TESTDIR}/include/tests/dropoutbitset_test.o ${OBJECTFILES:%.o=%_nomain.o}
+${TESTDIR}/TestFiles/f1: ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS} -ltbb -lyaml-cpp  
 
 ${TESTDIR}/TestFiles/f2: ${TESTDIR}/tests/dropout_tests.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS} -ltbb -lyaml-cpp -ltbb 
-
-
-${TESTDIR}/include/tests/dropoutbitset_test.o: include/tests/dropoutbitset_test.cpp 
-	${MKDIR} -p ${TESTDIR}/include/tests
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -O -Iinclude -I/usr/include/eigen3 -I. -std=c++11 -MMD -MP -MF "$@.d" -o ${TESTDIR}/include/tests/dropoutbitset_test.o include/tests/dropoutbitset_test.cpp
 
 
 ${TESTDIR}/tests/dropout_tests.o: tests/dropout_tests.cpp 

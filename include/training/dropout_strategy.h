@@ -11,9 +11,10 @@
 
 class DropoutStrategy{
 protected:
-    bool enabled = true;
+    bool enabled;
 public:
     enum NodeType{input,hidden,output,bias};
+    DropoutStrategy(bool _enabled): enabled(_enabled){}
     virtual bool unset(){return false;};
     virtual void nextStep(int currTime)=0;
     virtual bool isActive()=0;

@@ -65,6 +65,7 @@ public:
     Dropout(NodeType _type, int _seed, 
             int _prevLayerSize, int _nextLayerSize, int _hiddenLayerSize, 
             int _numLayers, int _layerIndex, int _nodeIndex=-1):
+    DropoutStrategy(true),
     type(_type), 
     nodeIndex(_nodeIndex), 
     layerIndex(_layerIndex), 

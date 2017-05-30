@@ -62,7 +62,8 @@ bool BiasNode::sendForwardMsgs(vector<Message*>& msgs){
 bool BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
     
-    deltaWeights = context->lr*(receivedDelta * input) + context->alpha*deltaWeights;
+    int batchSize = receivedDelta.cols();
+    deltaWeights = context->lr*(receivedDelta * input)/batchSize + context->alpha*deltaWeights;
 
     newWeights -= deltaWeights; // update step  
     
@@ -105,9 +106,10 @@ void BiasNode::onRecv(ForwardPropagationMessage* msg) {
 }
 
 void BiasNode::onRecv(BackwardPropagationMessage* msg) {  
-    if(!receivedDelta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
+    if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;
+    
     backwardSeenCount++;
     
     backwardMessagePool->returnMessage(msg);

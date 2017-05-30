@@ -43,7 +43,7 @@ public:
             } else if("dropoutbitset" == str) {
                 dropoutBitset();
             } else {
-                cout << "nothing to load" << endl;
+                cout << "No dropout strategy to load" << endl;
             }
         }
     }
@@ -58,7 +58,7 @@ private:
         int outputSize = context->nOutput;
         for(auto n: nodesRef){
             if(NeuralNode::HiddenNode* h = dynamic_cast<NeuralNode::HiddenNode*>(n)){
-                int prevLayerSize=0,nextLayerSize=0;
+                int prevLayerSize=hiddenLayerSize,nextLayerSize=hiddenLayerSize;
                 if(layerIndex == 0) prevLayerSize = inputSize;
                 if(layerIndex == numLayers-1) nextLayerSize = outputSize;
                 h->setDropoutStrategy(
@@ -103,7 +103,7 @@ private:
         
         for(auto n: nodesRef){
             if(NeuralNode::HiddenNode* h = dynamic_cast<NeuralNode::HiddenNode*>(n)){
-                int prevLayerSize=0,nextLayerSize=0;
+                int prevLayerSize=hiddenLayerSize,nextLayerSize=hiddenLayerSize;
                 if(layerIndex == 0) prevLayerSize = inputSize;
                 if(layerIndex == numLayers-1) nextLayerSize = outputSize;
                 h->setDropoutStrategy(
@@ -126,7 +126,7 @@ private:
                     new DropoutBitset<bufferSize>(
                         NodeType::output,context->seed,dropRate,
                         hiddenLayerSize,-1,hiddenLayerSize,
-                        numLayers,-1,-1
+                        numLayers,numLayers,-1
                     )
                 );
             } else if(BiasNode* b = dynamic_cast<BiasNode*>(n)){

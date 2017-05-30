@@ -262,7 +262,7 @@ public:
         }
         
         while(active)
-            active = step_all();
+            active = step_all_parallel();
     }
 };
 

@@ -45,10 +45,8 @@
       <itemPath>include/tools/dnn_graph.h</itemPath>
       <itemPath>include/graphs/dnn_graph_settings.h</itemPath>
       <itemPath>include/training/dropout.h</itemPath>
-      <itemPath>include/training/dropout_binomial.h</itemPath>
       <itemPath>include/training/dropout_bitset.h</itemPath>
       <itemPath>include/training/dropout_null.h</itemPath>
-      <itemPath>include/training/dropout_standard.h</itemPath>
       <itemPath>include/training/dropout_strategy.h</itemPath>
       <itemPath>include/misc/edge.h</itemPath>
       <itemPath>include/messages/forward_propagation_message.h</itemPath>
@@ -124,7 +122,6 @@
                      displayName="dropout bitset"
                      projectFiles="true"
                      kind="TEST">
-        <itemPath>include/tests/dropoutbitset_test.cpp</itemPath>
       </logicalFolder>
       <logicalFolder name="f2"
                      displayName="dropout tests"
@@ -300,11 +297,6 @@
       </item>
       <item path="include/states/state.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tests/dropoutbitset_test.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
       <item path="include/tools/clock.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
@@ -319,19 +311,9 @@
       </item>
       <item path="include/training/dropout.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/training/dropout_binomial.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/training/dropout_bitset.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/training/dropout_null.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/training/dropout_standard.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
       </item>
       <item path="include/training/dropout_strategy.h"
             ex="false"
@@ -594,11 +576,6 @@
       </item>
       <item path="include/states/state.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/tests/dropoutbitset_test.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
       <item path="include/tools/clock.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/dnn_graph.h" ex="false" tool="3" flavor2="0">
@@ -613,19 +590,9 @@
       </item>
       <item path="include/training/dropout.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/training/dropout_binomial.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/training/dropout_bitset.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/training/dropout_null.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/training/dropout_standard.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
       </item>
       <item path="include/training/dropout_strategy.h"
             ex="false"

@@ -70,7 +70,8 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
             
     // perform weight update first
-    deltaWeights = context->lr*(receivedDelta * activation) + context->alpha*deltaWeights;
+    int batchSize = receivedDelta.cols();
+    deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights;
 
     newWeights -= deltaWeights; // update step  
     
@@ -111,7 +112,7 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
 } 
 
 void NeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
-    if(!receivedDelta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
+    if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;
     backwardSeenCount++;
