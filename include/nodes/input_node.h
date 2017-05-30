@@ -27,8 +27,7 @@
 using namespace std;
 
 class NeuralNode::InputNode: public NeuralNode{
-    static NodeRegister<InputNode> m_reg;
-    static std::string m_type;
+    //static NodeRegister<InputNode> m_reg;
     
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
@@ -37,6 +36,7 @@ class NeuralNode::InputNode: public NeuralNode{
     Eigen::VectorXf newWeights;       // intermediate updated weights
     Eigen::VectorXf weights;
 public:
+    static std::string m_type;
     InputNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     virtual ~InputNode(){}
     string getType() override {return InputNode::m_type;}

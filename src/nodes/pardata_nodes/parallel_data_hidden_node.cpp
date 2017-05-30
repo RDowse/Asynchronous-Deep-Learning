@@ -1,12 +1,12 @@
 
-#include "nodes/hidden_node.h"
+#include "nodes/pardata_nodes/parallel_data_hidden_node.h"
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 
-std::string NeuralNode::HiddenNode::m_type = "Hidden";
-//NodeRegister<NeuralNode::HiddenNode> NeuralNode::HiddenNode::m_reg(NeuralNode::HiddenNode::m_type);
+std::string ParallelDataNeuralNode::HiddenNode::m_type = "Hidden";
+//NodeRegister<ParallelDataNeuralNode::HiddenNode> ParallelDataNeuralNode::HiddenNode::m_reg(ParallelDataNeuralNode::HiddenNode::m_type);
 
-void NeuralNode::HiddenNode::addEdge(Edge* e) {
+void ParallelDataNeuralNode::HiddenNode::addEdge(Edge* e) {
     // add to original edge sets
     Node::addEdge(e);
     if(e->src->getId() == m_id){
@@ -25,7 +25,7 @@ void NeuralNode::HiddenNode::addEdge(Edge* e) {
     }
 }
 
-bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
+bool ParallelDataNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     assert(readyToSendForward());
     
     if(!weights.size()) initWeights();
@@ -60,7 +60,7 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     forwardSeenCount = 0;
 }
 
-bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
 
     // perform weight update first
@@ -91,7 +91,7 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     backwardSeenCount = 0;
 }
 
-void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
+void ParallelDataNeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     if(input.size() != msg->activation.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
     input += msg->activation;
     forwardSeenCount++;    
@@ -112,7 +112,7 @@ void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
         weights = newWeights;
 }
 
-void NeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
+void ParallelDataNeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
     assert(!dropout->isEnabled() || dropout->isActive());
     if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];

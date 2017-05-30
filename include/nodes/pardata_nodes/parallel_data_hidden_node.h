@@ -5,10 +5,10 @@
  * Created on 20 March 2017, 23:50
  */
 
-#ifndef HIDDEN_NODE_H
-#define HIDDEN_NODE_H
+#ifndef PARALLEL_DATA_HIDDEN_NODE_H
+#define PARALLEL_DATA_HIDDEN_NODE_H
 
-#include "nodes/neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 #include "misc/node_factory.h"
 
 #include "graphs/dnn_graph_settings.h"
@@ -29,8 +29,9 @@
 
 using namespace std;
 
-class NeuralNode::HiddenNode: public NeuralNode{
+class ParallelDataNeuralNode::HiddenNode: public ParallelDataNeuralNode{
     static NodeRegister<HiddenNode> m_reg;
+    static std::string m_type;
     
     // for populating weights map
     int map_index = 0;
@@ -44,8 +45,7 @@ class NeuralNode::HiddenNode: public NeuralNode{
     Eigen::VectorXf input;
     Eigen::VectorXf error;
 public:    
-    static std::string m_type;
-    HiddenNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
+    HiddenNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
     virtual ~HiddenNode(){}
     string getType() override {return HiddenNode::m_type;}
     

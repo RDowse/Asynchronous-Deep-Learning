@@ -1,15 +1,15 @@
 
-#include "nodes/sync_node.h"
+#include "nodes/pardata_nodes/parallel_data_sync_node.h"
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 #include "tools/math.h"
 #include "states/backward_train_state.h"
 #include "states/forward_train_state.h"
 
-std::string NeuralNode::SyncNode::m_type = "Sync";
-//NodeRegister<NeuralNode::SyncNode> NeuralNode::SyncNode::m_reg(NeuralNode::SyncNode::m_type);
+std::string ParallelDataNeuralNode::SyncNode::m_type = "Sync";
+//NodeRegister<ParallelDataNeuralNode::SyncNode> ParallelDataNeuralNode::SyncNode::m_reg(ParallelDataNeuralNode::SyncNode::m_type);
 
-void NeuralNode::SyncNode::addEdge(Edge* e) {
+void ParallelDataNeuralNode::SyncNode::addEdge(Edge* e) {
     Node::addEdge(e);
     if(e->src->getId() == m_id){
         if(e->dst->getType() == "Output"){
@@ -35,7 +35,7 @@ void NeuralNode::SyncNode::addEdge(Edge* e) {
     } 
 }
     
-bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     assert(dataset!=NULL);
     
@@ -83,7 +83,7 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     backwardSeenCount = 0; 
 }
 
-bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
     
     Logging::log(3, "Sending sample %d backward", sampleIndex);
@@ -114,14 +114,14 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     forwardSeenCount = 0;
 }
 
-bool NeuralNode::SyncNode::readyToSendForward(){
+bool ParallelDataNeuralNode::SyncNode::readyToSendForward(){
     return (backwardSeenCount == incomingBackwardEdges.size() && context->epoch <= context->maxEpoch) || tick; 
 }
-bool NeuralNode::SyncNode::readyToSendBackward(){
+bool ParallelDataNeuralNode::SyncNode::readyToSendBackward(){
     return (forwardSeenCount == incomingForwardEdges.size());
 }
 
-void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
+void ParallelDataNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     backwardSeenCount++;
     backwardMessagePool->returnMessage(msg);
     
@@ -159,7 +159,7 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     }
 }
 
-void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
+void ParallelDataNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     forwardSeenCount++;    
     
     if(!receivedOutput.size() || batchSize != receivedOutput.rows()) 

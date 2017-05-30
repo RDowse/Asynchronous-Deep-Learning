@@ -86,6 +86,7 @@ private:
         
         // Read paths
         settings->netPath = config["netPath"].as<std::string>();
+        settings->netType = config["netType"].as<std::string>();
         settings->datasetTrainingPath = config["datasetTrainingPath"].as<std::string>();
         settings->datasetTestingPath = config["datasetTestingPath"].as<std::string>();
         settings->datasetType = config["dataset"].as<std::string>();

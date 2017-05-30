@@ -5,10 +5,10 @@
  * Created on 13 April 2017, 00:47
  */
 
-#ifndef SYNC_NODE_H
-#define SYNC_NODE_H
+#ifndef PARALLEL_DATA_SYNC_NODE_H
+#define PARALLEL_DATA_SYNC_NODE_H
 
-#include "nodes/neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 #include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
@@ -27,8 +27,8 @@
 
 using namespace std;
 
-class NeuralNode::SyncNode: public NeuralNode{
-    //static NodeRegister<SyncNode> m_reg;
+class ParallelDataNeuralNode::SyncNode: public ParallelDataNeuralNode{
+    static NodeRegister<SyncNode> m_reg;
     
     DataWrapper* dataset;
     
@@ -53,7 +53,7 @@ class NeuralNode::SyncNode: public NeuralNode{
     vector<float> error;
 public:
     static std::string m_type;
-    SyncNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
+    SyncNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
     virtual ~SyncNode(){
         if(lastState) delete lastState;
     }

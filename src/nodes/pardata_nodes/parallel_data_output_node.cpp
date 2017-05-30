@@ -1,14 +1,14 @@
 
-#include "nodes/output_node.h"
+#include "nodes/pardata_nodes/parallel_data_output_node.h"
 
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 #include "tools/math.h"
 
-std::string NeuralNode::OutputNode::m_type = "Output";
-//NodeRegister<NeuralNode::OutputNode> NeuralNode::OutputNode::m_reg(NeuralNode::OutputNode::m_type);
+std::string ParallelDataNeuralNode::OutputNode::m_type = "Output";
+//NodeRegister<ParallelDataNeuralNode::OutputNode> ParallelDataNeuralNode::OutputNode::m_reg(ParallelDataNeuralNode::OutputNode::m_type);
 
-void NeuralNode::OutputNode::addEdge(Edge* e) {
+void ParallelDataNeuralNode::OutputNode::addEdge(Edge* e) {
     // add to original edge sets
     Node::addEdge(e);
     // check edge belongs to this node
@@ -37,7 +37,7 @@ void NeuralNode::OutputNode::addEdge(Edge* e) {
     } 
 }
 
-bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     // calulate output activation
@@ -60,7 +60,7 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
     forwardSeenCount = 0;
 }
 
-bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());   
     
     msgs.reserve(outgoingBackwardEdges.size());
@@ -82,7 +82,7 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
     backwardSeenCount = 0;
 }
 
-void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
+void ParallelDataNeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
     if(input.size() != msg->activation.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
     input += msg->activation;
     forwardSeenCount++;    
@@ -100,7 +100,7 @@ void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
     forwardMessagePool->returnMessage(msg);
 }
 
-void NeuralNode::OutputNode::onRecv(BackwardPropagationMessage* msg) {
+void ParallelDataNeuralNode::OutputNode::onRecv(BackwardPropagationMessage* msg) {
     target = msg->target;
     backwardSeenCount++;
     

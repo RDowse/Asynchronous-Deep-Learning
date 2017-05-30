@@ -1,22 +1,19 @@
 /* 
- * File:   dnn_node.h
+ * File:   input_node.h
  * Author: ryan
  *
- * Created on 20 March 2017, 23:50
+ * Created on 23 March 2017, 23:36
  */
 
-#ifndef HIDDEN_NODE_H
-#define HIDDEN_NODE_H
+#ifndef PARALLEL_DATA_INPUT_NODE_H
+#define PARALLEL_DATA_INPUT_NODE_H
 
-#include "nodes/neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 #include "misc/node_factory.h"
-
-#include "graphs/dnn_graph_settings.h"
-#include "graphs/graph_settings.h"
-
+#include "tools/logging.h"
 #include "tools/math.h"
+#include "common.h"
 
-#include <eigen3/Eigen/Dense>
 #include <stack>
 #include <string>
 #include <cassert>
@@ -29,26 +26,21 @@
 
 using namespace std;
 
-class NeuralNode::HiddenNode: public NeuralNode{
-    static NodeRegister<HiddenNode> m_reg;
+class ParallelDataNeuralNode::InputNode: public ParallelDataNeuralNode{
+    static NodeRegister<InputNode> m_reg;
+    static std::string m_type;
     
-    // for populating weights map
-    int map_index = 0;
     unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
     
-    Eigen::MatrixXf receivedDelta;    // store received delta values
+    Eigen::MatrixXf receivedDelta;
     Eigen::VectorXf deltaWeights;     // delta weights, for momentum
-    Eigen::VectorXf newWeights;       // new weights to update
-    Eigen::VectorXf weights;          // current weights
-   
-    Eigen::VectorXf input;
-    Eigen::VectorXf error;
-public:    
-    static std::string m_type;
-    HiddenNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
-    virtual ~HiddenNode(){}
-    string getType() override {return HiddenNode::m_type;}
-    
+    Eigen::VectorXf newWeights;       // intermediate updated weights
+    Eigen::VectorXf weights;
+public:
+    InputNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
+    virtual ~InputNode(){}
+    string getType() override {return InputNode::m_type;}
+
     void addEdge(Edge* e) override;
     
     void setWeights(const vector<float>& w) override{
@@ -60,13 +52,15 @@ public:
         receivedDelta = Eigen::VectorXf::Zero(weights.size());
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
     }
-
+        
     void onRecv(ForwardPropagationMessage* msg) override;
     void onRecv(BackwardPropagationMessage* msg) override;
 
     bool sendForwardMsgs(vector<Message*>& msgs) override;
-    bool sendBackwardMsgs(vector<Message*>& msgs) override;
+    bool sendBackwardMsgs(vector<Message*>& msgs) override;    
 private:
+    // for populating weights map
+    int map_index = 0;
     void initWeights(){
         weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
         context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
@@ -77,5 +71,5 @@ private:
     }
 };
 
-#endif /* HIDDEN_NODE_H */
+#endif /* INPUT_NODE_H */
 

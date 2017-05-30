@@ -5,10 +5,10 @@
  * Created on 04 April 2017, 22:54
  */
 
-#ifndef BIAS_NODE_H
-#define BIAS_NODE_H
+#ifndef PARALLEL_DATA_BIAS_NODE_H
+#define PARALLEL_DATA_BIAS_NODE_H
 
-#include "nodes/neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 #include "misc/node_factory.h"
 #include "graphs/graph_settings.h"
 #include "graphs/dnn_graph_settings.h"
@@ -19,8 +19,9 @@
 
 using namespace std;
 
-class NeuralNode::BiasNode : public NeuralNode{
-    //static NodeRegister<BiasNode> m_reg;
+class ParallelDataNeuralNode::BiasNode : public ParallelDataNeuralNode{
+    static NodeRegister<BiasNode> m_reg;
+    static std::string m_type;
     
     // for populating weights map
     int map_index = 0;
@@ -33,8 +34,7 @@ class NeuralNode::BiasNode : public NeuralNode{
     
     Eigen::VectorXf input; // set to 1
 public:
-    static std::string m_type;
-    BiasNode(shared_ptr<GraphSettings> context): NeuralNode(context){};
+    BiasNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){};
     virtual ~BiasNode(){}
     string getType() override {return BiasNode::m_type;}
     void addEdge(Edge* e) override;

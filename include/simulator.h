@@ -218,7 +218,7 @@ public:
     
     // strategy config from YAML file
     void setStrategies(vector<string> config){
-        StrategyLoader stratLoader(m_settings,&m_nodes);
+        StrategyLoader<TNode> stratLoader(m_settings,&m_nodes);
         stratLoader.setConfig(config);
         stratLoader.load();
     }

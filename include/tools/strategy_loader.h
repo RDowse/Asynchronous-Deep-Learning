@@ -23,7 +23,14 @@
 
 using namespace std;
 
+template<typename TNode>
 class StrategyLoader{
+    typedef typename TNode::InputNode InputNode;
+    typedef typename TNode::OutputNode OutputNode;
+    typedef typename TNode::HiddenNode HiddenNode;
+    typedef typename TNode::BiasNode BiasNode;
+    typedef typename TNode::SyncNode SyncNode;
+    
     typedef DropoutStrategy::NodeType NodeType;
     shared_ptr<DNNGraphSettings> context;
     vector<string> config;
@@ -57,7 +64,7 @@ private:
         int inputSize = context->nInput;
         int outputSize = context->nOutput;
         for(auto n: nodesRef){
-            if(NeuralNode::HiddenNode* h = dynamic_cast<NeuralNode::HiddenNode*>(n)){
+            if(HiddenNode* h = dynamic_cast<HiddenNode*>(n)){
                 int prevLayerSize=hiddenLayerSize,nextLayerSize=hiddenLayerSize;
                 if(layerIndex == 0) prevLayerSize = inputSize;
                 if(layerIndex == numLayers-1) nextLayerSize = outputSize;
@@ -65,11 +72,11 @@ private:
                     new Dropout(NodeType::hidden,context->seed,prevLayerSize,
                         nextLayerSize,hiddenLayerSize,numLayers,layerIndex,nodeIndex++)
                 );
-            } else if(NeuralNode::InputNode* i = dynamic_cast<NeuralNode::InputNode*>(n)){
+            } else if(InputNode* i = dynamic_cast<InputNode*>(n)){
                 i->setDropoutStrategy(
                     new Dropout(NodeType::input,context->seed,-1,hiddenLayerSize,hiddenLayerSize,numLayers,-1)
                 );
-            } else if(NeuralNode::OutputNode* o = dynamic_cast<NeuralNode::OutputNode*>(n)){
+            } else if(OutputNode* o = dynamic_cast<OutputNode*>(n)){
                 o->setDropoutStrategy(
                     new Dropout(NodeType::output,context->seed,hiddenLayerSize,-1,hiddenLayerSize,numLayers,numLayers)
                 );
@@ -102,7 +109,7 @@ private:
         int outputSize = context->nOutput;
         
         for(auto n: nodesRef){
-            if(NeuralNode::HiddenNode* h = dynamic_cast<NeuralNode::HiddenNode*>(n)){
+            if(HiddenNode* h = dynamic_cast<HiddenNode*>(n)){
                 int prevLayerSize=hiddenLayerSize,nextLayerSize=hiddenLayerSize;
                 if(layerIndex == 0) prevLayerSize = inputSize;
                 if(layerIndex == numLayers-1) nextLayerSize = outputSize;
@@ -113,7 +120,7 @@ private:
                         numLayers,layerIndex,nodeIndex++
                     )
                 );
-            } else if(NeuralNode::InputNode* i = dynamic_cast<NeuralNode::InputNode*>(n)){
+            } else if(InputNode* i = dynamic_cast<InputNode*>(n)){
                 i->setDropoutStrategy(
                     new DropoutBitset<bufferSize>(
                         NodeType::input,context->seed,dropRate,
@@ -121,7 +128,7 @@ private:
                         numLayers,-1,-1
                     )
                 );
-            } else if(NeuralNode::OutputNode* o = dynamic_cast<NeuralNode::OutputNode*>(n)){
+            } else if(OutputNode* o = dynamic_cast<OutputNode*>(n)){
                 o->setDropoutStrategy(
                     new DropoutBitset<bufferSize>(
                         NodeType::output,context->seed,dropRate,

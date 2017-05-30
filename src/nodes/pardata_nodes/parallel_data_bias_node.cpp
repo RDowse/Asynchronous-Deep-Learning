@@ -1,12 +1,12 @@
 
-#include "nodes/bias_node.h"
+#include "nodes/pardata_nodes/parallel_data_bias_node.h"
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 
-std::string NeuralNode::BiasNode::m_type = "Bias";
-//NodeRegister<NeuralNode::BiasNode> NeuralNode::BiasNode::m_reg(NeuralNode::BiasNode::m_type);
+std::string ParallelDataNeuralNode::BiasNode::m_type = "Bias";
+//NodeRegister<BiasNode> ParallelDataNeuralNode::BiasNode::m_reg(ParallelDataNeuralNode::BiasNode::m_type);
 
-void NeuralNode::BiasNode::addEdge(Edge* e){
+void ParallelDataNeuralNode::BiasNode::addEdge(Edge* e){
     // add to original edge sets
     Node::addEdge(e);
     // check edge belongs to this node
@@ -34,7 +34,7 @@ void NeuralNode::BiasNode::addEdge(Edge* e){
     } 
 }
 
-bool NeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     if(!weights.size()) initWeights();
@@ -59,7 +59,7 @@ bool NeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     forwardSeenCount = 0;
 }
 
-bool NeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
     
     int batchSize = receivedDelta.cols();
@@ -82,7 +82,7 @@ bool NeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
 }
 
 
-void NeuralNode::BiasNode::onRecv(ForwardPropagationMessage* msg) {
+void ParallelDataNeuralNode::BiasNode::onRecv(ForwardPropagationMessage* msg) {
     // notifying msg from sync node
     forwardSeenCount++;
     input = msg->activation;
@@ -105,7 +105,7 @@ void NeuralNode::BiasNode::onRecv(ForwardPropagationMessage* msg) {
         weights = newWeights;
 }
 
-void NeuralNode::BiasNode::onRecv(BackwardPropagationMessage* msg) {  
+void ParallelDataNeuralNode::BiasNode::onRecv(BackwardPropagationMessage* msg) {  
     if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;

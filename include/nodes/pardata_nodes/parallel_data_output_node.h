@@ -5,10 +5,10 @@
  * Created on 23 March 2017, 23:54
  */
 
-#ifndef OUTPUT_NODE_H
-#define OUTPUT_NODE_H
+#ifndef PARALLEL_DATA_OUTPUT_NODE_H
+#define PARALLEL_DATA_OUTPUT_NODE_H
 
-#include "nodes/neural_node.h"
+#include "nodes/pardata_nodes/parallel_data_neural_node.h"
 #include "graphs/graph_settings.h"
 #include "misc/node_factory.h"
 #include "graphs/dnn_graph_settings.h"
@@ -23,15 +23,15 @@
 
 using namespace std;
 
-class NeuralNode::OutputNode: public NeuralNode{
-    //static NodeRegister<OutputNode> m_reg;
+class ParallelDataNeuralNode::OutputNode: public ParallelDataNeuralNode{
+    static NodeRegister<OutputNode> m_reg;
+    static std::string m_type;
     
     Eigen::VectorXf error;
     Eigen::VectorXf target;
     Eigen::VectorXf input;
 public:
-    static std::string m_type;
-    OutputNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
+    OutputNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
     virtual ~OutputNode(){}
     string getType() override{return OutputNode::m_type;}
     

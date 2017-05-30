@@ -21,11 +21,11 @@ using namespace std;
 class State{
 public:
     State(){}
-    virtual void onSend(BlockNeuralNode* n, vector<Message*>& msgs);
+    //virtual void onSend(BlockNeuralNode* n, vector<Message*>& msgs);
     virtual void onSend(NeuralNode* n, vector<Message*>& msgs);
     virtual void onSend(Node* n, vector<Message*>& msgs);
 
-    virtual bool readyToSend(BlockNeuralNode* n);    
+    //virtual bool readyToSend(BlockNeuralNode* n);    
     virtual bool readyToSend(NeuralNode* n);
     virtual bool readyToSend(Node* n);
     

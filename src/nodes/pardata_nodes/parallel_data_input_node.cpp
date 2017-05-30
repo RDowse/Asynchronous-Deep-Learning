@@ -1,13 +1,13 @@
 
-#include "nodes/input_node.h"
+#include "nodes/pardata_nodes/parallel_data_input_node.h"
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 #include "tools/math.h"
 
-std::string NeuralNode::InputNode::m_type = "Input";
-//NodeRegister<NeuralNode::InputNode> NeuralNode::InputNode::m_reg(NeuralNode::InputNode::m_type);
+std::string ParallelDataNeuralNode::InputNode::m_type = "Input";
+//NodeRegister<ParallelDataNeuralNode::InputNode> ParallelDataNeuralNode::InputNode::m_reg(ParallelDataNeuralNode::InputNode::m_type);
 
-void NeuralNode::InputNode::addEdge(Edge* e) {
+void ParallelDataNeuralNode::InputNode::addEdge(Edge* e) {
      // add to original edge sets
      Node::addEdge(e);
      // check edge belongs to this node
@@ -39,7 +39,7 @@ void NeuralNode::InputNode::addEdge(Edge* e) {
      assert(incomingForwardEdges.size() <= 1);
  }
 
-bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     
     if(!weights.size()) initWeights();
@@ -66,7 +66,7 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     forwardSeenCount = 0;
 }
 
-bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
+bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(readyToSendBackward());
             
     // perform weight update first
@@ -90,7 +90,7 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     backwardSeenCount = 0;
 }
 
-void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
+void ParallelDataNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     activation = msg->activation;
     forwardSeenCount++;
     
@@ -111,7 +111,7 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
         weights = newWeights;
 } 
 
-void NeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
+void ParallelDataNeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;

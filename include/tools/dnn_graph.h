@@ -12,16 +12,17 @@
 #include "misc/edge.h"
 
 #include "nodes/node.h"
+
 #include "nodes/bias_node.h"
 #include "nodes/sync_node.h"
 #include "nodes/input_node.h"
 #include "nodes/output_node.h"
 #include "nodes/hidden_node.h"
 
-#include "nodes/block_nodes/block_input_node.h"
-#include "nodes/block_nodes/block_hidden_node.h"
-#include "nodes/block_nodes/block_output_node.h"
-#include "nodes/block_nodes/block_sync_node.h"
+//#include "nodes/block_nodes/block_input_node.h"
+//#include "nodes/block_nodes/block_hidden_node.h"
+//#include "nodes/block_nodes/block_output_node.h"
+//#include "nodes/block_nodes/block_sync_node.h"
 
 #include <algorithm>
 #include <vector>
@@ -50,6 +51,7 @@ class DNNGraphBuilder{
     typedef typename TNode::InputNode InputNode;
     typedef typename TNode::OutputNode OutputNode;
     typedef typename TNode::HiddenNode HiddenNode;
+    typedef typename TNode::BiasNode BiasNode;
     typedef typename TNode::SyncNode SyncNode;
     
     vector<Node*> nodes;
@@ -92,10 +94,6 @@ public:
             file<<"BeginNodes\n";
             for(auto n: nodes){
                 file<< n->getType() << " " << n->getId();
-//                if(n->getType() == "Hidden"){
-//                    HiddenNode* h = dynamic_cast<HiddenNode*>(n);
-//                    file << " " << h->layer << " " << h->layerPos;
-//                }
                 file << "\n";
             }
             file<<"EndNodes\n";

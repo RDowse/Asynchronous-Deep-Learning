@@ -41,15 +41,17 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/misc/message_pool.o \
 	${OBJECTDIR}/src/misc/node_factory.o \
 	${OBJECTDIR}/src/nodes/bias_node.o \
-	${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o \
-	${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o \
-	${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o \
-	${OBJECTDIR}/src/nodes/block_nodes/block_sync_node.o \
 	${OBJECTDIR}/src/nodes/hidden_node.o \
 	${OBJECTDIR}/src/nodes/input_node.o \
 	${OBJECTDIR}/src/nodes/neural_node.o \
 	${OBJECTDIR}/src/nodes/node.o \
 	${OBJECTDIR}/src/nodes/output_node.o \
+	${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o \
+	${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o \
+	${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o \
+	${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o \
+	${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o \
+	${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o \
 	${OBJECTDIR}/src/nodes/sync_node.o \
 	${OBJECTDIR}/src/states/backward_train_state.o \
 	${OBJECTDIR}/src/states/forward_train_state.o \
@@ -127,26 +129,6 @@ ${OBJECTDIR}/src/nodes/bias_node.o: src/nodes/bias_node.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node.o src/nodes/bias_node.cpp
 
-${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o: src/nodes/block_nodes/block_hidden_node.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o src/nodes/block_nodes/block_hidden_node.cpp
-
-${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o: src/nodes/block_nodes/block_input_node.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o src/nodes/block_nodes/block_input_node.cpp
-
-${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o: src/nodes/block_nodes/block_output_node.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o src/nodes/block_nodes/block_output_node.cpp
-
-${OBJECTDIR}/src/nodes/block_nodes/block_sync_node.o: src/nodes/block_nodes/block_sync_node.cpp
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_sync_node.o src/nodes/block_nodes/block_sync_node.cpp
-
 ${OBJECTDIR}/src/nodes/hidden_node.o: src/nodes/hidden_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
@@ -171,6 +153,36 @@ ${OBJECTDIR}/src/nodes/output_node.o: src/nodes/output_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node.o src/nodes/output_node.cpp
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o: src/nodes/pardata_nodes/parallel_data_bias_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o src/nodes/pardata_nodes/parallel_data_bias_node.cpp
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o: src/nodes/pardata_nodes/parallel_data_hidden_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o src/nodes/pardata_nodes/parallel_data_hidden_node.cpp
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o: src/nodes/pardata_nodes/parallel_data_input_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o src/nodes/pardata_nodes/parallel_data_input_node.cpp
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o: src/nodes/pardata_nodes/parallel_data_neural_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o src/nodes/pardata_nodes/parallel_data_neural_node.cpp
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o: src/nodes/pardata_nodes/parallel_data_output_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o src/nodes/pardata_nodes/parallel_data_output_node.cpp
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o: src/nodes/pardata_nodes/parallel_data_sync_node.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I. -I. -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o src/nodes/pardata_nodes/parallel_data_sync_node.cpp
 
 ${OBJECTDIR}/src/nodes/sync_node.o: src/nodes/sync_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
@@ -322,58 +334,6 @@ ${OBJECTDIR}/src/nodes/bias_node_nomain.o: ${OBJECTDIR}/src/nodes/bias_node.o sr
 	    ${CP} ${OBJECTDIR}/src/nodes/bias_node.o ${OBJECTDIR}/src/nodes/bias_node_nomain.o;\
 	fi
 
-${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node_nomain.o: ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o src/nodes/block_nodes/block_hidden_node.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node_nomain.o src/nodes/block_nodes/block_hidden_node.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node.o ${OBJECTDIR}/src/nodes/block_nodes/block_hidden_node_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/nodes/block_nodes/block_input_node_nomain.o: ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o src/nodes/block_nodes/block_input_node.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_input_node_nomain.o src/nodes/block_nodes/block_input_node.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/nodes/block_nodes/block_input_node.o ${OBJECTDIR}/src/nodes/block_nodes/block_input_node_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/nodes/block_nodes/block_output_node_nomain.o: ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o src/nodes/block_nodes/block_output_node.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_output_node_nomain.o src/nodes/block_nodes/block_output_node.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/nodes/block_nodes/block_output_node.o ${OBJECTDIR}/src/nodes/block_nodes/block_output_node_nomain.o;\
-	fi
-
-${OBJECTDIR}/src/nodes/block_nodes/block_sync_node_nomain.o: ${OBJECTDIR}/src/nodes/block_nodes/block_sync_node.o src/nodes/block_nodes/block_sync_node.cpp 
-	${MKDIR} -p ${OBJECTDIR}/src/nodes/block_nodes
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/block_nodes/block_sync_node.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/block_nodes/block_sync_node_nomain.o src/nodes/block_nodes/block_sync_node.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/src/nodes/block_nodes/block_sync_node.o ${OBJECTDIR}/src/nodes/block_nodes/block_sync_node_nomain.o;\
-	fi
-
 ${OBJECTDIR}/src/nodes/hidden_node_nomain.o: ${OBJECTDIR}/src/nodes/hidden_node.o src/nodes/hidden_node.cpp 
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/hidden_node.o`; \
@@ -437,6 +397,84 @@ ${OBJECTDIR}/src/nodes/output_node_nomain.o: ${OBJECTDIR}/src/nodes/output_node.
 	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node_nomain.o src/nodes/output_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/output_node.o ${OBJECTDIR}/src/nodes/output_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node_nomain.o: ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o src/nodes/pardata_nodes/parallel_data_bias_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node_nomain.o src/nodes/pardata_nodes/parallel_data_bias_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node_nomain.o: ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o src/nodes/pardata_nodes/parallel_data_hidden_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node_nomain.o src/nodes/pardata_nodes/parallel_data_hidden_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node_nomain.o: ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o src/nodes/pardata_nodes/parallel_data_input_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node_nomain.o src/nodes/pardata_nodes/parallel_data_input_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node_nomain.o: ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o src/nodes/pardata_nodes/parallel_data_neural_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node_nomain.o src/nodes/pardata_nodes/parallel_data_neural_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node_nomain.o: ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o src/nodes/pardata_nodes/parallel_data_output_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node_nomain.o src/nodes/pardata_nodes/parallel_data_output_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node_nomain.o;\
+	fi
+
+${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node_nomain.o: ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o src/nodes/pardata_nodes/parallel_data_sync_node.cpp 
+	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -I. -I. -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node_nomain.o src/nodes/pardata_nodes/parallel_data_sync_node.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node_nomain.o;\
 	fi
 
 ${OBJECTDIR}/src/nodes/sync_node_nomain.o: ${OBJECTDIR}/src/nodes/sync_node.o src/nodes/sync_node.cpp 

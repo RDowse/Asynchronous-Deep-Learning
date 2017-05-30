@@ -33,12 +33,6 @@
       <itemPath>include/states/backward_train_state.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
       <itemPath>include/nodes/bias_node.h</itemPath>
-      <itemPath>include/nodes/block_nodes/block_hidden_node.h</itemPath>
-      <itemPath>include/nodes/block_nodes/block_input_node.h</itemPath>
-      <itemPath>include/graphs/block_neural_network_settings.h</itemPath>
-      <itemPath>include/nodes/block_nodes/block_neural_node.h</itemPath>
-      <itemPath>include/nodes/block_nodes/block_output_node.h</itemPath>
-      <itemPath>include/nodes/block_nodes/block_sync_node.h</itemPath>
       <itemPath>include/tools/clock.h</itemPath>
       <itemPath>include/common.h</itemPath>
       <itemPath>include/misc/data_wrapper.h</itemPath>
@@ -64,6 +58,12 @@
       <itemPath>include/nodes/node.h</itemPath>
       <itemPath>include/misc/node_factory.h</itemPath>
       <itemPath>include/nodes/output_node.h</itemPath>
+      <itemPath>include/nodes/pardata_nodes/parallel_data_bias_node.h</itemPath>
+      <itemPath>include/nodes/pardata_nodes/parallel_data_hidden_node.h</itemPath>
+      <itemPath>include/nodes/pardata_nodes/parallel_data_input_node.h</itemPath>
+      <itemPath>include/nodes/pardata_nodes/parallel_data_neural_node.h</itemPath>
+      <itemPath>include/nodes/pardata_nodes/parallel_data_output_node.h</itemPath>
+      <itemPath>include/nodes/pardata_nodes/parallel_data_sync_node.h</itemPath>
       <itemPath>include/states/predict_state.h</itemPath>
       <itemPath>include/simulator.h</itemPath>
       <itemPath>include/states/state.h</itemPath>
@@ -85,10 +85,6 @@
       <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
       <itemPath>src/states/backward_train_state.cpp</itemPath>
       <itemPath>src/nodes/bias_node.cpp</itemPath>
-      <itemPath>src/nodes/block_nodes/block_hidden_node.cpp</itemPath>
-      <itemPath>src/nodes/block_nodes/block_input_node.cpp</itemPath>
-      <itemPath>src/nodes/block_nodes/block_output_node.cpp</itemPath>
-      <itemPath>src/nodes/block_nodes/block_sync_node.cpp</itemPath>
       <itemPath>src/tools/clock.cpp</itemPath>
       <itemPath>src/tools/dnn_graph.cpp</itemPath>
       <itemPath>src/messages/forward_propagation_message.cpp</itemPath>
@@ -102,6 +98,12 @@
       <itemPath>src/nodes/node.cpp</itemPath>
       <itemPath>src/misc/node_factory.cpp</itemPath>
       <itemPath>src/nodes/output_node.cpp</itemPath>
+      <itemPath>src/nodes/pardata_nodes/parallel_data_bias_node.cpp</itemPath>
+      <itemPath>src/nodes/pardata_nodes/parallel_data_hidden_node.cpp</itemPath>
+      <itemPath>src/nodes/pardata_nodes/parallel_data_input_node.cpp</itemPath>
+      <itemPath>src/nodes/pardata_nodes/parallel_data_neural_node.cpp</itemPath>
+      <itemPath>src/nodes/pardata_nodes/parallel_data_output_node.cpp</itemPath>
+      <itemPath>src/nodes/pardata_nodes/parallel_data_sync_node.cpp</itemPath>
       <itemPath>src/states/predict_state.cpp</itemPath>
       <itemPath>src/states/state.cpp</itemPath>
       <itemPath>src/training/stochastic_momentum_training.cpp</itemPath>
@@ -204,11 +206,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="include/graphs/block_neural_network_settings.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/graphs/dnn_graph_settings.h"
             ex="false"
             tool="3"
@@ -244,31 +241,6 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/block_nodes/block_hidden_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_input_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_neural_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_output_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_sync_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
@@ -278,6 +250,36 @@
       <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_bias_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_hidden_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_input_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_neural_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_sync_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="include/nodes/sync_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -353,26 +355,6 @@
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/nodes/block_nodes/block_hidden_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/nodes/block_nodes/block_input_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/nodes/block_nodes/block_output_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/nodes/block_nodes/block_sync_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
       <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
@@ -382,6 +364,36 @@
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_bias_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_hidden_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_input_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_neural_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_sync_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -483,11 +495,6 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="include/graphs/block_neural_network_settings.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/graphs/dnn_graph_settings.h"
             ex="false"
             tool="3"
@@ -523,31 +530,6 @@
       </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nodes/block_nodes/block_hidden_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_input_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_neural_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_output_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/nodes/block_nodes/block_sync_node.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/input_node.h" ex="false" tool="3" flavor2="0">
@@ -557,6 +539,36 @@
       <item path="include/nodes/node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/output_node.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_bias_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_hidden_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_input_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_neural_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/pardata_nodes/parallel_data_sync_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="include/nodes/sync_node.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -632,26 +644,6 @@
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="src/nodes/block_nodes/block_hidden_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/nodes/block_nodes/block_input_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/nodes/block_nodes/block_output_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/nodes/block_nodes/block_sync_node.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
       <item path="src/nodes/hidden_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/input_node.cpp" ex="false" tool="1" flavor2="0">
@@ -661,6 +653,36 @@
       <item path="src/nodes/node.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/nodes/output_node.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_bias_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_hidden_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_input_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_neural_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/pardata_nodes/parallel_data_sync_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/nodes/sync_node.cpp" ex="false" tool="1" flavor2="0">
       </item>

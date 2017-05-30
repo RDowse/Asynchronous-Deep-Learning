@@ -9,10 +9,12 @@
 #include "misc/data_wrapper.h"
 
 #include "nodes/neural_node.h"
-#include "nodes/block_nodes/block_neural_node.h"
+//#include "nodes/block_nodes/block_neural_node.h"
 
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"
+
+#include "misc/node_factory.h"
 
 #include <map>
 #include <vector>
@@ -26,6 +28,7 @@ void usage(){
     cout << "Usage: enter yaml path for configuration\n";
 }
 
+template<typename TNode>
 void simulate(shared_ptr<DNNGraphSettings> settings){
     printf("Starting sim...\n");
     Logging::m_logLevel = 5;
@@ -39,7 +42,7 @@ void simulate(shared_ptr<DNNGraphSettings> settings){
         Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
         
         cout << settings->logLevel << endl;
-        Simulator<NeuralNode> sim(settings->logLevel,nNodes,nEdges,*stats);
+        Simulator<TNode> sim(settings->logLevel,nNodes,nEdges,*stats);
         Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
@@ -83,6 +86,19 @@ void buildGraph(string name, int nHLayers, int nHidden, int nInput, int nOutput,
     dnngraph.writeGraphviz(ss2.str());
 }
 
+template<typename TNode>
+void run(shared_ptr<DNNGraphSettings> settings){
+    registerNodes<TNode>();
+    if(settings->command == "build"){
+        buildGraph<TNode>(settings->netPath, settings->nHLayers, settings->nHidden,
+                settings->nInput, settings->nOutput, true);
+    } else if(settings->command == "run") {
+        simulate<TNode>(settings);
+    } else {
+        assert(0);
+    }
+}
+
 int main(int argc, char** argv) {
     // Get usage for the executable.
     if(argc!=2){
@@ -98,15 +114,14 @@ int main(int argc, char** argv) {
     
     settings->printParameters();
     
-    if(settings->command == "build"){
-        buildGraph<NeuralNode>(settings->netPath, settings->nHLayers, settings->nHidden,
-                settings->nInput, settings->nOutput, true);
-    } else if(settings->command == "run") {
-        simulate(settings);
+    if("neural" == settings->netType){
+        run<NeuralNode>(settings);
+    } else if("parallel_data_neural" == settings->netType){
+        //run<>
     } else {
-        assert(0);
+        cout << "Net type " << settings->netType << "not recognised" << endl;
     }
-    
+
     return 0;
 }
 

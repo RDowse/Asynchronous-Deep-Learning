@@ -5,8 +5,8 @@
  * Created on 24 April 2017, 00:27
  */
 
-#ifndef NEURAL_NODE_H
-#define NEURAL_NODE_H
+#ifndef PARALLEL_DATA_NEURAL_NODE_H
+#define PARALLEL_DATA_NEURAL_NODE_H
 
 #include "nodes/node.h"
 #include "graphs/dnn_graph_settings.h"
@@ -27,7 +27,7 @@ class State;
 class ForwardPropagationMessage;
 class BackwardPropagationMessage;
 
-class NeuralNode: public Node{
+class ParallelDataNeuralNode: public Node{
 public:
     class InputNode;
     class HiddenNode;
@@ -57,7 +57,7 @@ protected:
     // node output/activation
     Eigen::VectorXf activation;
 public:
-    NeuralNode(shared_ptr<GraphSettings> context): Node(context){   
+    ParallelDataNeuralNode(shared_ptr<GraphSettings> context): Node(context){   
         dropout = new DropoutNull();
         try{
             this->context = std::static_pointer_cast<DNNGraphSettings>(context);
