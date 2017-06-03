@@ -15,6 +15,9 @@
 class BackwardPropagationMessage: public Message
 {
 public:
+    // numbered batch for debugging
+    int batchIndex;
+    
     // individual node values
     Eigen::VectorXf delta;
     Eigen::VectorXf target;

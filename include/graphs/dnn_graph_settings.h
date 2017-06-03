@@ -26,6 +26,10 @@ public:
     string command;
     int seed = 0;
     
+    // Parallel data parameters
+    int numModels = 1;
+    int wait = 1;
+    
     // Path params
     string netPath;
     string netType;
@@ -42,6 +46,7 @@ public:
     // Current epoch
     int epoch = 0;
     
+    // Specify dropout type
     string dropout;
     
     // Training parameters
@@ -68,6 +73,11 @@ public:
     // Differentiated Activation function
     float (*deltaActivationFnc)(float);
     
+    // Error saving
+    vector<float> accuracy;
+    vector<float> error_validation;
+    vector<float> error_training;
+    
     DNNGraphSettings(){
         activationFnc = &math::activationTanH;
         deltaActivationFnc = &math::deltaActivationTanH;
@@ -91,7 +101,8 @@ public:
         cout << " alpha " << alpha;
         cout << " batchsize " << batchSize;
         cout << " maxEpoch "  << maxEpoch;  
-        cout << " minError "  << minError << endl;
+        cout << " minError "  << minError;
+        cout << " numModels "  << numModels << endl;
     }
 };
 

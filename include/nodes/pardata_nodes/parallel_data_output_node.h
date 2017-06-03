@@ -14,7 +14,7 @@
 #include "graphs/dnn_graph_settings.h"
 #include "tools/logging.h"
 
-#include <string>
+#include <Eigen/StdVector>
 #include <cassert>
 #include <cstdio>
 #include <exception>
@@ -24,12 +24,19 @@
 using namespace std;
 
 class ParallelDataNeuralNode::OutputNode: public ParallelDataNeuralNode{
-    Eigen::VectorXf error;
-    Eigen::VectorXf target;
-    Eigen::VectorXf input;
+    std::vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > target;
+    std::vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > input;
 public:
     static std::string m_type;
-    OutputNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
+    OutputNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){
+        try{
+            auto tmp_context = std::static_pointer_cast<DNNGraphSettings>(context);
+            input = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(tmp_context->numModels);
+            target = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(tmp_context->numModels);
+        } catch (const std::bad_cast& e) {
+            std::cout << e.what() << "\n";
+        }
+    }
     virtual ~OutputNode(){}
     string getType() override{return OutputNode::m_type;}
     
@@ -38,8 +45,8 @@ public:
     void onRecv(ForwardPropagationMessage* msg) override;
     void onRecv(BackwardPropagationMessage* msg) override;
     
-    bool sendForwardMsgs(vector<Message*>& msgs) override;
-    bool sendBackwardMsgs(vector<Message*>& msgs) override;
+    bool sendForwardMsgs(vector<Message*>& msgs, int stateIndex) override;
+    bool sendBackwardMsgs(vector<Message*>& msgs, int stateIndex) override;
 };
 
 #endif /* OUTPUT_NODE_H */

@@ -17,8 +17,7 @@ using namespace std;
 
 template<typename TMessage>
 class MessagePool{
-    //queue<TMessage*> pool;
-    std::shared_ptr<tbb::concurrent_bounded_queue<TMessage*>> pool;
+    tbb::concurrent_bounded_queue<TMessage*> pool;
     static MessagePool* instance;
     MessagePool();
 public:

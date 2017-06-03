@@ -30,59 +30,54 @@ using namespace std;
 class ParallelDataNeuralNode::SyncNode: public ParallelDataNeuralNode{
     DataWrapper* dataset;
     
-    State<ParallelDataNeuralNode>* lastState;           // tmp fix for deleting states
-    
-    bool tick = true;           // trigger initial message propagation
+    bool tick = true;
     bool validating = false;    // flag for propagating validation set
-  
+    
     // sampling
     int sampleIndex = 0;
-    
     int batchSize = 0;
+    
+    // batch tracking
+    int batchCount = 0;
+    int activeBatchCount = 0;
+    int timer = 0;
     
     int map_index = 0;
     unordered_map<int,int> dstOutputIndex;        // map backprop index to output
     
     // Error calculations
-    Eigen::MatrixXf receivedOutput;
+    std::vector<Eigen::MatrixXf,Eigen::aligned_allocator<Eigen::MatrixXf> > receivedOutput;
     float training_error = 0;
     float accuracy = 0;
     vector<float> min_error; 
     vector<float> error;
 public:
     static std::string m_type;
-    SyncNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
-    virtual ~SyncNode(){
-        if(lastState) delete lastState;
+    SyncNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){
+        try{
+            auto tmp_context = std::static_pointer_cast<DNNGraphSettings>(context);
+            receivedOutput = vector<Eigen::MatrixXf,Eigen::aligned_allocator<Eigen::MatrixXf> >(tmp_context->numModels);
+        } catch (const std::bad_cast& e) {
+            std::cout << e.what() << "\n";
+        }
     }
+    virtual ~SyncNode(){}
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;
         min_error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
         error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
     }
-    void addEdge(Edge* e) override;    
+    void addEdge(Edge* e) override;
     
-    bool readyToSendForward() override;
-    bool readyToSendBackward() override;
+    bool readyToSendForward(int i) override;
+    bool readyToSendBackward(int i) override;
     
     void onRecv(ForwardPropagationMessage* msg) override;
     void onRecv(BackwardPropagationMessage* msg) override;
     
-    bool sendBackwardMsgs(vector<Message*>& msgs);
-    bool sendForwardMsgs(vector<Message*>& msgs);
-    
-private:
-    template<typename TState>
-    void swapState(){
-        if(!lastState){
-            state = new TState();
-        } else {
-            auto tmpState = lastState;
-            lastState = state;
-            state = tmpState;
-        }
-    }
+    bool sendBackwardMsgs(vector<Message*>& msgs, int stateIndex);
+    bool sendForwardMsgs(vector<Message*>& msgs, int stateIndex);
 };
 
 #endif /* SYNC_NODE_H */

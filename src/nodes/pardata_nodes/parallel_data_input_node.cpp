@@ -38,12 +38,12 @@ void ParallelDataNeuralNode::InputNode::addEdge(Edge* e) {
      assert(incomingForwardEdges.size() <= 1);
  }
 
-bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendForward());
+bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs, int stateIndex){
+    assert(readyToSendForward(stateIndex));
     
     if(!weights.size()) initWeights();
     
-    Eigen::MatrixXf mat = activation*weights.transpose();
+    Eigen::MatrixXf mat = activation[stateIndex]*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -55,6 +55,7 @@ bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
             msg->dst = outgoingForwardEdges[i]->dst->getId();
             msg->time = time;
             msg->dataSetType = dataSetType;
+            msg->batchIndex = stateIndex;
 
             msg->activation = mat.col(i);
             msgs.push_back(msg);
@@ -62,18 +63,20 @@ bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     }
     
     // reset 
-    forwardSeenCount = 0;
-    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<ParallelDataNeuralNode>>();
+    forwardSeenCount[stateIndex] = 0;
+    delete state[stateIndex];
+    state[stateIndex] = new BackwardTrainState<ParallelDataNeuralNode>();
 }
 
-bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendBackward());
+bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs, int stateIndex){
+    assert(readyToSendBackward(stateIndex));
             
     // perform weight update first
     int batchSize = receivedDelta.cols();
-    deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights;
-
-    newWeights -= deltaWeights; // update step  
+    deltaWeights = (context->lr/4)*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights;
+    
+    weights -= deltaWeights; // async update step  
+    updateCount++; // track current number updates
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -82,18 +85,19 @@ bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs)
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->time = time;
-
+        msg->batchIndex = stateIndex;
         msgs.push_back(msg);
     }
     
     // reset
-    backwardSeenCount = 0;
-    swapState<ForwardTrainState<ParallelDataNeuralNode>>();
+    backwardSeenCount[stateIndex] = 0;
+    delete state[stateIndex];
+    state[stateIndex] = new ForwardTrainState<ParallelDataNeuralNode>();
 }
 
 void ParallelDataNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
-    activation = msg->activation;
-    forwardSeenCount++;
+    activation[msg->batchIndex] = msg->activation;
+    forwardSeenCount[msg->batchIndex]++;
     
     dataSetType = msg->dataSetType;
     
@@ -106,17 +110,13 @@ void ParallelDataNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     }
     
     forwardMessagePool->returnMessage(msg);
-    
-    // weight update step
-    if(readyToSendForward())
-        weights = newWeights;
 } 
 
 void ParallelDataNeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;
-    backwardSeenCount++;
+    backwardSeenCount[msg->batchIndex]++;
     
     backwardMessagePool->returnMessage(msg);
 }

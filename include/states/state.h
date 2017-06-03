@@ -20,10 +20,10 @@ template<typename TNode>
 class State{
 public:
     State(){}
-    
     virtual void onSend(TNode* n, vector<Message*>& msgs)=0;
-    
+    virtual void onSend(TNode* n, vector<Message*>& msgs, int stateIndex)=0;
     virtual bool readyToSend(TNode* n)=0;
+    virtual bool readyToSend(TNode* n, int stateIndex)=0;
 };
 
 #endif /* STATE_H */

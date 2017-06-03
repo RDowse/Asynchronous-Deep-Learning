@@ -20,6 +20,7 @@
 
 #include "common.h"
 
+#include <Eigen/StdVector>
 #include <eigen3/Eigen/Dense>
 #include <vector>
 #include <memory>
@@ -43,7 +44,7 @@ protected:
     
     shared_ptr<DNNGraphSettings> context;
     
-    State<ParallelDataNeuralNode>* state;
+    vector<State<ParallelDataNeuralNode>*> state;
     
     DataSetType dataSetType;
     
@@ -56,11 +57,11 @@ protected:
     vector<Edge*> outgoingForwardEdges;
     
     // seen counts
-    int forwardSeenCount = 0;
-    int backwardSeenCount = 0;
+    vector<int> forwardSeenCount;
+    vector<int> backwardSeenCount;
     
     // node output/activation
-    Eigen::VectorXf activation;
+    std::vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > activation;
 public:
     ParallelDataNeuralNode(shared_ptr<GraphSettings> context): Node(context){   
         dropout = new DropoutNull();
@@ -69,8 +70,17 @@ public:
         } catch (const std::bad_cast& e) {
             std::cout << e.what() << "\n";
         }
+        
+        forwardSeenCount = vector<int>(this->context->numModels,0);
+        backwardSeenCount = vector<int>(this->context->numModels,0);
+        state = vector<State<ParallelDataNeuralNode>*>(this->context->numModels,NULL);
+        activation = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(this->context->numModels);
+        for(auto& s: state) s = new ForwardTrainState<ParallelDataNeuralNode>();
     }
-    
+    virtual ~ParallelDataNeuralNode(){
+        delete dropout;
+        for(auto& s: state) delete s;
+    }
     virtual string getType()=0;
     
     virtual void setWeights(const vector<float>& w){
@@ -83,41 +93,49 @@ public:
     }
     
     void setState(State<ParallelDataNeuralNode>* _state){
-        if(state) delete state;
-        state = _state;
+        delete _state;
+//        if(state) delete state;
+//        state = _state;
     }
     
     virtual bool readyToSend(){
-        assert(state);
-        state->readyToSend(this);
+        assert(!state.empty());
+        for(int i = 0; i < state.size(); ++i)
+            if(state[i]->readyToSend(this, i)) return true;
+        return false;
     }  
     
     // Handle sending of messages and routing for the node
     virtual bool onSend(vector<Message*>& msgs){
-        assert(state);
-        state->onSend(this, msgs);
+        assert(!state.empty());
+        for(int i = 0; i < state.size(); ++i){
+            if(state[i]->readyToSend(this,i)){
+                state[i]->onSend(this, msgs, i);
+                return true; // only operate on one state during a timestep 
+            }
+        }
     }
     
     // Handle message receiving
     virtual void onRecv(ForwardPropagationMessage* msg)=0;
     virtual void onRecv(BackwardPropagationMessage* msg)=0;
     
-    virtual bool sendBackwardMsgs(vector<Message*>& msgs)=0;
-    virtual bool sendForwardMsgs(vector<Message*>& msgs)=0;
+    virtual bool sendBackwardMsgs(vector<Message*>& msgs, int stateIndex)=0;
+    virtual bool sendForwardMsgs(vector<Message*>& msgs, int stateIndex)=0;
     
-    virtual bool readyToSendForward(){
-        if(!dropout->unset()) return dropout->readyToSendForward(forwardSeenCount);
-        return (forwardSeenCount == incomingForwardEdges.size()); 
+    virtual bool readyToSendForward(int i){
+        if(!dropout->unset()) return dropout->readyToSendForward(forwardSeenCount[i]);
+        return (forwardSeenCount[i] == incomingForwardEdges.size()); 
     }
-    virtual bool readyToSendBackward(){
-        if(!dropout->unset()) return dropout->readyToSendBackward(backwardSeenCount);
-        return (backwardSeenCount == incomingBackwardEdges.size());
+    virtual bool readyToSendBackward(int i){
+        if(!dropout->unset()) return dropout->readyToSendBackward(backwardSeenCount[i]);
+        return (backwardSeenCount[i] == incomingBackwardEdges.size());
     }
 protected:
     template<typename TState>
-    void swapState(){
-        delete state;
-        state = new TState(); 
+    void swapState(State<ParallelDataNeuralNode>* _state){
+        delete _state;
+        _state = new TState(); 
     }
 };
 

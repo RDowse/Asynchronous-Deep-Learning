@@ -34,8 +34,8 @@ void ParallelDataNeuralNode::SyncNode::addEdge(Edge* e) {
     } 
 }
     
-bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendForward());
+bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs, int stateIndex){
+    assert(readyToSendForward(stateIndex));
     assert(dataset!=NULL);
     
     // time step
@@ -44,17 +44,19 @@ bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     auto& images = validating ? 
         dataset->validation_images : dataset->training_images;
     
-    //int batchSize = 0;
-    if(validating){
-        batchSize = dataset->validation_labels.size(); 
-    }else{
-        if( sampleIndex + context->batchSize > dataset->training_labels.size() ) 
-            batchSize = dataset->training_labels.size() - sampleIndex;
-        else
-            batchSize = context->batchSize;
-    }
+//    if(validating){
+//        batchSize = dataset->validation_labels.size(); 
+//    }else{
+//        // for batch remainder
+//        if( sampleIndex + context->batchSize > dataset->training_labels.size() ) 
+//            batchSize = dataset->training_labels.size() - sampleIndex;
+//        else 
+//            batchSize = context->batchSize;
+//    }
     
-    // TODO: check data size matches the input size
+    // simplified
+    batchSize = validating ? dataset->validation_labels.size() : context->batchSize;
+    
     Logging::log(3, "Sending sample %d", sampleIndex);
     
     // send out data samples to input nodes
@@ -66,6 +68,7 @@ bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->time = time;
         msg->dataSetType = validating ? DataSetType::validation : DataSetType::training;
+        msg->batchIndex = stateIndex;
         
         // sampling strategy
         if(outgoingForwardEdges[i]->dst->getType() == "Input" 
@@ -73,21 +76,31 @@ bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
             msg->activation = images.block(sampleIndex,j++,batchSize,1);
         } else if(outgoingForwardEdges[i]->dst->getType() == "Bias"){
             msg->activation = Eigen::VectorXf::Ones(batchSize);
-        } 
+        } else {
+            assert(0); // shouldn't occur
+        }
         msgs.push_back(msg);
     }
+    assert((batchCount % context->numModels) == stateIndex);
+    
+    // move to next batch
+    activeBatchCount++;
+    batchCount++;
+    assert(activeBatchCount <= context->numModels);
+    
+    sampleIndex += batchSize;
     
     // reset
     tick = false;
-    backwardSeenCount = 0; 
+    backwardSeenCount[stateIndex] = 0; 
 }
 
-bool ParallelDataNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendBackward());
+bool ParallelDataNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs, int stateIndex){
+    assert(readyToSendBackward(stateIndex));
     
-    Logging::log(3, "Sending sample %d backward", sampleIndex);
-    
-    auto batchLabels = dataset->training_labels.block(sampleIndex,0,batchSize,1);
+    Logging::log(3, "Sending sample %d backward", sampleIndex-(activeBatchCount*batchSize));
+
+    auto batchLabels = dataset->training_labels.block(sampleIndex-(activeBatchCount*batchSize),0,batchSize,1);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
@@ -95,44 +108,51 @@ bool ParallelDataNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->time = time;
+        msg->batchIndex = stateIndex;
         
         Eigen::VectorXf target(batchSize);
-        if(outgoingBackwardEdges.size() == 1){ // binary classification
-            for(int j = 0; j < batchSize; ++j)
-                target(j) = (batchLabels(j) ? context->actMax : context->actMin);
-        } else { // multi classification
-            for(int j = 0; j < batchSize; ++j)
-                target(j) = (batchLabels(j) == i ? context->actMax : context->actMin);
-        }
+        for(int j = 0; j < batchSize; ++j)
+            target(j) = (batchLabels(j) == i ? context->actMax : context->actMin);
         assert(outgoingBackwardEdges[i]->dst->getType() == "Output");
         msg->target = target;
         msgs.push_back(msg);
     }
     
     // reset
-    forwardSeenCount = 0;
+    forwardSeenCount[stateIndex] = 0;
 }
 
-bool ParallelDataNeuralNode::SyncNode::readyToSendForward(){
-    return (backwardSeenCount == incomingBackwardEdges.size() && context->epoch <= context->maxEpoch) || tick; 
+bool ParallelDataNeuralNode::SyncNode::readyToSendForward(int i){
+    return  (backwardSeenCount[i] == incomingBackwardEdges.size() 
+            || activeBatchCount < context->numModels
+            || tick)
+            && (batchCount % context->numModels) == i
+            && context->epoch < context->maxEpoch 
+            && sampleIndex < dataset->training_labels.size() 
+            && activeBatchCount < context->numModels;
 }
-bool ParallelDataNeuralNode::SyncNode::readyToSendBackward(){
-    return (forwardSeenCount == incomingForwardEdges.size());
+
+bool ParallelDataNeuralNode::SyncNode::readyToSendBackward(int i){
+    return (forwardSeenCount[i] == incomingForwardEdges.size());
 }
 
 void ParallelDataNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
-    backwardSeenCount++;
+    backwardSeenCount[msg->batchIndex]++;
     backwardMessagePool->returnMessage(msg);
     
-    // update flags and indexes once all data is received
-    if(readyToSendForward()){
-        
-        sampleIndex += batchSize;
+    int batchIndex = msg->batchIndex;
+    assert(backwardSeenCount[batchIndex] <= incomingBackwardEdges.size());
+    
+    if(backwardSeenCount[batchIndex] == incomingBackwardEdges.size())
+    {   // state update
+        // free up active batch count
+        activeBatchCount--;
+        assert(activeBatchCount >= 0);
         
         int nTrainingSamples = dataset->training_labels.size();
         
         // end of epoch, all samples in the training set have been passed
-        if(sampleIndex==nTrainingSamples){
+        if(sampleIndex==nTrainingSamples && activeBatchCount == 0){
             dataset->shuffle();
             
             // next epoch
@@ -143,9 +163,7 @@ void ParallelDataNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             
             Logging::log(0,"ACCURACY: %f\n",context->accuracy);
             Logging::log(0,"AVERAGE ERROR: %f\n",context->training_error);
-            Logging::log(0,"EPOCH: %d\n",context->epoch);            
-
-            validating = true;
+            Logging::log(0,"EPOCH: %d\n",context->epoch);       
             
             // reset
             sampleIndex = 0;
@@ -153,65 +171,47 @@ void ParallelDataNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             accuracy = 0;
         } 
         
-        // swap state
-        swapState<ForwardTrainState<ParallelDataNeuralNode>>();
+        delete state[batchIndex];
+        state[batchIndex] = new ForwardTrainState<ParallelDataNeuralNode>();
     }
 }
 
 void ParallelDataNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
-    forwardSeenCount++;    
+    forwardSeenCount[msg->batchIndex]++;   
     
-    if(!receivedOutput.size() || batchSize != receivedOutput.rows()) 
-        receivedOutput = Eigen::MatrixXf(batchSize,outgoingBackwardEdges.size());
+    if(!receivedOutput[msg->batchIndex].size() || batchSize != receivedOutput[msg->batchIndex].rows()) 
+        receivedOutput[msg->batchIndex] = Eigen::MatrixXf(batchSize,outgoingBackwardEdges.size());
     
     int index = dstOutputIndex[msg->src];
     
     // network output
-    receivedOutput.col(index) = msg->activation;
+    receivedOutput[msg->batchIndex].col(index) = msg->activation;
     
     forwardMessagePool->returnMessage(msg);
     
-    // switch propagation direction
-    if(readyToSendBackward()){
+    int batchIndex = msg->batchIndex;
+    if(readyToSendBackward(batchIndex)){
         // training error
         if(outgoingBackwardEdges.size() == 1){ assert(0); }// todo implement binary version
         
-        auto batchLabels = !validating ? dataset->training_labels.block(sampleIndex,0,batchSize,1):
+        int batchSampleIndex = sampleIndex - batchSize*activeBatchCount;
+        auto batchLabels = !validating ? dataset->training_labels.block(batchSampleIndex,0,batchSize,1):
             dataset->validation_labels; 
         
         Eigen::MatrixXf target = Eigen::MatrixXf::Constant(batchSize,outgoingBackwardEdges.size(),context->actMin);
         for(int i = 0; i < batchSize; ++i)
             target( i, (int)batchLabels(i) ) = context->actMax;
-        training_error += math::mse(target,receivedOutput);
+        training_error += math::mse(target,receivedOutput[msg->batchIndex]);
         
-        // for accuracy predicition, should really be in a separate forward pass
+        // TODO: separate accuracy predicition for the training set into a separate forward pass
         MatrixXf::Index maxIndex[batchSize];
         VectorXf maxVal(batchSize);
-        for(int i = 0; i < batchSize; ++i){
-            if(outgoingBackwardEdges.size() == 1){ // binary classification
-                auto mid = (context->actMax - context->actMin) / 2;
-                if((receivedOutput(i) > mid)==batchLabels(i)) accuracy++;
-            } else { // multi-classification
-                maxVal(i) = receivedOutput.row(i).maxCoeff( &maxIndex[i] );
-                if(maxIndex[i]==batchLabels(i)) accuracy++;
-            }
+        for(int i = 0; i < batchSize; ++i){ // multi-classification only
+            maxVal(i) = receivedOutput[msg->batchIndex].row(i).maxCoeff( &maxIndex[i] );
+            if(maxIndex[i]==batchLabels(i)) accuracy++;
         }
 
-        // Swap state
-        if(!validating) swapState<BackwardTrainState<ParallelDataNeuralNode>>();
-        
-        if(validating){
-            Logging::log(0,"VALIDATION ACCURACY: %f\n\n",accuracy/dataset->validation_labels.size());
-            
-            // trigger next wave
-            validating = false;
-            backwardSeenCount = incomingBackwardEdges.size();
-
-            // reset
-            forwardSeenCount = 0;
-            sampleIndex = 0;
-            training_error = 0;
-            accuracy = 0;
-        }
+        delete state[msg->batchIndex];
+        state[msg->batchIndex] = new BackwardTrainState<ParallelDataNeuralNode>();
     }
 }

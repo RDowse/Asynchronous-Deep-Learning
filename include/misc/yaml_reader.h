@@ -97,6 +97,8 @@ private:
         settings->batchSize = config["settings"]["batchSize"].as<int>();
         settings->maxEpoch = config["settings"]["maxEpoch"].as<int>();
         settings->minError = config["settings"]["minError"].as<float>();
+        if(config["settings"]["numModels"].IsDefined()) 
+            settings->numModels = config["settings"]["numModels"].as<int>();
         
         // Strategy
         if(config["strategy"].IsDefined())

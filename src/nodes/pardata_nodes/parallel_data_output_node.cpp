@@ -6,7 +6,6 @@
 #include "tools/math.h"
 
 std::string ParallelDataNeuralNode::OutputNode::m_type = "Output";
-//NodeRegister<ParallelDataNeuralNode::OutputNode> ParallelDataNeuralNode::OutputNode::m_reg(ParallelDataNeuralNode::OutputNode::m_type);
 
 void ParallelDataNeuralNode::OutputNode::addEdge(Edge* e) {
     // add to original edge sets
@@ -37,11 +36,11 @@ void ParallelDataNeuralNode::OutputNode::addEdge(Edge* e) {
     } 
 }
 
-bool ParallelDataNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendForward());
+bool ParallelDataNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs, int stateIndex){
+    assert(readyToSendForward(stateIndex));
     
     // calulate output activation
-    activation = input.unaryExpr(context->activationFnc);
+    activation[stateIndex] = input[stateIndex].unaryExpr(context->activationFnc);
     
     msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
@@ -50,23 +49,26 @@ bool ParallelDataNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs)
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->time = time;
+        msg->batchIndex = stateIndex;
         
-        msg->activation = activation;
+        msg->activation = activation[stateIndex];
         msgs.push_back(msg);
     }
     
     // reset state
-    input.setZero(input.size());
-    forwardSeenCount = 0;
-    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<ParallelDataNeuralNode>>();
+    input[stateIndex].setZero(input[stateIndex].size());
+    forwardSeenCount[stateIndex] = 0;
+    //if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<ParallelDataNeuralNode>>(state[stateIndex]);
+    delete state[stateIndex];
+    state[stateIndex] = new BackwardTrainState<ParallelDataNeuralNode>();
 }
 
-bool ParallelDataNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendBackward());   
+bool ParallelDataNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs, int stateIndex){
+    assert(readyToSendBackward(stateIndex));   
     
     msgs.reserve(outgoingBackwardEdges.size());
-    Eigen::VectorXf diff = -(target-activation);
-    Eigen::VectorXf delta = diff.array() * activation.unaryExpr(context->deltaActivationFnc).array();
+    Eigen::VectorXf diff = -(target[stateIndex]-activation[stateIndex]);
+    Eigen::VectorXf delta = diff.array() * activation[stateIndex].unaryExpr(context->deltaActivationFnc).array();
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         if(dropout->isPrevLayerNodeActive(i)){
             assert( 0 == outgoingBackwardEdges[i]->msgStatus );
@@ -74,20 +76,24 @@ bool ParallelDataNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs
             msg->src = m_id; 
             msg->dst = outgoingBackwardEdges[i]->dst->getId();
             msg->time = time;
+            msg->batchIndex = stateIndex;
 
             msg->delta = delta; 
             msgs.push_back(msg);
         }
     }
     
-    backwardSeenCount = 0;
-    swapState<ForwardTrainState<ParallelDataNeuralNode>>();
+    backwardSeenCount[stateIndex] = 0;
+    //swapState<ForwardTrainState<ParallelDataNeuralNode>>(state[stateIndex]);
+    delete state[stateIndex];
+    state[stateIndex] = new ForwardTrainState<ParallelDataNeuralNode>();
 }
 
 void ParallelDataNeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
-    if(input.size() != msg->activation.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
-    input += msg->activation;
-    forwardSeenCount++;    
+    if(input[msg->batchIndex].size() != msg->activation.size()) 
+        input[msg->batchIndex] = Eigen::VectorXf::Zero(msg->activation.size());
+    input[msg->batchIndex] += msg->activation;
+    forwardSeenCount[msg->batchIndex]++;    
     
     dataSetType = msg->dataSetType;
     
@@ -103,8 +109,8 @@ void ParallelDataNeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) 
 }
 
 void ParallelDataNeuralNode::OutputNode::onRecv(BackwardPropagationMessage* msg) {
-    target = msg->target;
-    backwardSeenCount++;
+    target[msg->batchIndex] = msg->target;
+    backwardSeenCount[msg->batchIndex]++;
     
     backwardMessagePool->returnMessage(msg);
 }

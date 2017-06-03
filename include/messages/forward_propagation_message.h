@@ -16,6 +16,9 @@
 class ForwardPropagationMessage: public Message
 {
 public:
+    // numbered batches for debugging
+    int batchIndex;
+    
     // training/validation/testing data
     DataSetType dataSetType = DataSetType::training;
     

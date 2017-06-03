@@ -14,7 +14,9 @@ template<typename TNode>
 class BackwardTrainState: public State<TNode>{
     public:
     void onSend(TNode* n, vector<Message*>& msgs) override;
+    void onSend(TNode* n, vector<Message*>& msgs, int stateIndex) override;
     bool readyToSend(TNode* n) override;
+    bool readyToSend(TNode* n, int stateIndex) override;
 };
 
 #endif /* BACKWARD_TRAIN_STATE_H */

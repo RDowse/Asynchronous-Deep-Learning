@@ -29,6 +29,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/training/AsyncDataUpdateStrategy.h</itemPath>
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
       <itemPath>include/states/backward_train_state.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
@@ -305,6 +306,11 @@
       </item>
       <item path="include/tools/strategy_loader.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/training/AsyncDataUpdateStrategy.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="include/training/dropout.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/training/dropout_bitset.h" ex="false" tool="3" flavor2="0">
@@ -566,6 +572,11 @@
       <item path="include/tools/math.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/tools/strategy_loader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/training/AsyncDataUpdateStrategy.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="include/training/dropout.h" ex="false" tool="3" flavor2="0">
       </item>

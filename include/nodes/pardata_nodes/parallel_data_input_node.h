@@ -27,11 +27,12 @@
 using namespace std;
 
 class ParallelDataNeuralNode::InputNode: public ParallelDataNeuralNode{
-    unordered_map<int,int> dstWeightIndex;        // map of weights associated to dst ids
+    unordered_map<int,int> dstWeightIndex; // map of weights associated to dst ids
+    
+    int updateCount = 0;
     
     Eigen::MatrixXf receivedDelta;
-    Eigen::VectorXf deltaWeights;     // delta weights, for momentum
-    Eigen::VectorXf newWeights;       // intermediate updated weights
+    Eigen::VectorXf deltaWeights;     // delta weights, stored for momentum
     Eigen::VectorXf weights;
 public:
     static std::string m_type;
@@ -41,31 +42,21 @@ public:
 
     void addEdge(Edge* e) override;
     
-    void setWeights(const vector<float>& w) override{
-        assert(w.size() == outgoingForwardEdges.size());
-        //weights = Eigen::Map<Eigen::VectorXf>(&w[0],w.size());
-        newWeights = weights; 
-        
-        // init size of delta values
-        receivedDelta = Eigen::VectorXf::Zero(weights.size());
-        deltaWeights = Eigen::VectorXf::Zero(weights.size());
-    }
+    void setWeights(const vector<float>& w) override{ assert(0); }
         
     void onRecv(ForwardPropagationMessage* msg) override;
     void onRecv(BackwardPropagationMessage* msg) override;
 
-    bool sendForwardMsgs(vector<Message*>& msgs) override;
-    bool sendBackwardMsgs(vector<Message*>& msgs) override;    
+    bool sendForwardMsgs(vector<Message*>& msgs, int stateIndex) override;
+    bool sendBackwardMsgs(vector<Message*>& msgs, int stateIndex) override;    
 private:
     // for populating weights map
     int map_index = 0;
     void initWeights(){
         weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
-        context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
-        newWeights = weights;    
-        
-        // init size of delta values
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
+        receivedDelta = Eigen::MatrixXf();
+        context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
     }
 };
 

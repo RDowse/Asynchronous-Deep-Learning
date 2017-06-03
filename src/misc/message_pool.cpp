@@ -9,17 +9,13 @@ template<typename TMessage>
 MessagePool<TMessage>* MessagePool<TMessage>::instance = NULL;
 
 template<typename TMessage>
-MessagePool<TMessage>::MessagePool():pool(new tbb::concurrent_bounded_queue<TMessage*>()){}
+MessagePool<TMessage>::MessagePool(){}
 
 template<typename TMessage>
 MessagePool<TMessage>::~MessagePool(){
-//    while(!pool.empty()){
-//        delete pool.front();
-//        pool.pop();
-//    }
-    while(!pool->empty()){
+    while(!pool.empty()){
         TMessage* msg;
-        pool->try_pop(msg);
+        pool.try_pop(msg);
         delete msg;
     }
 }
@@ -34,27 +30,19 @@ MessagePool<TMessage>* MessagePool<TMessage>::getInstance(){
 
 template<typename TMessage>
 TMessage* MessagePool<TMessage>::getMessage(){
-//    if(pool.empty()) {
-//        return new TMessage();
-//    } else {
-//        TMessage* msg = pool.front();
-//        pool.pop();
-//        return msg;
-//    }
-    if(pool->empty()) {
+    if(pool.empty()) {
         return new TMessage();
     } else {
         TMessage* msg;
-        pool->try_pop(msg);
+        pool.try_pop(msg);
         return msg;
     }
 }
 
 template<typename TMessage>
 void MessagePool<TMessage>::returnMessage(TMessage* msg){
-    // TODO: reset msg
-    //pool.push(msg);
-    pool->push(msg);
+    // TODO: reset message
+    pool.push(msg);
 }
 
 template class MessagePool<ForwardPropagationMessage>;
