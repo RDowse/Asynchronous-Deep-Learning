@@ -13,6 +13,7 @@
 
 #include "tools/loader.h"
 #include "tools/dnn_graph.h"
+#include "tools/csv_writer.h"
 
 #include "misc/node_factory.h"
 
@@ -69,6 +70,11 @@ void simulate(shared_ptr<DNNGraphSettings> settings){
         auto s = std::static_pointer_cast<DNNGraphSettings>(settings);
         cout << "Final epoch " << s->epoch << endl;
         cout << "training error: " << s->training_error << ", accuracy: " << s->accuracy << endl;
+        
+        CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
+            "w/error.csv",settings->error_training,settings->error_validation,settings->error_testing);
+        CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
+            "w/accuracy.csv",settings->accuracy_train,settings->accuracy_validation,settings->accuracy_testing);
     } else {
         cout << "Unable to open file "<< settings->netPath << "\n";
         return;

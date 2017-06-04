@@ -74,9 +74,13 @@ public:
     float (*deltaActivationFnc)(float);
     
     // Error saving
-    vector<float> accuracy;
-    vector<float> error_validation;
-    vector<float> error_training;
+    Eigen::VectorXf accuracy_validation;
+    Eigen::VectorXf accuracy_train;
+    Eigen::VectorXf accuracy_testing;
+    Eigen::VectorXf error_validation;
+    Eigen::VectorXf error_training;
+    Eigen::VectorXf error_testing;
+    Eigen::MatrixXi confusion_matrix_test;
     
     DNNGraphSettings(){
         activationFnc = &math::activationTanH;

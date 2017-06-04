@@ -33,7 +33,7 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     activation = input.unaryExpr(context->activationFnc);
     
     Eigen::MatrixXf mat;
-    if(dataSetType == DataSetType::validation && !dropout->unset() && dropout->isEnabled())
+    if(dataSetType != DataSetType::training && !dropout->unset() && dropout->isEnabled())
         mat = 0.5*activation*weights.transpose(); // for dropout based on probability, TODO correct for prime (adjustable probability)
     else 
         mat = activation*weights.transpose();
@@ -57,7 +57,7 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     // reset
     input.setZero(input.size());
     forwardSeenCount = 0;
-    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<NeuralNode>>();
+    if(dataSetType==DataSetType::training) swapState<BackwardTrainState<NeuralNode>>();
 }
 
 bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){

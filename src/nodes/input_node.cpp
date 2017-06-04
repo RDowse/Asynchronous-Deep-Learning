@@ -64,7 +64,7 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     
     // reset 
     forwardSeenCount = 0;
-    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<NeuralNode>>();
+    if(dataSetType==DataSetType::training) swapState<BackwardTrainState<NeuralNode>>();
 }
 
 bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){

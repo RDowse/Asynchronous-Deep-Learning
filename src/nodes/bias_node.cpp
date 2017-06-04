@@ -56,7 +56,7 @@ bool NeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     }
     
     forwardSeenCount = 0;
-    if(dataSetType!=DataSetType::validation) swapState<BackwardTrainState<NeuralNode>>();
+    if(dataSetType==DataSetType::training) swapState<BackwardTrainState<NeuralNode>>();
 }
 
 bool NeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){

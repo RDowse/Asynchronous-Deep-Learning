@@ -41,18 +41,30 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     // time step
     time++;
     
-    auto& images = validating ? 
-        dataset->validation_images : dataset->training_images;
-    
-    //int batchSize = 0;
-    if(validating){
-        batchSize = dataset->validation_labels.size(); 
-    }else{
-        if( sampleIndex + context->batchSize > dataset->training_labels.size() ) 
-            batchSize = dataset->training_labels.size() - sampleIndex;
-        else
-            batchSize = context->batchSize;
-    }
+    MatrixXf* images = NULL;
+    switch(dataSetType){
+        case DataSetType::training:
+            images = &dataset->training_images;
+            if( sampleIndex + context->batchSize > dataset->training_labels.size() ) 
+                currBatchSize = dataset->training_labels.size() - sampleIndex;
+            else
+                currBatchSize = context->batchSize;
+            break;
+        case DataSetType::validating:
+            images = &dataset->validation_images;
+            currBatchSize = 1000; //dataset->validation_labels.size();
+            break;
+        case DataSetType::testing:
+            images = &dataset->testing_images;
+            currBatchSize = 1000; //dataset->testing_labels.size();
+            break;
+        case DataSetType::training_test:
+            images = &dataset->training_images;
+            currBatchSize = 1000; //dataset->training_labels.size();
+            break;
+        default:
+            assert(0);
+    };
     
     // TODO: check data size matches the input size
     Logging::log(3, "Sending sample %d", sampleIndex);
@@ -65,14 +77,14 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->time = time;
-        msg->dataSetType = validating ? DataSetType::validation : DataSetType::training;
+        msg->dataSetType = dataSetType;
         
         // sampling strategy
         if(outgoingForwardEdges[i]->dst->getType() == "Input" 
-                && j < images.cols()){
-            msg->activation = images.block(sampleIndex,j++,batchSize,1);
+                && j < images->cols()){
+            msg->activation = images->block(sampleIndex,j++,currBatchSize,1);
         } else if(outgoingForwardEdges[i]->dst->getType() == "Bias"){
-            msg->activation = Eigen::VectorXf::Ones(batchSize);
+            msg->activation = Eigen::VectorXf::Ones(currBatchSize);
         } 
         msgs.push_back(msg);
     }
@@ -87,7 +99,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     Logging::log(3, "Sending sample %d backward", sampleIndex);
     
-    auto batchLabels = dataset->training_labels.block(sampleIndex,0,batchSize,1);
+    auto batchLabels = dataset->training_labels.block(sampleIndex,0,currBatchSize,1);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
@@ -96,12 +108,12 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->time = time;
         
-        Eigen::VectorXf target(batchSize);
+        Eigen::VectorXf target(currBatchSize);
         if(outgoingBackwardEdges.size() == 1){ // binary classification
-            for(int j = 0; j < batchSize; ++j)
+            for(int j = 0; j < currBatchSize; ++j)
                 target(j) = (batchLabels(j) ? context->actMax : context->actMin);
         } else { // multi classification
-            for(int j = 0; j < batchSize; ++j)
+            for(int j = 0; j < currBatchSize; ++j)
                 target(j) = (batchLabels(j) == i ? context->actMax : context->actMin);
         }
         assert(outgoingBackwardEdges[i]->dst->getType() == "Output");
@@ -127,7 +139,7 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     // update flags and indexes once all data is received
     if(readyToSendForward()){
         
-        sampleIndex += batchSize;
+        sampleIndex += currBatchSize;
         
         int nTrainingSamples = dataset->training_labels.size();
         
@@ -137,19 +149,14 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             
             // next epoch
             context->epoch++;
-                        
-            context->accuracy = accuracy/nTrainingSamples;
-            context->training_error = training_error/nTrainingSamples;
             
-            Logging::log(0,"ACCURACY: %f\n",context->accuracy);
-            Logging::log(0,"AVERAGE ERROR: %f\n",context->training_error);
             Logging::log(0,"EPOCH: %d\n",context->epoch);            
 
-            validating = true;
+            dataSetType = DataSetType::training_test;
             
             // reset
             sampleIndex = 0;
-            training_error = 0;
+            error = 0;
             accuracy = 0;
         } 
         
@@ -161,8 +168,8 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
 void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     forwardSeenCount++;    
     
-    if(!receivedOutput.size() || batchSize != receivedOutput.rows()) 
-        receivedOutput = Eigen::MatrixXf(batchSize,outgoingBackwardEdges.size());
+    if(!receivedOutput.size() || currBatchSize != receivedOutput.rows()) 
+        receivedOutput = Eigen::MatrixXf(currBatchSize,outgoingBackwardEdges.size());
     
     int index = dstOutputIndex[msg->src];
     
@@ -176,42 +183,87 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
         // training error
         if(outgoingBackwardEdges.size() == 1){ assert(0); }// todo implement binary version
         
-        auto batchLabels = !validating ? dataset->training_labels.block(sampleIndex,0,batchSize,1):
-            dataset->validation_labels; 
-        
-        Eigen::MatrixXf target = Eigen::MatrixXf::Constant(batchSize,outgoingBackwardEdges.size(),context->actMin);
-        for(int i = 0; i < batchSize; ++i)
-            target( i, (int)batchLabels(i) ) = context->actMax;
-        training_error += math::mse(target,receivedOutput);
-        
-        // for accuracy predicition, should really be in a separate forward pass
-        MatrixXf::Index maxIndex[batchSize];
-        VectorXf maxVal(batchSize);
-        for(int i = 0; i < batchSize; ++i){
-            if(outgoingBackwardEdges.size() == 1){ // binary classification
-                auto mid = (context->actMax - context->actMin) / 2;
-                if((receivedOutput(i) > mid)==batchLabels(i)) accuracy++;
-            } else { // multi-classification
-                maxVal(i) = receivedOutput.row(i).maxCoeff( &maxIndex[i] );
-                if(maxIndex[i]==batchLabels(i)) accuracy++;
-            }
-        }
+        const VectorXi* labels = NULL;
+        string text; int numSamples; DataSetType nextDataSet;
+        Eigen::VectorXf* accuracy_ref; Eigen::VectorXf* error_ref;
+        switch(dataSetType){
+            case DataSetType::training:
+                // do nothing
+                break;
+            case DataSetType::training_test:
+                text = "TRAINING ACCURACY";
+                nextDataSet = DataSetType::validating;
+                numSamples = dataset->training_labels.size();
+                labels = &dataset->training_labels;
+                
+                error_ref = &context->error_training;
+                accuracy_ref = &context->accuracy_train;
+                break;
+            case DataSetType::validating:
+                text = "VALIDATION ACCURACY";
+                nextDataSet = DataSetType::testing;
+                numSamples = dataset->validation_labels.size();
+                labels = &dataset->validation_labels;
+                
+                error_ref = &context->error_validation;
+                accuracy_ref = &context->accuracy_validation;
+                break;
+            case DataSetType::testing:
+                text = "TESTING ACCURACY"; 
+                nextDataSet = DataSetType::training;
+                numSamples = dataset->testing_labels.size();
+                labels = &dataset->testing_labels;
+                
+                error_ref = &context->error_testing;
+                accuracy_ref = &context->accuracy_testing;
+                break;
+            default:
+                assert(0);
+        };
 
-        // Swap state
-        if(!validating) swapState<BackwardTrainState<NeuralNode>>();
-        
-        if(validating){
-            Logging::log(0,"VALIDATION ACCURACY: %f\n\n",accuracy/dataset->validation_labels.size());
+        if(DataSetType::training != dataSetType){
+            const VectorXi& tmp_labels = labels->block(sampleIndex,0,currBatchSize,1);
             
-            // trigger next wave
-            validating = false;
+            // Calc training error from target information
+            Eigen::MatrixXf target = Eigen::MatrixXf::Constant(currBatchSize,outgoingBackwardEdges.size(),context->actMin);
+            for(int i = 0; i < currBatchSize; ++i)
+                target( i, (int)tmp_labels(i) ) = context->actMax;
+            error += math::mse(target,receivedOutput);
+            
+            // Calc accuracy of current sample
+            MatrixXf::Index maxIndex[currBatchSize];
+            VectorXf maxVal(currBatchSize);
+            for(int i = 0; i < currBatchSize; ++i){
+                maxVal(i) = receivedOutput.row(i).maxCoeff( &maxIndex[i] );
+                if(maxIndex[i]==tmp_labels(i)) accuracy++;
+            }
+            
+            // next sample
+            sampleIndex += currBatchSize;
+            
+            // trigger forward propagation for next wave
             backwardSeenCount = incomingBackwardEdges.size();
-
-            // reset
             forwardSeenCount = 0;
-            sampleIndex = 0;
-            training_error = 0;
-            accuracy = 0;
+            
+            // Output accuracy info
+            if(sampleIndex==numSamples){
+                Logging::log(0,"%s: %f\n\n",text.c_str(),accuracy/numSamples);
+
+                // save accuracy values
+                (*accuracy_ref)(context->epoch-1) = accuracy/numSamples;
+                (*error_ref)(context->epoch-1) = error/numSamples;
+                
+                // switch dataset
+                dataSetType = nextDataSet;
+
+                // reset
+                sampleIndex = 0;
+                error = 0;
+                accuracy = 0;
+            }
+        } else {
+            // start backpropagation when training
+            swapState<BackwardTrainState<NeuralNode>>();
         }
     }
 }

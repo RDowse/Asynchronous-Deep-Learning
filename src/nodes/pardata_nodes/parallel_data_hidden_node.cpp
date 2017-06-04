@@ -33,7 +33,7 @@ bool ParallelDataNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs,
     activation[stateIndex] = input[stateIndex].unaryExpr(context->activationFnc);
     
     Eigen::MatrixXf mat;
-    if(dataSetType == DataSetType::validation && !dropout->unset() && dropout->isEnabled())
+    if(dataSetType == DataSetType::validating && !dropout->unset() && dropout->isEnabled())
         mat = 0.5*activation[stateIndex]*weights.transpose(); // for dropout based on probability, TODO correct for prime (adjustable probability)
     else 
         mat = activation[stateIndex]*weights.transpose();
@@ -71,12 +71,7 @@ bool ParallelDataNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs
 
     // perform weight update first
     int batchSize = receivedDelta.cols();
-    if(m_id >= 786 && m_id <= 795)
-        deltaWeights = (context->lr/3)*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights;
-    if(m_id >= 797 && m_id <= 806)
-        deltaWeights = (context->lr/2)*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights; // with momentum
-    if(m_id >= 808 && m_id <= 817)
-        deltaWeights = (context->lr/1)*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights; // with momentum
+    deltaWeights = context->lr*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights; // with momentum
 
     // Calculate next delta value
     Eigen::VectorXf tmp = weights.transpose()*receivedDelta;

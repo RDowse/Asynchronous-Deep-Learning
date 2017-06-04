@@ -33,28 +33,28 @@ class NeuralNode::SyncNode: public NeuralNode{
     bool tick = true;           // trigger initial message propagation
     bool validating = false;    // flag for propagating validation set
   
+    DataSetType dataSetType = DataSetType::training;
+    
     // sampling
     int sampleIndex = 0;
     
-    int batchSize = 0;
+    int currBatchSize = 0;
     
     int map_index = 0;
     unordered_map<int,int> dstOutputIndex;        // map backprop index to output
     
-    // Error calculations
+    // backpropagation
     Eigen::MatrixXf receivedOutput;
-    float training_error = 0;
+    
+    // Error calculations
+    float error = 0;
     float accuracy = 0;
-    vector<float> min_error; 
-    vector<float> error;
 public:
     static std::string m_type;
     SyncNode(shared_ptr<GraphSettings> context): NeuralNode(context){}
     string getType() override {return SyncNode::m_type;}
     void setDataSet(DataWrapper* ds ){
         dataset = ds;
-        min_error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
-        error = vector<float>(dataset->training_labels.size(),std::numeric_limits<float>::max());
     }
     void addEdge(Edge* e) override;    
     

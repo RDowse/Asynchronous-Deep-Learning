@@ -66,7 +66,7 @@ bool ParallelDataNeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs, 
     assert(readyToSendBackward(stateIndex));
     
     int batchSize = receivedDelta.cols();
-    deltaWeights = (context->lr/context->numModels)*(receivedDelta * input[stateIndex])/batchSize + context->alpha*deltaWeights;
+    deltaWeights = context->lr*(receivedDelta * input[stateIndex])/batchSize + context->alpha*deltaWeights;
 
     weights -= deltaWeights; // update step  
     updateCount++; // track current number updates

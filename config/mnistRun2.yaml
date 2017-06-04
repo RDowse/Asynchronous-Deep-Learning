@@ -11,7 +11,7 @@ settings:
     lr: 0.1 #0.01
     alpha: 0.7 #0.5
     batchSize: 64 
-    maxEpoch: 30
+    maxEpoch: 2
     minError: 0.01
-#strategy: dropoutbitset
+strategy: dropoutbitset
 

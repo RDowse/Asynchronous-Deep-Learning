@@ -103,6 +103,15 @@ private:
         // Strategy
         if(config["strategy"].IsDefined())
             settings->dropout = config["strategy"].as<std::string>();
+        
+        // initialise error vectors
+        settings->accuracy_validation = Eigen::VectorXf::Zero(settings->maxEpoch,1);
+        settings->accuracy_train = Eigen::VectorXf::Zero(settings->maxEpoch,1);
+        settings->accuracy_testing = Eigen::VectorXf::Zero(settings->maxEpoch,1);
+        settings->error_validation = Eigen::VectorXf::Zero(settings->maxEpoch,1);
+        settings->error_training = Eigen::VectorXf::Zero(settings->maxEpoch,1);
+        settings->error_testing = Eigen::VectorXf::Zero(settings->maxEpoch,1);
+        settings->confusion_matrix_test = Eigen::MatrixXi::Zero(10,10);
     }
 };
 

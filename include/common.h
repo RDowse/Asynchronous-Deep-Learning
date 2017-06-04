@@ -10,7 +10,7 @@
 #define COMMON_H
 
 enum DataSetType{
-    training, validation, test
+    training, training_test, validating, testing
 };
 
 #endif /* COMMON_H */

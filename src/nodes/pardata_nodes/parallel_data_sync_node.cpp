@@ -67,7 +67,7 @@ bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs, i
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->time = time;
-        msg->dataSetType = validating ? DataSetType::validation : DataSetType::training;
+        msg->dataSetType = validating ? DataSetType::validating : DataSetType::training;
         msg->batchIndex = stateIndex;
         
         // sampling strategy

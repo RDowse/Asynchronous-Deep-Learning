@@ -73,7 +73,7 @@ bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs,
             
     // perform weight update first
     int batchSize = receivedDelta.cols();
-    deltaWeights = (context->lr/4)*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights;
+    deltaWeights = context->lr*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights;
     
     weights -= deltaWeights; // async update step  
     updateCount++; // track current number updates
