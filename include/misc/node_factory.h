@@ -10,6 +10,7 @@
 
 #include "nodes/node.h"
 #include "nodes/neural_node.h"
+#include "nodes/async_nodes/async_neural_node.h"
 #include "nodes/pardata_nodes/parallel_data_neural_node.h"
 
 #include "tools/logging.h"

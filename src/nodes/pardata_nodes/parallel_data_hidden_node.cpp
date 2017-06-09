@@ -33,10 +33,7 @@ bool ParallelDataNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs,
     activation[stateIndex] = input[stateIndex].unaryExpr(context->activationFnc);
     
     Eigen::MatrixXf mat;
-    if(dataSetType == DataSetType::validating && !dropout->unset() && dropout->isEnabled())
-        mat = 0.5*activation[stateIndex]*weights.transpose(); // for dropout based on probability, TODO correct for prime (adjustable probability)
-    else 
-        mat = activation[stateIndex]*weights.transpose();
+    mat = activation[stateIndex]*saved_weights[updateRef[stateIndex]%context->numModels].transpose();
         
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -55,9 +52,6 @@ bool ParallelDataNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs,
         }
     }
     
-    // store current weight values
-    prevWeights[stateIndex] = weights;
-    
     // reset
     input[stateIndex].setZero(input[stateIndex].size());
     forwardSeenCount[stateIndex] = 0;
@@ -71,15 +65,17 @@ bool ParallelDataNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs
 
     // perform weight update first
     int batchSize = receivedDelta.cols();
-    deltaWeights = context->lr*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights; // with momentum
+    deltaWeights = (context->lr/context->numModels)*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights; // with momentum
 
     // Calculate next delta value
-    Eigen::VectorXf tmp = weights.transpose()*receivedDelta;
-    //Eigen::VectorXf tmp = prevWeights[stateIndex].transpose()*receivedDelta;
+    //Eigen::VectorXf tmp = weights.transpose()*receivedDelta;
+    Eigen::VectorXf tmp = saved_weights[updateRef[stateIndex]%context->numModels].transpose()*receivedDelta;
     Eigen::VectorXf delta2 = tmp.array() * activation[stateIndex].unaryExpr(context->deltaActivationFnc).array();
     
-    // update step  
+    // update step
     weights -= deltaWeights;
+    updateCount++;
+    saved_weights[updateCount%context->numModels] = weights;
 
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -107,17 +103,13 @@ void ParallelDataNeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) 
     if(input[msg->batchIndex].size() != msg->activation.size()) 
         input[msg->batchIndex] = Eigen::VectorXf::Zero(msg->activation.size());
 
+    // track update reference
+    if(forwardSeenCount[msg->batchIndex] == 0) updateRef[msg->batchIndex] = msg->updateNumber;
+    //assert(updateRef[msg->batchIndex] == msg->updateNumber); // messed up by bias node
+    
     input[msg->batchIndex] += msg->activation;
     forwardSeenCount[msg->batchIndex]++;    
     dataSetType = msg->dataSetType;
-    
-    if(dataSetType==DataSetType::training) dropout->setEnabled(true);
-    else dropout->setEnabled(false);
-    
-    if(!dropout->unset() && msg->time > time){
-        dropout->nextStep(msg->time);
-        time = msg->time;
-    }
     
     forwardMessagePool->returnMessage(msg);
 }

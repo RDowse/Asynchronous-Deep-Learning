@@ -34,6 +34,8 @@ class ParallelDataNeuralNode::InputNode: public ParallelDataNeuralNode{
     Eigen::MatrixXf receivedDelta;
     Eigen::VectorXf deltaWeights;     // delta weights, stored for momentum
     Eigen::VectorXf weights;
+    
+    //vector<Eigen::VectorXf> saved_weights;
 public:
     static std::string m_type;
     InputNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){}
@@ -54,6 +56,9 @@ private:
     int map_index = 0;
     void initWeights(){
         weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
+        
+        //saved_weights = vector<Eigen::VectorXf>(context->numModels,weights);
+        
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
         receivedDelta = Eigen::MatrixXf();
         context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());

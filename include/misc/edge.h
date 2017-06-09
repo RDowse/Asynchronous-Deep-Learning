@@ -14,8 +14,8 @@ class Message;
 class Node;
 
 class Edge{ 
-    unsigned delay;
 public:
+    unsigned delay;
     Message* msg;
     Node* dst;
     Node* src;

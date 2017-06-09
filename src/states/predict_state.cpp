@@ -1,6 +1,8 @@
 
 #include "states/predict_state.h"
+
 #include "nodes/neural_node.h"
+#include "nodes/async_nodes/async_neural_node.h"
 #include "nodes/pardata_nodes/parallel_data_neural_node.h"
 
 // NeuralNode
@@ -36,4 +38,21 @@ template<> bool PredictState<ParallelDataNeuralNode>::readyToSend(ParallelDataNe
 
 template<> bool PredictState<ParallelDataNeuralNode>::readyToSend(ParallelDataNeuralNode* n, int stateIndex){
     return n->readyToSendForward(stateIndex);
+}
+
+// AsyncNode
+template<> void PredictState<AsyncNeuralNode>::onSend(AsyncNeuralNode* n, vector<Message*>& msgs){
+    n->sendForwardMsgs(msgs);
+}
+
+template<> void PredictState<AsyncNeuralNode>::onSend(AsyncNeuralNode* n, vector<Message*>& msgs, int stateIndex){
+    assert(0);
+}
+
+template<> bool PredictState<AsyncNeuralNode>::readyToSend(AsyncNeuralNode* n){
+    return n->readyToSendForward();
+}
+
+template<> bool PredictState<AsyncNeuralNode>::readyToSend(AsyncNeuralNode* n, int stateIndex){
+    assert(0);
 }

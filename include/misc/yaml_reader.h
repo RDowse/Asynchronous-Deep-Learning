@@ -84,6 +84,9 @@ private:
         // Logging level
         settings->logLevel = config["logLevel"].as<int>();
         
+        // test number
+        if(config["testNumber"].IsDefined()) settings->testNumber = config["testNumber"].as<int>();
+        
         // Read paths
         settings->netPath = config["netPath"].as<std::string>();
         settings->netType = config["netType"].as<std::string>();
@@ -97,12 +100,24 @@ private:
         settings->batchSize = config["settings"]["batchSize"].as<int>();
         settings->maxEpoch = config["settings"]["maxEpoch"].as<int>();
         settings->minError = config["settings"]["minError"].as<float>();
-        if(config["settings"]["numModels"].IsDefined()) 
-            settings->numModels = config["settings"]["numModels"].as<int>();
         
         // Strategy
         if(config["strategy"].IsDefined())
             settings->dropout = config["strategy"].as<std::string>();
+        
+        // Parallel Data Parameters
+        if(config["settings"]["numModels"].IsDefined()) 
+            settings->numModels = config["settings"]["numModels"].as<int>();
+        
+        // Async Data Parameters
+        if(config["settings"]["forwardDropTolerance"].IsDefined()) 
+            settings->forwardDropTolerance = config["settings"]["forwardDropTolerance"].as<float>();
+        if(config["settings"]["backwardDropTolerance"].IsDefined()) 
+            settings->backwardDropTolerance = config["settings"]["backwardDropTolerance"].as<float>();
+        if(config["settings"]["maxDelay"].IsDefined()) 
+            settings->maxDelay = config["settings"]["maxDelay"].as<int>();
+        if(config["settings"]["enableVariableEdgeDelay"].IsDefined()) 
+            settings->enableVariableEdgeDelay = config["settings"]["enableVariableEdgeDelay"].as<bool>();
         
         // initialise error vectors
         settings->accuracy_validation = Eigen::VectorXf::Zero(settings->maxEpoch,1);

@@ -29,6 +29,12 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>include/nodes/async_nodes/async_bias_node.h</itemPath>
+      <itemPath>include/nodes/async_nodes/async_hidden_node.h</itemPath>
+      <itemPath>include/nodes/async_nodes/async_input_node.h</itemPath>
+      <itemPath>include/nodes/async_nodes/async_neural_node.h</itemPath>
+      <itemPath>include/nodes/async_nodes/async_output_node.h</itemPath>
+      <itemPath>include/nodes/async_nodes/async_sync_node.h</itemPath>
       <itemPath>include/messages/backward_propagation_message.h</itemPath>
       <itemPath>include/states/backward_train_state.h</itemPath>
       <itemPath>include/graphs/basic_graph_settings.h</itemPath>
@@ -80,6 +86,12 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>src/nodes/async_nodes/async_bias_node.cpp</itemPath>
+      <itemPath>src/nodes/async_nodes/async_hidden_node.cpp</itemPath>
+      <itemPath>src/nodes/async_nodes/async_input_node.cpp</itemPath>
+      <itemPath>src/nodes/async_nodes/async_neural_node.cpp</itemPath>
+      <itemPath>src/nodes/async_nodes/async_output_node.cpp</itemPath>
+      <itemPath>src/nodes/async_nodes/async_sync_node.cpp</itemPath>
       <itemPath>src/messages/backward_propagation_message.cpp</itemPath>
       <itemPath>src/states/backward_train_state.cpp</itemPath>
       <itemPath>src/nodes/bias_node.cpp</itemPath>
@@ -234,6 +246,36 @@
       </item>
       <item path="include/misc/yaml_reader.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/async_nodes/async_bias_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_hidden_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_input_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_neural_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_sync_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
@@ -334,6 +376,36 @@
       <item path="src/misc/message_pool.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_bias_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_hidden_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_input_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_neural_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_sync_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -498,6 +570,36 @@
       </item>
       <item path="include/misc/yaml_reader.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/nodes/async_nodes/async_bias_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_hidden_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_input_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_neural_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_output_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/nodes/async_nodes/async_sync_node.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="include/nodes/bias_node.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/nodes/hidden_node.h" ex="false" tool="3" flavor2="0">
@@ -598,6 +700,36 @@
       <item path="src/misc/message_pool.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/misc/node_factory.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_bias_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_hidden_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_input_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_neural_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_output_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/nodes/async_nodes/async_sync_node.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
       <item path="src/nodes/bias_node.cpp" ex="false" tool="1" flavor2="0">
       </item>

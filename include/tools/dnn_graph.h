@@ -26,6 +26,13 @@
 #include "nodes/pardata_nodes/parallel_data_input_node.h"
 #include "nodes/pardata_nodes/parallel_data_sync_node.h"
 
+#include "nodes/async_nodes/async_bias_node.h"
+#include "nodes/async_nodes/async_hidden_node.h"
+#include "nodes/async_nodes/async_input_node.h"
+#include "nodes/async_nodes/async_neural_node.h"
+#include "nodes/async_nodes/async_output_node.h"
+#include "nodes/async_nodes/async_sync_node.h"
+
 #include <algorithm>
 #include <vector>
 #include <memory>
@@ -71,8 +78,11 @@ class DNNGraphBuilder{
     // Map assigning colors to nodes for Graphviz
     static map<string,string> nodeColors;
 public:    
-    DNNGraphBuilder(int _nHLayers, int _nHidden, int _nInput, int _nOutput, bool _bias, int _nCPU);
-        
+    DNNGraphBuilder(int _nHLayers, int _nHidden, int _nInput, int _nOutput, bool _bias, int _nCPU)
+    :nHLayers(_nHLayers),nHidden(_nHidden),nInput(_nInput),nOutput(_nOutput),bias(_bias),
+        actNHidden(_nHidden), actNInput(_nInput), actNOutput(_nOutput){
+        init();
+    }
     ~DNNGraphBuilder(){
         for(auto it = nodes.begin(); it != nodes.end(); it++)
             delete (*it);
@@ -156,7 +166,10 @@ public:
  
 private:
     string type();
-    void writeParams(ofstream& file);
+    void writeParams(ofstream& file){
+        file<<4<<"\n";        // PARAMETER COUNT
+        file<<nHLayers<<" "<<nHidden<<" "<<nInput<<" "<<nOutput<<"\n";
+    }
     void init(){
         auto settings = make_shared<DNNGraphSettings>();
         

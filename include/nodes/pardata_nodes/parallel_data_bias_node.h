@@ -31,12 +31,15 @@ class ParallelDataNeuralNode::BiasNode : public ParallelDataNeuralNode{
     Eigen::VectorXf weights; 
     
     std::vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > input; // set to 1
+    vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > saved_weights;
+    vector<int> updateRef;
 public:
     static std::string m_type;
     BiasNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){
         try{
             auto tmp_context = std::static_pointer_cast<DNNGraphSettings>(context);
             input = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(tmp_context->numModels);
+            updateRef = vector<int>(tmp_context->numModels,0);
         } catch (const std::bad_cast& e) {
             std::cout << e.what() << "\n";
         }
@@ -58,6 +61,8 @@ private:
         
         // init size of delta values
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
+        
+        saved_weights = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(context->numModels,weights);
     }
 };
 

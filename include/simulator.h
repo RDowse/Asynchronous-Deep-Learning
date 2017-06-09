@@ -50,7 +50,7 @@ private:
     
     typedef typename TNode::SyncNode SyncNode;
     
-    shared_ptr<GraphSettings> m_settings; 
+    shared_ptr<GraphSettings> context; 
     vector<Edge*> m_edges;
     vector<Node*> m_nodes;
     multimap<string, Node*> m_node_map;
@@ -171,6 +171,7 @@ private:
     }
     
     bool step_all_parallel(){
+        
         Logging::log(2, "stepping edges");
         bool active=false;    
         for(auto& e: m_edges){
@@ -185,6 +186,9 @@ private:
                 step_node_par(*it,active);
             }
         },tbb::auto_partitioner());
+        
+        // global time for async
+        context->incrementTime();
         
         return active;
     }    
@@ -219,7 +223,7 @@ public:
     
     // strategy config from YAML file
     void setStrategies(vector<string> config){
-        StrategyLoader<TNode> stratLoader(m_settings,&m_nodes);
+        StrategyLoader<TNode> stratLoader(context,&m_nodes);
         stratLoader.setConfig(config);
         stratLoader.load();
     }
@@ -231,7 +235,7 @@ public:
     }
     
     void setGraphSettings(shared_ptr<GraphSettings> settings){
-        m_settings = settings;
+        context = settings;
     }
         
     void addEdge(int src, int dst, int delay = 1){
@@ -256,6 +260,16 @@ public:
         }
     }
     
+    double edgeModTimeTotal = 0;
+    void modifyEdgeDelay(){
+        tbb::tick_count t0 = tbb::tick_count::now();
+        
+        for(auto e: m_edges)
+            e->delay = context->delayInitialiserFnc(context->maxDelay);
+        
+        edgeModTimeTotal += (tbb::tick_count::now()-t0).seconds();
+    }
+    
     void run(const string& command){
         Logging::log(1, "begin run");
         bool active=true;
@@ -268,8 +282,17 @@ public:
             assert(0);
         }
         
-        while(active)
+        tbb::tick_count t0 = tbb::tick_count::now();
+        while(active){
             active = step_all_parallel();
+            
+            // adjust the delay of edges
+            if(context->enableVariableEdgeDelay) modifyEdgeDelay();
+        }
+        tbb::tick_count t1 = tbb::tick_count::now();
+        
+        cout << "Total run time: " << (t1-t0).seconds() - edgeModTimeTotal << endl;
+        context->runTime = (t1-t0).seconds() - edgeModTimeTotal;
     }
 };
 

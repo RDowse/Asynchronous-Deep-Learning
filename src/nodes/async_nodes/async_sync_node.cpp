@@ -1,14 +1,14 @@
 
-#include "nodes/sync_node.h"
+#include "nodes/async_nodes/async_sync_node.h"
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 #include "tools/math.h"
 #include "states/backward_train_state.h"
 #include "states/forward_train_state.h"
 
-std::string NeuralNode::SyncNode::m_type = "Sync";
+std::string AsyncNeuralNode::SyncNode::m_type = "Sync";
 
-void NeuralNode::SyncNode::addEdge(Edge* e) {
+void AsyncNeuralNode::SyncNode::addEdge(Edge* e) {
     Node::addEdge(e);
     if(e->src->getId() == m_id){
         if(e->dst->getType() == "Output"){
@@ -34,13 +34,7 @@ void NeuralNode::SyncNode::addEdge(Edge* e) {
     } 
 }
     
-bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendForward());
-    assert(dataset!=NULL);
-    
-    // time step
-    time++;
-    
+bool AsyncNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     MatrixXf* images = NULL;
     switch(dataSetType){
         case DataSetType::training:
@@ -52,11 +46,11 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
             break;
         case DataSetType::validating:
             images = &dataset->validation_images;
-            currBatchSize = 1000;
+            currBatchSize = 1000; 
             break;
         case DataSetType::testing:
             images = &dataset->testing_images;
-            currBatchSize = 1000; 
+            currBatchSize = 1000;
             break;
         case DataSetType::training_test:
             images = &dataset->training_images;
@@ -66,7 +60,6 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
             assert(0);
     };
     
-    // TODO: check data size matches the input size
     Logging::log(3, "Sending sample %d", sampleIndex);
     
     // send out data samples to input nodes
@@ -87,16 +80,17 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
             msg->activation = Eigen::VectorXf::Ones(currBatchSize);
         } 
         msgs.push_back(msg);
+        
+        numMessagesSent++;
     }
     
     // reset
+    receivedOutput.setZero(receivedOutput.rows(),receivedOutput.cols());
     tick = false;
     backwardSeenCount = 0; 
 }
 
-bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
-    assert(readyToSendBackward());
-    
+bool AsyncNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     Logging::log(3, "Sending sample %d backward", sampleIndex);
     
     auto batchLabels = dataset->training_labels.block(sampleIndex,0,currBatchSize,1);
@@ -119,27 +113,33 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         assert(outgoingBackwardEdges[i]->dst->getType() == "Output");
         msg->target = target;
         msgs.push_back(msg);
+        
+        numMessagesSent++;
     }
     
     // reset
     forwardSeenCount = 0;
 }
 
-bool NeuralNode::SyncNode::readyToSendForward(){
-    return  backwardSeenCount == incomingBackwardEdges.size() &&
-                (context->epoch < context->maxEpoch || dataSetType != DataSetType::training) || tick;
+bool AsyncNeuralNode::SyncNode::readyToSendForward(){
+    return backwardSeenCount == incomingBackwardEdges.size() && 
+            (context->epoch < context->maxEpoch || dataSetType != DataSetType::training) || tick; 
 }
-bool NeuralNode::SyncNode::readyToSendBackward(){
+
+bool AsyncNeuralNode::SyncNode::readyToSendBackward(){
     return (forwardSeenCount == incomingForwardEdges.size());
 }
 
-void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
+void AsyncNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     backwardSeenCount++;
     backwardMessagePool->returnMessage(msg);
     
     // update flags and indexes once all data is received
     if(readyToSendForward()){
         
+        // time step
+        time++;
+
         sampleIndex += currBatchSize;
         
         int nTrainingSamples = dataset->training_labels.size();
@@ -162,25 +162,25 @@ void NeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
         } 
         
         // swap state
-        swapState<ForwardTrainState<NeuralNode>>();
+        swapState<ForwardTrainState<AsyncNeuralNode>>();
     }
 }
 
-void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
+void AsyncNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     forwardSeenCount++;    
     
     if(!receivedOutput.size() || currBatchSize != receivedOutput.rows()) 
-        receivedOutput = Eigen::MatrixXf(currBatchSize,outgoingBackwardEdges.size());
+        receivedOutput = Eigen::MatrixXf::Zero(currBatchSize,outgoingBackwardEdges.size());
     
     int index = dstOutputIndex[msg->src];
     
     // network output
-    receivedOutput.col(index) = msg->activation;
+    receivedOutput.col(index) += msg->activation;
     
     forwardMessagePool->returnMessage(msg);
     
     // switch propagation direction
-    if(readyToSendBackward()){
+    if(readyToSendBackward()){ // || (context->time-timer) >= maxTime){
         // training error
         if(outgoingBackwardEdges.size() == 1){ assert(0); }// todo implement binary version
         
@@ -264,7 +264,7 @@ void NeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
             }
         } else {
             // start backpropagation when training
-            swapState<BackwardTrainState<NeuralNode>>();
+            swapState<BackwardTrainState<AsyncNeuralNode>>();
         }
     }
 }

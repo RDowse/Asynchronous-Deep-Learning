@@ -14,12 +14,23 @@
 #include "graphs/graph_settings.h"
 
 #include <iostream>
+#include <random>
 
 using namespace std;
 
 // Note: context design pattern, maintains and shared information for the system 
 class DNNGraphSettings: public GraphSettings{
 public:
+    // Test
+    int testNumber = -1;
+    
+    // Global timer
+    int time = 0;
+    int waitTime = 1;
+    
+    // Async
+    float forwardDropTolerance = 1;
+    float backwardDropTolerance = 1;
     
     // Debugging log level
     int logLevel;
@@ -82,10 +93,24 @@ public:
     Eigen::VectorXf error_testing;
     Eigen::MatrixXi confusion_matrix_test;
     
+private:    
+    static std::default_random_engine generator;
+    static std::normal_distribution<double> distribution;
+    
+    // Should be in another class, but kept here for simplicity
+    static int delayInitialiser(int _maxDelay){
+        int number = -1;
+        while((number<0.0)&&(number>10.0))
+            number = distribution(generator);
+        return number;
+    }
+    
+public:
     DNNGraphSettings(){
         activationFnc = &math::activationTanH;
         deltaActivationFnc = &math::deltaActivationTanH;
         initWeightsFnc = &weight_init::initWeights;
+        delayInitialiserFnc = &DNNGraphSettings::delayInitialiser;
         
         actMax = activationFnc(5);
         actMin = activationFnc(-5);
@@ -108,7 +133,13 @@ public:
         cout << " minError "  << minError;
         cout << " numModels "  << numModels << endl;
     }
+    
+    void incrementTime() override{
+        time++;
+    }
 };
+
+std::normal_distribution<double> DNNGraphSettings::distribution = std::normal_distribution<double>(4.0,2.0);
 
 #endif /* DNN_GRAPH_H */
 

@@ -5,7 +5,6 @@
 #include "tools/math.h"
 
 std::string NeuralNode::InputNode::m_type = "Input";
-//NodeRegister<NeuralNode::InputNode> NeuralNode::InputNode::m_reg(NeuralNode::InputNode::m_type);
 
 void NeuralNode::InputNode::addEdge(Edge* e) {
      // add to original edge sets

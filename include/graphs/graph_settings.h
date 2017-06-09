@@ -12,8 +12,14 @@
 
 class GraphSettings{
 public:
+    double runTime = 0;
+    bool enableVariableEdgeDelay = false;
+    int maxDelay = 0;
+    int (*delayInitialiserFnc)(int);
+public:
     GraphSettings(){}
     virtual void setParameters(std::vector<int>& params){};
+    virtual void incrementTime(){};
 };
 
 #endif /* GRAPH_H */

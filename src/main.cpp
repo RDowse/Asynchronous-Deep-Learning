@@ -9,6 +9,7 @@
 #include "misc/data_wrapper.h"
 
 #include "nodes/neural_node.h"
+#include "nodes/async_nodes/async_neural_node.h"
 #include "nodes/pardata_nodes/parallel_data_neural_node.h"
 
 #include "tools/loader.h"
@@ -16,6 +17,8 @@
 #include "tools/csv_writer.h"
 
 #include "misc/node_factory.h"
+
+#include "tbb/tick_count.h"
 
 #include <map>
 #include <vector>
@@ -30,32 +33,32 @@ void usage(){
 }
 
 template<typename TNode>
-void simulate(shared_ptr<DNNGraphSettings> settings){
+void simulate(shared_ptr<DNNGraphSettings> context){
     printf("Starting sim...\n");
     Logging::m_logLevel = 5;
     std::ostream *stats=&std::cout;
     ifstream file;
-    file.open(settings->netPath);
+    file.open(context->netPath);
     if(file.is_open()){
         int lineNumber = 0, nNodes = 0, nEdges = 0;
         string type = Loader::readType(lineNumber,file);
         
-        Loader::readHeader(lineNumber,file,settings,nNodes,nEdges);
+        Loader::readHeader(lineNumber,file,context,nNodes,nEdges);
         
-        cout << settings->logLevel << endl;
-        Simulator<TNode> sim(settings->logLevel,nNodes,nEdges,*stats);
-        Loader::readBody(lineNumber,file,settings,sim,nNodes,nEdges);
+        cout << context->logLevel << endl;
+        Simulator<TNode> sim(context->logLevel,nNodes,nEdges,*stats);
+        Loader::readBody(lineNumber,file,context,sim,nNodes,nEdges);
         printf("Loaded graph to sim\n");
         
-        vector<string> conf = {settings->dropout};
+        vector<string> conf = {context->dropout};
         sim.setStrategies(conf);
         
         printf("Loading data\n");
         DataWrapper* data;
-        if("mnist" == settings->datasetType){
-            data = new MNISTDataWrapper(settings->datasetTrainingPath,settings->datasetTestingPath);
-        } else if("xor" == settings->datasetType){
-            data = new XORDataWrapper(settings->datasetTrainingPath,settings->datasetTestingPath);
+        if("mnist" == context->datasetType){
+            data = new MNISTDataWrapper(context->datasetTrainingPath,context->datasetTestingPath);
+        } else if("xor" == context->datasetType){
+            data = new XORDataWrapper(context->datasetTrainingPath,context->datasetTestingPath);
         } else {
             cout << "Invalid dataset type\n" << endl;
             assert(0);
@@ -64,19 +67,28 @@ void simulate(shared_ptr<DNNGraphSettings> settings){
         // basic check for data size
         assert(data->training_images.cols() < nNodes);
         sim.loadInput(data);
+        
+        // run
         cout << "Starting run\n";
         sim.run("train");
         
-        auto s = std::static_pointer_cast<DNNGraphSettings>(settings);
-        cout << "Final epoch " << s->epoch << endl;
+        auto s = std::static_pointer_cast<DNNGraphSettings>(context);
+        cout << "Final epoch: " << s->epoch << endl;
         cout << "training error: " << s->training_error << ", accuracy: " << s->accuracy << endl;
         
-        CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
-            "w/error.csv",settings->error_training,settings->error_validation,settings->error_testing);
-        CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
-            "w/accuracy.csv",settings->accuracy_train,settings->accuracy_validation,settings->accuracy_testing);
+        if(context->testNumber!=-1){
+            stringstream ss;
+            ss << "output/test" << context->testNumber << "/";
+            CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
+                ss.str()+"error.csv",context->error_training,context->error_validation,context->error_testing,
+                "training error, validation error, testing error \n");
+            CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
+                ss.str()+"accuracy.csv",context->accuracy_train,context->accuracy_validation,context->accuracy_testing,
+                "training accuracy, validation accuracy, testing accuracy \n");
+            CSVWriter::writeContext(ss.str()+"config.txt",context);
+        }
     } else {
-        cout << "Unable to open file "<< settings->netPath << "\n";
+        cout << "Unable to open file "<< context->netPath << "\n";
         return;
     }
     file.close();
@@ -93,13 +105,13 @@ void buildGraph(string name, int nHLayers, int nHidden, int nInput, int nOutput,
 }
 
 template<typename TNode>
-void run(shared_ptr<DNNGraphSettings> settings){
+void run(shared_ptr<DNNGraphSettings> context){
     registerNodes<TNode>();
-    if(settings->command == "build"){
-        buildGraph<TNode>(settings->netPath, settings->nHLayers, settings->nHidden,
-                settings->nInput, settings->nOutput, true);
-    } else if(settings->command == "run") {
-        simulate<TNode>(settings);
+    if(context->command == "build"){
+        buildGraph<TNode>(context->netPath, context->nHLayers, context->nHidden,
+                context->nInput, context->nOutput, true);
+    } else if(context->command == "run") {
+        simulate<TNode>(context);
     } else {
         assert(0);
     }
@@ -115,17 +127,19 @@ int main(int argc, char** argv) {
     
     string yamlPath = argv[1];
     YamlReader yamlReader(yamlPath);
-    auto settings = make_shared<DNNGraphSettings>();
-    yamlReader.readConfig(settings);
+    auto context = make_shared<DNNGraphSettings>();
+    yamlReader.readConfig(context);
     
-    settings->printParameters();
+    context->printParameters();
     
-    if("neural" == settings->netType){
-        run<NeuralNode>(settings);
-    } else if("parallel_data_neural" == settings->netType){
-        run<ParallelDataNeuralNode>(settings);
-    } else {
-        cout << "Net type " << settings->netType << "not recognised" << endl;
+    if("neural" == context->netType){
+        run<NeuralNode>(context);
+    } else if("parallel_data_neural" == context->netType){
+        run<ParallelDataNeuralNode>(context);
+    } else if("async_neural" == context->netType){
+        run<AsyncNeuralNode>(context);
+    }else {
+        cout << "Net type " << context->netType << "not recognised" << endl;
     }
 
     return 0;

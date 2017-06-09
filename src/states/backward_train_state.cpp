@@ -1,6 +1,8 @@
 
 #include "states/backward_train_state.h"
+
 #include "nodes/neural_node.h"
+#include "nodes/async_nodes/async_neural_node.h"
 #include "nodes/pardata_nodes/parallel_data_neural_node.h"
 
 // NeuralNode
@@ -35,4 +37,21 @@ template<> bool BackwardTrainState<ParallelDataNeuralNode>::readyToSend(Parallel
 
 template<> bool BackwardTrainState<ParallelDataNeuralNode>::readyToSend(ParallelDataNeuralNode* n, int stateIndex){
     return n->readyToSendBackward(stateIndex);
+}
+
+// AsyncNeuralNode
+template<> void BackwardTrainState<AsyncNeuralNode>::onSend(AsyncNeuralNode* n, vector<Message*>& msgs){
+    n->sendBackwardMsgs(msgs);
+}
+
+template<> void BackwardTrainState<AsyncNeuralNode>::onSend(AsyncNeuralNode* n, vector<Message*>& msgs, int stateIndex){
+    assert(0);
+}
+    
+template<> bool BackwardTrainState<AsyncNeuralNode>::readyToSend(AsyncNeuralNode* n){
+    return n->readyToSendBackward();
+}
+
+template<> bool BackwardTrainState<AsyncNeuralNode>::readyToSend(AsyncNeuralNode* n, int stateIndex){
+    assert(0);
 }

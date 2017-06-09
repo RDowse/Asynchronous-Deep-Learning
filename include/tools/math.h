@@ -40,10 +40,17 @@ namespace math{
         return 1 - pow(x,2);
     }
 
+    inline float activationLinear(float x){
+        if(abs(x) < 2 ) return 0.5*x;
+        return x >= 2 ? 1 : -1; 
+    }
+    
+    inline float deltaActivationLinear(float x){
+        return 0.5;
+    }
     /*
      * Cost functions
      */
-    
     // single sample
     inline float mse(Eigen::VectorXf target, Eigen::VectorXf output){
         Eigen::VectorXf diff = target - output;

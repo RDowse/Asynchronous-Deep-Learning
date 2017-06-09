@@ -1,12 +1,12 @@
 
-#include "nodes/pardata_nodes/parallel_data_input_node.h"
+#include "nodes/async_nodes/async_input_node.h"
 #include "messages/forward_propagation_message.h"
 #include "messages/backward_propagation_message.h"
 #include "tools/math.h"
 
-std::string ParallelDataNeuralNode::InputNode::m_type = "Input";
+std::string AsyncNeuralNode::InputNode::m_type = "Input";
 
-void ParallelDataNeuralNode::InputNode::addEdge(Edge* e) {
+void AsyncNeuralNode::InputNode::addEdge(Edge* e) {
      // add to original edge sets
      Node::addEdge(e);
      // check edge belongs to this node
@@ -38,11 +38,12 @@ void ParallelDataNeuralNode::InputNode::addEdge(Edge* e) {
      assert(incomingForwardEdges.size() <= 1);
  }
 
-bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs, int stateIndex){
-    assert(readyToSendForward(stateIndex));
+bool AsyncNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
+    assert(readyToSendForward());
     
     if(!weights.size()) initWeights();
-    Eigen::MatrixXf mat = activation[stateIndex]*weights.transpose();
+    
+    Eigen::MatrixXf mat = activation*weights.transpose();
     
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -52,31 +53,31 @@ bool ParallelDataNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs, 
             auto msg = forwardMessagePool->getMessage();
             msg->src = m_id;
             msg->dst = outgoingForwardEdges[i]->dst->getId();
-            msg->time = time;
+            msg->time = curr_forward_batch;
             msg->dataSetType = dataSetType;
-            msg->batchIndex = stateIndex;
-            msg->updateNumber = updateCount;
 
             msg->activation = mat.col(i);
             msgs.push_back(msg);
+            
+            numMessagesSent++;
         }
     }
     
+    curr_forward_batch++;
+    
+    forwardSeenCount = 0;
+    
     // reset 
-    forwardSeenCount[stateIndex] = 0;
-    delete state[stateIndex];
-    state[stateIndex] = new BackwardTrainState<ParallelDataNeuralNode>();
+    if(dataSetType == DataSetType::training) swapState<BackwardTrainState<AsyncNeuralNode>>();
 }
 
-bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs, int stateIndex){
-    assert(readyToSendBackward(stateIndex));
-            
+bool AsyncNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
+    
     // perform weight update first
     int batchSize = receivedDelta.cols();
-    deltaWeights = (context->lr/context->numModels)*(receivedDelta * activation[stateIndex])/batchSize + context->alpha*deltaWeights;
+    deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights;
     
-    weights -= deltaWeights; // async update step  
-    updateCount++; // track current number updates
+    weights -= deltaWeights;
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -84,31 +85,48 @@ bool ParallelDataNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs,
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->time = time;
-        msg->batchIndex = stateIndex;
+        msg->time = curr_forward_batch;
+
         msgs.push_back(msg);
+        
+        numMessagesSent++;
     }
     
-    // reset
-    backwardSeenCount[stateIndex] = 0;
-    delete state[stateIndex];
-    state[stateIndex] = new ForwardTrainState<ParallelDataNeuralNode>();
+    curr_backward_batch++;
+    receivedFirstMessage = false;
+    
+    // reset delta values
+    receivedDelta.Zero(receivedDelta.rows(),receivedDelta.cols());
+    
+    backwardSeenCount = 0;
+    swapState<ForwardTrainState<AsyncNeuralNode>>();
 }
 
-void ParallelDataNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
-    activation[msg->batchIndex] = msg->activation;
-    forwardSeenCount[msg->batchIndex]++;
+void AsyncNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
+    activation = msg->activation;
+    forwardSeenCount++;
     
     dataSetType = msg->dataSetType;
+    
+    if(dataSetType==DataSetType::training) dropout->setEnabled(true);
+    else dropout->setEnabled(false);
+    
+    if(!dropout->unset() && msg->time > time){
+        dropout->nextStep(msg->time);
+        time = msg->time;
+    }
     
     forwardMessagePool->returnMessage(msg);
 } 
 
-void ParallelDataNeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
+void AsyncNeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
+    
+    if(backwardDiscardMsgCheck(msg)) return;
+    
+    backwardSeenCount++;
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;
-    backwardSeenCount[msg->batchIndex]++;
     
     backwardMessagePool->returnMessage(msg);
 }

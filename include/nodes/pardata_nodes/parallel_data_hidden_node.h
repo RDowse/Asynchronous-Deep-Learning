@@ -38,15 +38,17 @@ class ParallelDataNeuralNode::HiddenNode: public ParallelDataNeuralNode{// for p
     Eigen::VectorXf deltaWeights;     // delta weights, for momentum
     Eigen::VectorXf weights;          // current weights
     
-    std::vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > prevWeights;
     std::vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > input;
+    
+    vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> > saved_weights;
+    vector<int> updateRef;
 public:    
     static std::string m_type;
     HiddenNode(shared_ptr<GraphSettings> context): ParallelDataNeuralNode(context){
         try{
             auto tmp_context = std::static_pointer_cast<DNNGraphSettings>(context);
             input = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(tmp_context->numModels);
-            prevWeights = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(tmp_context->numModels);
+            updateRef = vector<int>(tmp_context->numModels,0);
         } catch (const std::bad_cast& e) {
             std::cout << e.what() << "\n";
         }
@@ -68,6 +70,8 @@ private:
         weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
         deltaWeights = Eigen::VectorXf::Zero(weights.size());
         context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
+        
+        saved_weights = vector<Eigen::VectorXf,Eigen::aligned_allocator<Eigen::VectorXf> >(context->numModels,weights);
     }
 };
 

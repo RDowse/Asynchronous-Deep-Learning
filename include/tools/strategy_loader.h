@@ -21,6 +21,13 @@
 #include "nodes/pardata_nodes/parallel_data_output_node.h"
 #include "nodes/pardata_nodes/parallel_data_input_node.h"
 
+#include "nodes/async_nodes/async_neural_node.h"
+#include "nodes/async_nodes/async_bias_node.h"
+#include "nodes/async_nodes/async_hidden_node.h"
+#include "nodes/async_nodes/async_input_node.h"
+#include "nodes/async_nodes/async_output_node.h"
+#include "nodes/async_nodes/async_sync_node.h"
+
 #include "training/dropout.h"
 #include "training/dropout_bitset.h"
 
