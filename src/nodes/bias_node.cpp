@@ -42,7 +42,7 @@ bool NeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
     
     msgs.reserve(outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
-        if(dropout->isNextLayerNodeActive(i)){
+        if(dropout->isNextLayerNodeActive(i) || dataSetType != DataSetType::training){
             assert( 0 == outgoingForwardEdges[i]->msgStatus );
             auto msg = forwardMessagePool->getMessage();
             msg->src = m_id;
@@ -65,7 +65,8 @@ bool NeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     int batchSize = receivedDelta.cols();
     deltaWeights = context->lr*(receivedDelta * input)/batchSize + context->alpha*deltaWeights;
 
-    newWeights -= deltaWeights; // update step  
+    weights -= deltaWeights; // update step  
+    weights = context->regularizationFnc(weights, context->c);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -100,10 +101,6 @@ void NeuralNode::BiasNode::onRecv(ForwardPropagationMessage* msg) {
     }
     
     forwardMessagePool->returnMessage(msg);
-    
-    // weights update step
-    if(readyToSendForward())
-        weights = newWeights;
 }
 
 void NeuralNode::BiasNode::onRecv(BackwardPropagationMessage* msg) {  

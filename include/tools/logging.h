@@ -13,10 +13,9 @@ public:
     static void log(int level, const char *msg, ...)
     {
         if(level <= m_logLevel){
-            char localBuffer[256];
+            char localBuffer[1024];
             char *globalBuffer=0;
             char *buffer=localBuffer;
-            
             
             va_list va;
             va_start(va, msg);
@@ -43,7 +42,6 @@ public:
                 delete[] globalBuffer;
             }
         }
-        
     }
 };
 

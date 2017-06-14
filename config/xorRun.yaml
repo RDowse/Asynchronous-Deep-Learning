@@ -1,5 +1,5 @@
 command: run
-logLevel: 0
+logLevel: 1
 netPath: w/xor.graph
 datasetTrainingPath: dataset/xor_train.csv
 datasetTestingPath: dataset/xor_test.csv
@@ -8,5 +8,4 @@ settings:
     lr: 0.01
     alpha: 0.5 
     batchSize: 1
-    maxEpoch: 50000
-    minError: 0.01
+    maxEpoch: 100

@@ -8,5 +8,4 @@ settings:
     lr: 0.01
     alpha: 0.5 
     batchSize: 1
-    maxEpoch: 100000
-    minError: 0.01
+    maxEpoch: 100

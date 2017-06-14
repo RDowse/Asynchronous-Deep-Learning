@@ -36,7 +36,6 @@ class NeuralNode::HiddenNode: public NeuralNode{
     
     Eigen::MatrixXf receivedDelta;    // store received delta values
     Eigen::VectorXf deltaWeights;     // delta weights, for momentum
-    Eigen::VectorXf newWeights;       // new weights to update
     Eigen::VectorXf weights;          // current weights
    
     Eigen::VectorXf input;
@@ -49,15 +48,7 @@ public:
     
     void addEdge(Edge* e) override;
     
-    void setWeights(const vector<float>& w) override{
-        assert(w.size() == outgoingForwardEdges.size());
-        //weights = Eigen::Map<Eigen::VectorXf>(&w[0],w.size());
-        newWeights = weights; 
-        
-        // init size of delta values
-        receivedDelta = Eigen::VectorXf::Zero(weights.size());
-        deltaWeights = Eigen::VectorXf::Zero(weights.size());
-    }
+    void setWeights(const vector<float>& w) override{ assert(0); }
 
     void onRecv(ForwardPropagationMessage* msg) override;
     void onRecv(BackwardPropagationMessage* msg) override;
@@ -68,7 +59,6 @@ private:
     void initWeights(){
         weights = Eigen::VectorXf::Zero(outgoingForwardEdges.size());
         context->initWeightsFnc(weights,outgoingForwardEdges.size(),incomingForwardEdges.size());
-        newWeights = weights;    
         
         // init size of delta values
         deltaWeights = Eigen::VectorXf::Zero(weights.size());

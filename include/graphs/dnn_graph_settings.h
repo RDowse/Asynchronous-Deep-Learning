@@ -24,13 +24,15 @@ public:
     // Test
     int testNumber = -1;
     
-    // Global timer
-    int time = 0;
-    int waitTime = 1;
-    
     // Async
     float forwardDropTolerance = 1;
     float backwardDropTolerance = 1;
+    float waitTimeFactor = 1;
+    int waitTime = 0;
+    float mean = 1;
+    float std = 0;
+    std::normal_distribution<double> distribution;
+    std::default_random_engine generator;
     
     // Debugging log level
     int logLevel;
@@ -65,7 +67,6 @@ public:
     float alpha;          // momentum (0.5)
     int batchSize;        // training set must be divisible batch size 
     int maxEpoch;         // maximum epochs for training
-    float minError;       // minimum error to stop training
     
     // Error values
     float accuracy;
@@ -84,6 +85,13 @@ public:
     // Differentiated Activation function
     float (*deltaActivationFnc)(float);
     
+    Eigen::MatrixXf (*regularizationFnc)(Eigen::MatrixXf, float);
+    float c = 2;
+    
+    /*
+     * Output Data, TODO refactor into separate class
+     */
+    
     // Error saving
     Eigen::VectorXf accuracy_validation;
     Eigen::VectorXf accuracy_train;
@@ -93,15 +101,22 @@ public:
     Eigen::VectorXf error_testing;
     Eigen::MatrixXi confusion_matrix_test;
     
-private:    
-    static std::default_random_engine generator;
-    static std::normal_distribution<double> distribution;
+    int numForwardMessagesDropped = 0;
+    int numForwardMessagesSent = 0;
+    int numBackwardMessagesDropped = 0;
+    int numBackwardMessagesSent = 0;
+    
+    // specifically for the sync node
+    int numForwardMessagesDroppedSync = 0;
+    int numForwardMessagesSentSync = 0;
+    int numBackwardMessagesDroppedSync = 0;
+    int numBackwardMessagesSentSync = 0;
     
     // Should be in another class, but kept here for simplicity
-    static int delayInitialiser(int _maxDelay){
+    int delayInitialiser() override{
         int number = -1;
-        while((number<0.0)&&(number>10.0))
-            number = distribution(generator);
+        while( (number < 1) || (number>10.0) )
+            number = (int)distribution(generator);
         return number;
     }
     
@@ -110,7 +125,7 @@ public:
         activationFnc = &math::activationTanH;
         deltaActivationFnc = &math::deltaActivationTanH;
         initWeightsFnc = &weight_init::initWeights;
-        delayInitialiserFnc = &DNNGraphSettings::delayInitialiser;
+        regularizationFnc = &math::maxNormRegularization;
         
         actMax = activationFnc(5);
         actMin = activationFnc(-5);
@@ -130,16 +145,9 @@ public:
         cout << " alpha " << alpha;
         cout << " batchsize " << batchSize;
         cout << " maxEpoch "  << maxEpoch;  
-        cout << " minError "  << minError;
         cout << " numModels "  << numModels << endl;
     }
-    
-    void incrementTime() override{
-        time++;
-    }
 };
-
-std::normal_distribution<double> DNNGraphSettings::distribution = std::normal_distribution<double>(4.0,2.0);
 
 #endif /* DNN_GRAPH_H */
 

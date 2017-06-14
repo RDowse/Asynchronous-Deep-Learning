@@ -11,15 +11,14 @@
 #include <vector>
 
 class GraphSettings{
-public:
+public:  
+    int stepTime = 0;
     double runTime = 0;
     bool enableVariableEdgeDelay = false;
-    int maxDelay = 0;
-    int (*delayInitialiserFnc)(int);
-public:
     GraphSettings(){}
     virtual void setParameters(std::vector<int>& params){};
-    virtual void incrementTime(){};
+    void incrementTime(){stepTime++;};
+    virtual int delayInitialiser(){}
 };
 
 #endif /* GRAPH_H */

@@ -48,7 +48,7 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
-        if(dropout->isNextLayerNodeActive(i)){
+        if(dropout->isNextLayerNodeActive(i) || dataSetType != DataSetType::training){
             assert( 0 == outgoingForwardEdges[i]->msgStatus );
             auto msg = forwardMessagePool->getMessage();
             msg->src = m_id;
@@ -73,7 +73,8 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     int batchSize = receivedDelta.cols();
     deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights;
 
-    newWeights -= deltaWeights; // update step  
+    weights -= deltaWeights; // update step  
+    weights = context->regularizationFnc(weights, context->c);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -106,10 +107,6 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     }
     
     forwardMessagePool->returnMessage(msg);
-    
-    // weight update step
-    if(readyToSendForward())
-        weights = newWeights;
 } 
 
 void NeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {

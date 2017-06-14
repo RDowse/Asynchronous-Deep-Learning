@@ -60,13 +60,25 @@ public:
         if("async_neural" == context->netType){
             file << "Edge Delays" << endl;
             file << "EnableEdgeDelay: " << context->enableVariableEdgeDelay << endl;
-            file << "Max delay: "<< context->maxDelay << endl;
             file << "Wait time: "<< context->waitTime << endl;
+            file << "Wait time factor: "<< context->waitTimeFactor << endl;
+            file << "Mean: "<< context->mean << endl;
+            file << "Std: "<< context->std << endl;
             file << "Forward drop tolerance: " << context->forwardDropTolerance << endl;
-            file << "Backward drop tolerance: " << context->backwardDropTolerance << endl;
+            file << "Backward drop tolerance: " << context->backwardDropTolerance << endl << endl;
+            
+            file << "Message Stats" << endl;
+            file << "NumForwardMessagesSent: " << context->numForwardMessagesSent << endl;
+            file << "NumBackwardMessagesSent: " << context->numBackwardMessagesSent << endl;
+            file << "NumForwardMessagesDropped: " << context->numForwardMessagesDropped << endl;
+            file << "NumBackwardMesssagesDropped: " << context->numBackwardMessagesDropped << endl << endl;
+            
+            file << "NumForwardMessagesSentSync: " << context->numForwardMessagesSentSync << endl;
+            file << "NumBackwardMessagesSentSync: " << context->numBackwardMessagesSentSync << endl;
         }
         
         file << "Runtime: " << context->runTime << endl;
+        file << "TotalSimSteps: " << context->stepTime << endl;
     }
 };
 

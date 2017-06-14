@@ -48,6 +48,13 @@ namespace math{
     inline float deltaActivationLinear(float x){
         return 0.5;
     }
+    
+    inline Eigen::MatrixXf maxNormRegularization(Eigen::MatrixXf mat, float c){
+        if(mat.norm() > c)
+            mat = c/mat.norm() * mat;
+        return mat;
+    }
+    
     /*
      * Cost functions
      */

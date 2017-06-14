@@ -51,7 +51,7 @@ bool AsyncNeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
             msg->activation = mat.col(i);
             msgs.push_back(msg);
             
-            numMessagesSent++;
+            numMessagesSentForward++;
         }
     }
     
@@ -76,7 +76,7 @@ bool AsyncNeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
         msg->time = curr_backward_batch;
         msgs.push_back(msg);
         
-        numMessagesSent++;
+        numMessagesSentBackward++;
     }
     assert(msgs.size() == 1);
     

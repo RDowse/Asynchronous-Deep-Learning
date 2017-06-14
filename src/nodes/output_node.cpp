@@ -90,6 +90,8 @@ void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
     
     dataSetType = msg->dataSetType;
     
+    //cout << m_id << " " << forwardSeenCount << " " << incomingForwardEdges.size() << endl;
+    
     if(dataSetType==DataSetType::training) dropout->setEnabled(true);
     else dropout->setEnabled(false);
     

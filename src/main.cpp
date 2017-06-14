@@ -28,13 +28,15 @@
 #include <random>
 #include <cstdlib>
 
+string testPath = "";
+
 void usage(){
     cout << "Usage: enter yaml path for configuration\n";
 }
 
 template<typename TNode>
 void simulate(shared_ptr<DNNGraphSettings> context){
-    printf("Starting sim...\n");
+    printf("Starting sim...\n\n");
     Logging::m_logLevel = 5;
     std::ostream *stats=&std::cout;
     ifstream file;
@@ -55,6 +57,7 @@ void simulate(shared_ptr<DNNGraphSettings> context){
         
         printf("Loading data\n");
         DataWrapper* data;
+        
         if("mnist" == context->datasetType){
             data = new MNISTDataWrapper(context->datasetTrainingPath,context->datasetTestingPath);
         } else if("xor" == context->datasetType){
@@ -76,9 +79,9 @@ void simulate(shared_ptr<DNNGraphSettings> context){
         cout << "Final epoch: " << s->epoch << endl;
         cout << "training error: " << s->training_error << ", accuracy: " << s->accuracy << endl;
         
-        if(context->testNumber!=-1){
+        if(testPath!=""){
             stringstream ss;
-            ss << "output/test" << context->testNumber << "/";
+            ss << testPath << "/";
             CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
                 ss.str()+"error.csv",context->error_training,context->error_validation,context->error_testing,
                 "training error, validation error, testing error \n");
@@ -87,6 +90,8 @@ void simulate(shared_ptr<DNNGraphSettings> context){
                 "training accuracy, validation accuracy, testing accuracy \n");
             CSVWriter::writeContext(ss.str()+"config.txt",context);
         }
+        
+        delete data;
     } else {
         cout << "Unable to open file "<< context->netPath << "\n";
         return;
@@ -119,11 +124,15 @@ void run(shared_ptr<DNNGraphSettings> context){
 
 int main(int argc, char** argv) {
     // Get usage for the executable.
-    if(argc!=2){
+    if(argc<2 || argc>3){
         usage();
         return 0;
     }
     srand(time(NULL));
+    
+    if(argc==3){
+        testPath = argv[2];
+    }
     
     string yamlPath = argv[1];
     YamlReader yamlReader(yamlPath);

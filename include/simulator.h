@@ -179,8 +179,8 @@ private:
         }
         
         Logging::log(2, "stepping nodes");
-        int k = m_nodes.size()/4;
-        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end(),k),
+        
+        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
             [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
             for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
                 step_node_par(*it,active);
@@ -213,11 +213,15 @@ public:
     }
         
     ~Simulator(){
-        for(auto it = m_nodes.begin(); it != m_nodes.end(); it++)
-            delete (*it);
+//        for(auto it = m_nodes.begin(); it != m_nodes.end(); it++)
+//            delete (*it);
+        for(int i = 0; i < m_nodes.size(); i++)
+            delete m_nodes[i];
         m_nodes.clear();
-        for(auto it = m_edges.begin(); it != m_edges.end(); it++)
-            delete (*it);
+//        for(auto it = m_edges.begin(); it != m_edges.end(); it++)
+//            delete (*it);
+        for(int i = 0; i < m_edges.size(); i++)
+            delete m_edges[i];
         m_edges.clear();
     }
     
@@ -265,10 +269,13 @@ public:
         tbb::tick_count t0 = tbb::tick_count::now();
         
         for(auto e: m_edges)
-            e->delay = context->delayInitialiserFnc(context->maxDelay);
+            e->delay = context->delayInitialiser();
         
         edgeModTimeTotal += (tbb::tick_count::now()-t0).seconds();
     }
+    
+    // For results gathering, specific to the node type
+    void postProcessing(shared_ptr<GraphSettings> _context){}
     
     void run(const string& command){
         Logging::log(1, "begin run");
@@ -282,18 +289,62 @@ public:
             assert(0);
         }
         
+        modifyEdgeDelay();
+        
         tbb::tick_count t0 = tbb::tick_count::now();
         while(active){
             active = step_all_parallel();
             
             // adjust the delay of edges
-            if(context->enableVariableEdgeDelay) modifyEdgeDelay();
+            if(context->enableVariableEdgeDelay && (context->stepTime % 25 == 0) ) modifyEdgeDelay();
         }
         tbb::tick_count t1 = tbb::tick_count::now();
-        
         cout << "Total run time: " << (t1-t0).seconds() - edgeModTimeTotal << endl;
         context->runTime = (t1-t0).seconds() - edgeModTimeTotal;
+        
+        cout << "Total steps: " << context->stepTime << endl;
+        
+        postProcessing(context);
     }
 };
+
+template<> void Simulator<AsyncNeuralNode>::postProcessing(shared_ptr<GraphSettings> _context){
+    cout << "Starting post processing of result" << endl;
+    try{
+        auto context = std::static_pointer_cast<DNNGraphSettings>(_context);
+        for(auto n: m_nodes){
+        if(auto node = dynamic_cast<AsyncNeuralNode::HiddenNode*>(n)){
+            context->numBackwardMessagesDropped += node->discardedBackwardMessageCount;
+            context->numForwardMessagesDropped += node->discardedForwardMessageCount;
+            context->numBackwardMessagesSent += node->numMessagesSentBackward;
+            context->numForwardMessagesSent += node->numMessagesSentForward;
+        } else if(auto node = dynamic_cast<AsyncNeuralNode::BiasNode*>(n)){
+            context->numBackwardMessagesDropped += node->discardedBackwardMessageCount;
+            context->numForwardMessagesDropped += node->discardedForwardMessageCount;
+            context->numBackwardMessagesSent += node->numMessagesSentBackward;
+            context->numForwardMessagesSent += node->numMessagesSentForward;    
+        } else if(auto node = dynamic_cast<AsyncNeuralNode::InputNode*>(n)){
+            context->numBackwardMessagesDropped += node->discardedBackwardMessageCount;
+            context->numForwardMessagesDropped += node->discardedForwardMessageCount;
+            context->numBackwardMessagesSent += node->numMessagesSentBackward;
+            context->numForwardMessagesSent += node->numMessagesSentForward;
+        } else if(auto node = dynamic_cast<AsyncNeuralNode::OutputNode*>(n)){
+            context->numBackwardMessagesDropped += node->discardedBackwardMessageCount;
+            context->numForwardMessagesDropped += node->discardedForwardMessageCount;
+            context->numBackwardMessagesSent += node->numMessagesSentBackward;
+            context->numForwardMessagesSent += node->numMessagesSentForward;
+        } else if(auto node = dynamic_cast<AsyncNeuralNode::SyncNode*>(n)){
+            context->numBackwardMessagesDroppedSync += node->discardedBackwardMessageCount;
+            context->numForwardMessagesDroppedSync += node->discardedForwardMessageCount;
+            context->numBackwardMessagesSentSync += node->numMessagesSentBackward;
+            context->numForwardMessagesSentSync += node->numMessagesSentForward;
+        }
+    }
+    } catch (const std::bad_cast& e) {
+        std::cout << e.what() << "\n";
+        exit(1);
+    }
+
+}
 
 #endif /* SIMULATOR_H */

@@ -71,12 +71,10 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 
 # Test Files
 TESTFILES= \
-	${TESTDIR}/TestFiles/f1 \
-	${TESTDIR}/TestFiles/f2
+	${TESTDIR}/TestFiles/f1
 
 # Test Object Files
-TESTOBJECTFILES= \
-	${TESTDIR}/tests/dropout_tests.o
+TESTOBJECTFILES=
 
 # C Compiler Flags
 CFLAGS=
@@ -262,16 +260,6 @@ ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 ${TESTDIR}/TestFiles/f1: ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   
-
-${TESTDIR}/TestFiles/f2: ${TESTDIR}/tests/dropout_tests.o ${OBJECTFILES:%.o=%_nomain.o}
-	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS}   
-
-
-${TESTDIR}/tests/dropout_tests.o: tests/dropout_tests.cpp 
-	${MKDIR} -p ${TESTDIR}/tests
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -I. -I. -I. -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/dropout_tests.o tests/dropout_tests.cpp
 
 
 ${OBJECTDIR}/src/main_nomain.o: ${OBJECTDIR}/src/main.o src/main.cpp 
@@ -669,7 +657,6 @@ ${OBJECTDIR}/src/tools/logging_nomain.o: ${OBJECTDIR}/src/tools/logging.o src/to
 	@if [ "${TEST}" = "" ]; \
 	then  \
 	    ${TESTDIR}/TestFiles/f1 || true; \
-	    ${TESTDIR}/TestFiles/f2 || true; \
 	else  \
 	    ./${TEST} || true; \
 	fi

@@ -60,7 +60,7 @@ bool AsyncNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
             assert(0);
     };
     
-    Logging::log(3, "Sending sample %d", sampleIndex);
+    //Logging::log(0, "Sending sample %d", sampleIndex);
     
     // send out data samples to input nodes
     msgs.reserve(outgoingForwardEdges.size());
@@ -81,7 +81,7 @@ bool AsyncNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         } 
         msgs.push_back(msg);
         
-        numMessagesSent++;
+        numMessagesSentForward++;
     }
     
     // reset
@@ -114,7 +114,7 @@ bool AsyncNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         msg->target = target;
         msgs.push_back(msg);
         
-        numMessagesSent++;
+        numMessagesSentBackward++;
     }
     
     // reset

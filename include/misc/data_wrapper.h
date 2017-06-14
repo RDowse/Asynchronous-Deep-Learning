@@ -49,22 +49,33 @@ struct DataWrapper{
     }
 protected:
     void readCSV(const string& path, vector<int>& label, vector< vector<float> >& data){
-       ifstream file (path);
-       string str;
-       while(getline(file,str)){
-           istringstream ss(str);
-           data.push_back(vector<float>());
-           label.push_back(0);
-           readLine(ss,label.back(),data.back());
-       }
+        ifstream file (path);
+        if (file.is_open()) {
+            string str;
+            while(getline(file,str)){
+                istringstream ss(str);
+                data.push_back(vector<float>());
+                label.push_back(0);
+                readLine(ss,label.back(),data.back());
+            }
+            file.close();
+        } else {
+            cout << "Couldnt read csv " << path << endl;
+            exit(1);
+        }
     }  
-    void convert2dVecToMat(const vector< vector<float> >& data, MatrixXf& mat){
-        mat = MatrixXf(data.size(), data[0].size());
-        for (int i = 0; i < data.size(); i++)
-            mat.row(i) = VectorXf::Map(&data[i][0],data[i].size());
+    
+    Eigen::MatrixXf ConvertToEigenMatrix(std::vector<std::vector<float>>& data)
+    {
+        Eigen::MatrixXf eMatrix(data.size(), data[0].size());
+        for (int i = 0; i < data.size(); ++i)
+            eMatrix.row(i) = Eigen::VectorXf::Map(&data[i][0], data[0].size());
+        return eMatrix;
     }
-    void convertVecToVec(const vector<int>& data, VectorXi& mat){
-        mat = VectorXi::Map(&data[0],data.size());
+    
+    Eigen::VectorXi ConvertToEigenVec(vector<int>& data){
+        Eigen::VectorXi mat = VectorXi::Map(&data[0],data.size());
+        return mat;
     }
 private:
     void readLine(istringstream& ss, int& label, vector<float>& data){
@@ -72,10 +83,9 @@ private:
        getline(ss,str,',');
        label = atoi(str.c_str());
        while(getline(ss,str,',')){
-           data.push_back(atof(str.c_str()));
+           data.push_back(stof(str.c_str()));
        }
     }
-
 };
 
 struct XORDataWrapper: public DataWrapper{
@@ -88,11 +98,11 @@ struct XORDataWrapper: public DataWrapper{
         readCSV(training_path,tmp_training_labels,tmp_training_images);
         readCSV(testing_path,tmp_testing_labels,tmp_testing_images);
         
-        convert2dVecToMat(tmp_training_images,training_images);
-        convertVecToVec(tmp_training_labels,training_labels);
+        training_images = ConvertToEigenMatrix(tmp_training_images);
+        training_labels = ConvertToEigenVec(tmp_training_labels);
         
-        convert2dVecToMat(tmp_testing_images,testing_images);
-        convertVecToVec(tmp_testing_labels,testing_labels);  
+        testing_images = ConvertToEigenMatrix(tmp_testing_images);
+        testing_labels = ConvertToEigenVec(tmp_testing_labels);
     }
 };
 
@@ -101,9 +111,10 @@ struct MNISTDataWrapper: public DataWrapper{
         // test set
         vector< vector<float> > tmp_testing_images;
         vector<int> tmp_testing_labels;
-        readCSV(testing_path,tmp_testing_labels,tmp_testing_images);        
-        convert2dVecToMat(tmp_testing_images,testing_images);
-        convertVecToVec(tmp_testing_labels,testing_labels);  
+        readCSV(testing_path,tmp_testing_labels,tmp_testing_images); 
+        
+        testing_images = ConvertToEigenMatrix(tmp_testing_images);
+        testing_labels = ConvertToEigenVec(tmp_testing_labels);
         
         // training set
         vector< vector<float> > tmp_training_images;
@@ -128,16 +139,16 @@ struct MNISTDataWrapper: public DataWrapper{
             tmp_training_labels.push_back(tmp_labels[x]);
             tmp_training_images.push_back(tmp_images[x]);
         }
-        convert2dVecToMat(tmp_training_images,training_images);
-        convertVecToVec(tmp_training_labels,training_labels);    
+        training_images = ConvertToEigenMatrix(tmp_training_images);
+        training_labels = ConvertToEigenVec(tmp_training_labels);
         training_images = training_images/255;
         
         for(auto x: validation){
             tmp_validation_labels.push_back(tmp_labels[x]);
             tmp_validation_images.push_back(tmp_images[x]);
         }
-        convert2dVecToMat(tmp_validation_images,validation_images);
-        convertVecToVec(tmp_validation_labels,validation_labels);
+        validation_images = ConvertToEigenMatrix(tmp_validation_images);
+        validation_labels = ConvertToEigenVec(tmp_validation_labels);
         validation_images = validation_images/255;
     }
 };

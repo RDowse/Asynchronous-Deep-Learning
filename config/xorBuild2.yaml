@@ -1,6 +1,6 @@
 command: build
 logLevel: 0
-netPath: w/xor2
+netPath: w/xor
 netType: neural
 topology:
     nHiddenLayers: 2

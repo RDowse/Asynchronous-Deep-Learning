@@ -37,6 +37,12 @@ public:
     class OutputNode;
     class BiasNode;
     class SyncNode;
+    
+    // message counts
+    int discardedForwardMessageCount = 0;
+    int discardedBackwardMessageCount = 0;
+    int numMessagesSentForward = 0;
+    int numMessagesSentBackward = 0;
 protected:
     static MessagePool<ForwardPropagationMessage>* forwardMessagePool;
     static MessagePool<BackwardPropagationMessage>* backwardMessagePool;
@@ -68,11 +74,6 @@ protected:
     int curr_backward_batch = 0;
     
     bool receivedFirstMessage = false;
-    
-    // message counts
-    int discardedForwardMessageCount = 0;
-    int discardedBackwardMessageCount = 0;
-    int numMessagesSent = 0;
     
     // node output/activation
     Eigen::VectorXf activation;
@@ -131,11 +132,11 @@ public:
     
     virtual bool readyToSendForward(){
         return forwardSeenCount == incomingForwardEdges.size() || 
-                (context->time - forwardTime >= context->waitTime && receivedFirstMessage && dataSetType == DataSetType::training); 
+            (context->stepTime - forwardTime >= context->waitTime && receivedFirstMessage && dataSetType == DataSetType::training); 
     }
     virtual bool readyToSendBackward(){
         return backwardSeenCount == incomingBackwardEdges.size() || 
-                (context->time - backwardTime >= context->waitTime && receivedFirstMessage && dataSetType == DataSetType::training);
+            (context->stepTime - backwardTime >= context->waitTime && receivedFirstMessage && dataSetType == DataSetType::training);
     }
 protected:
     template<typename TState>

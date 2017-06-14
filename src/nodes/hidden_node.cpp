@@ -41,7 +41,7 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
-        if(dropout->isNextLayerNodeActive(i)){
+        if(dropout->isNextLayerNodeActive(i) || dataSetType != DataSetType::training){
             assert( 0 == outgoingForwardEdges[i]->msgStatus );
             auto msg = forwardMessagePool->getMessage();
             msg->src = m_id;
@@ -66,12 +66,13 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     // perform weight update first
     int batchSize = receivedDelta.cols();
     deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights; // with momentum
-
-    newWeights -= deltaWeights; // update step  
     
     // Calculate next delta value
     Eigen::VectorXf tmp = weights.transpose()*receivedDelta;
     Eigen::VectorXf delta2 = tmp.array() * activation.unaryExpr(context->deltaActivationFnc).array();
+
+    weights -= deltaWeights; // update step  
+    weights = context->regularizationFnc(weights, context->c);
 
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
@@ -107,10 +108,6 @@ void NeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     }
     
     forwardMessagePool->returnMessage(msg);
-    
-    // weight update step
-    if(readyToSendForward())
-        weights = newWeights;
 }
 
 void NeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {

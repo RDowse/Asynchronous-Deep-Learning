@@ -15,6 +15,7 @@
 #include <locale>
 #include <algorithm>
 #include <iostream>
+#include <random>
 #include <memory>
 
 using namespace std;
@@ -26,7 +27,7 @@ public:
     YamlReader(std::string path){
         cout << "Reading yaml file: " << path << "\n";
         config = YAML::LoadFile(path);
-        if(config["command"]){
+        if(config["command"].IsDefined()){
             cout << "command: " << config["command"].as<string>() << "\n";
             command = toLower(config["command"].as<string>());
             if(command != "build" && command != "run"){
@@ -34,6 +35,9 @@ public:
                 usage();
                 exit(1);
             }
+        } else {
+            cout << "No command given\n";
+            exit(1);
         }
     }
     
@@ -99,7 +103,6 @@ private:
         settings->alpha = config["settings"]["alpha"].as<float>();
         settings->batchSize = config["settings"]["batchSize"].as<int>();
         settings->maxEpoch = config["settings"]["maxEpoch"].as<int>();
-        settings->minError = config["settings"]["minError"].as<float>();
         
         // Strategy
         if(config["strategy"].IsDefined())
@@ -109,15 +112,25 @@ private:
         if(config["settings"]["numModels"].IsDefined()) 
             settings->numModels = config["settings"]["numModels"].as<int>();
         
-        // Async Data Parameters
-        if(config["settings"]["forwardDropTolerance"].IsDefined()) 
-            settings->forwardDropTolerance = config["settings"]["forwardDropTolerance"].as<float>();
-        if(config["settings"]["backwardDropTolerance"].IsDefined()) 
-            settings->backwardDropTolerance = config["settings"]["backwardDropTolerance"].as<float>();
-        if(config["settings"]["maxDelay"].IsDefined()) 
-            settings->maxDelay = config["settings"]["maxDelay"].as<int>();
-        if(config["settings"]["enableVariableEdgeDelay"].IsDefined()) 
-            settings->enableVariableEdgeDelay = config["settings"]["enableVariableEdgeDelay"].as<bool>();
+        // Edge Delay settings
+        if(config["edgeSettings"].IsDefined()){
+            if(config["edgeSettings"]["enableVariableEdgeDelay"].IsDefined()) 
+                settings->enableVariableEdgeDelay = config["edgeSettings"]["enableVariableEdgeDelay"].as<bool>();    
+            if(config["edgeSettings"]["distribution"].IsDefined()){
+                settings->mean = config["edgeSettings"]["distribution"]["mean"].as<float>();
+                settings->std = config["edgeSettings"]["distribution"]["std"].as<float>();
+                settings->distribution.param(std::normal_distribution<double>(settings->mean, settings->std).param()); 
+                settings->generator.seed(std::random_device{}());
+            }
+        }
+    
+        // Async Specific Data Parameters
+        if(settings->netType == "async_neural" && config["netSpecificSettings"].IsDefined()){
+            settings->forwardDropTolerance = config["netSpecificSettings"]["forwardDropTolerance"].as<float>();
+            settings->backwardDropTolerance = config["netSpecificSettings"]["backwardDropTolerance"].as<float>();
+            settings->waitTimeFactor = config["netSpecificSettings"]["waitTimeFactor"].as<float>();
+            settings->waitTime = settings->waitTimeFactor*settings->std;
+        }
         
         // initialise error vectors
         settings->accuracy_validation = Eigen::VectorXf::Zero(settings->maxEpoch,1);

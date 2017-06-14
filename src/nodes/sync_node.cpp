@@ -67,7 +67,7 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     };
     
     // TODO: check data size matches the input size
-    Logging::log(3, "Sending sample %d", sampleIndex);
+    //Logging::log(0, "Sending sample %d", sampleIndex);
     
     // send out data samples to input nodes
     msgs.reserve(outgoingForwardEdges.size());

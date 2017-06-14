@@ -33,8 +33,14 @@ bool AsyncNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     // calulate output activation
     activation = input.unaryExpr(context->activationFnc);
     
+    //Eigen::MatrixXf mat;
+    //mat = activation*weights.transpose();
+    
     Eigen::MatrixXf mat;
-    mat = activation*weights.transpose();
+    if(dataSetType != DataSetType::training && !dropout->unset() && dropout->isEnabled())
+        mat = 0.5*activation*weights.transpose(); // for dropout based on probability, TODO correct for prime (adjustable probability)
+    else 
+        mat = activation*weights.transpose();
         
     msgs.reserve(outgoingForwardEdges.size());
     assert(weights.size() == outgoingForwardEdges.size());
@@ -50,7 +56,7 @@ bool AsyncNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
             msg->activation = mat.col(i);
             msgs.push_back(msg);
             
-            numMessagesSent++;
+            numMessagesSentForward++;
         }
     }
     
@@ -86,7 +92,7 @@ bool AsyncNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
             msg->delta = delta2; 
             msgs.push_back(msg);
             
-            numMessagesSent++;
+            numMessagesSentBackward++;
         }
     }
     

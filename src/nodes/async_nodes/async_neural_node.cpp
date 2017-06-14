@@ -17,7 +17,7 @@ bool AsyncNeuralNode::forwardDiscardMsgCheck(ForwardPropagationMessage* msg){
 
     if(!receivedFirstMessage && forwardSeenCount > (int)((float)incomingForwardEdges.size()*context->forwardDropTolerance) ){
         receivedFirstMessage = true;
-        forwardTime = context->time;
+        forwardTime = context->stepTime;
     }
 
     return false;
@@ -32,7 +32,7 @@ bool AsyncNeuralNode::backwardDiscardMsgCheck(BackwardPropagationMessage* msg){
 
     if(!receivedFirstMessage && backwardSeenCount > (int)((float)incomingBackwardEdges.size()*context->backwardDropTolerance) ){
         receivedFirstMessage = true;
-        backwardTime = context->time;
+        backwardTime = context->stepTime;
     }
 
     return false;

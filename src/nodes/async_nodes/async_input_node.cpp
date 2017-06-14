@@ -59,7 +59,7 @@ bool AsyncNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
             msg->activation = mat.col(i);
             msgs.push_back(msg);
             
-            numMessagesSent++;
+            numMessagesSentForward++;
         }
     }
     
@@ -89,7 +89,7 @@ bool AsyncNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
 
         msgs.push_back(msg);
         
-        numMessagesSent++;
+        numMessagesSentBackward++;
     }
     
     curr_backward_batch++;
