@@ -69,7 +69,7 @@ bool AsyncNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         msg->dataSetType = dataSetType;
         
         // sampling strategy
@@ -100,7 +100,7 @@ bool AsyncNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         
         Eigen::VectorXf target(currBatchSize);
         if(outgoingBackwardEdges.size() == 1){ // binary classification
@@ -123,7 +123,8 @@ bool AsyncNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
 
 bool AsyncNeuralNode::SyncNode::readyToSendForward(){
     return backwardSeenCount == incomingBackwardEdges.size() && 
-            (context->epoch < context->maxEpoch || dataSetType != DataSetType::training) || tick; 
+            (context->epoch < context->maxEpoch || dataSetType != DataSetType::training) || 
+            (context->epoch < context->maxEpoch && tick); 
 }
 
 bool AsyncNeuralNode::SyncNode::readyToSendBackward(){
@@ -138,7 +139,7 @@ void AsyncNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
     if(readyToSendForward()){
         
         // time step
-        time++;
+        batchNum++;
 
         sampleIndex += currBatchSize;
         
@@ -180,7 +181,7 @@ void AsyncNeuralNode::SyncNode::onRecv(ForwardPropagationMessage* msg){
     forwardMessagePool->returnMessage(msg);
     
     // switch propagation direction
-    if(readyToSendBackward()){ // || (context->time-timer) >= maxTime){
+    if(readyToSendBackward()){ 
         // training error
         if(outgoingBackwardEdges.size() == 1){ assert(0); }// todo implement binary version
         

@@ -48,7 +48,7 @@ bool NeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         
         msg->activation = activation;
         msgs.push_back(msg);
@@ -72,7 +72,7 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
             auto msg = backwardMessagePool->getMessage();
             msg->src = m_id; 
             msg->dst = outgoingBackwardEdges[i]->dst->getId();
-            msg->time = time;
+            msg->batchNum = batchNum;
 
             msg->delta = delta; 
             msgs.push_back(msg);
@@ -85,21 +85,20 @@ bool NeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs){
 
 void NeuralNode::OutputNode::onRecv(ForwardPropagationMessage* msg) {
     if(input.size() != msg->activation.size()) input = Eigen::VectorXf::Zero(msg->activation.size());
+    
     input += msg->activation;
-    forwardSeenCount++;    
     
     dataSetType = msg->dataSetType;
-    
-    //cout << m_id << " " << forwardSeenCount << " " << incomingForwardEdges.size() << endl;
     
     if(dataSetType==DataSetType::training) dropout->setEnabled(true);
     else dropout->setEnabled(false);
     
-    if(!dropout->unset() && msg->time > time){
-        dropout->nextStep(msg->time);
-        time = msg->time;
+    if(!dropout->unset() && msg->batchNum > batchNum){
+        dropout->nextStep(msg->batchNum);
+        batchNum = msg->batchNum;
     }
-    
+
+    forwardSeenCount++;       
     forwardMessagePool->returnMessage(msg);
 }
 

@@ -103,152 +103,152 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/asynchronous-deep-learning: ${OBJECTF
 ${OBJECTDIR}/src/main.o: src/main.cpp
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cpp
 
 ${OBJECTDIR}/src/messages/backward_propagation_message.o: src/messages/backward_propagation_message.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/messages
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/backward_propagation_message.o src/messages/backward_propagation_message.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/backward_propagation_message.o src/messages/backward_propagation_message.cpp
 
 ${OBJECTDIR}/src/messages/forward_propagation_message.o: src/messages/forward_propagation_message.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/messages
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message.o src/messages/forward_propagation_message.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message.o src/messages/forward_propagation_message.cpp
 
 ${OBJECTDIR}/src/misc/message_pool.o: src/misc/message_pool.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/misc
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/message_pool.o src/misc/message_pool.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/message_pool.o src/misc/message_pool.cpp
 
 ${OBJECTDIR}/src/misc/node_factory.o: src/misc/node_factory.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/misc
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/node_factory.o src/misc/node_factory.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/node_factory.o src/misc/node_factory.cpp
 
 ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node.o: src/nodes/async_nodes/async_bias_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/async_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node.o src/nodes/async_nodes/async_bias_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node.o src/nodes/async_nodes/async_bias_node.cpp
 
 ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node.o: src/nodes/async_nodes/async_hidden_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/async_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node.o src/nodes/async_nodes/async_hidden_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node.o src/nodes/async_nodes/async_hidden_node.cpp
 
 ${OBJECTDIR}/src/nodes/async_nodes/async_input_node.o: src/nodes/async_nodes/async_input_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/async_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_input_node.o src/nodes/async_nodes/async_input_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_input_node.o src/nodes/async_nodes/async_input_node.cpp
 
 ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node.o: src/nodes/async_nodes/async_neural_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/async_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node.o src/nodes/async_nodes/async_neural_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node.o src/nodes/async_nodes/async_neural_node.cpp
 
 ${OBJECTDIR}/src/nodes/async_nodes/async_output_node.o: src/nodes/async_nodes/async_output_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/async_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_output_node.o src/nodes/async_nodes/async_output_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_output_node.o src/nodes/async_nodes/async_output_node.cpp
 
 ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node.o: src/nodes/async_nodes/async_sync_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/async_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node.o src/nodes/async_nodes/async_sync_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node.o src/nodes/async_nodes/async_sync_node.cpp
 
 ${OBJECTDIR}/src/nodes/bias_node.o: src/nodes/bias_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node.o src/nodes/bias_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node.o src/nodes/bias_node.cpp
 
 ${OBJECTDIR}/src/nodes/hidden_node.o: src/nodes/hidden_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/hidden_node.o src/nodes/hidden_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/hidden_node.o src/nodes/hidden_node.cpp
 
 ${OBJECTDIR}/src/nodes/input_node.o: src/nodes/input_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node.o src/nodes/input_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node.o src/nodes/input_node.cpp
 
 ${OBJECTDIR}/src/nodes/neural_node.o: src/nodes/neural_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/neural_node.o src/nodes/neural_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/neural_node.o src/nodes/neural_node.cpp
 
 ${OBJECTDIR}/src/nodes/node.o: src/nodes/node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node.o src/nodes/node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node.o src/nodes/node.cpp
 
 ${OBJECTDIR}/src/nodes/output_node.o: src/nodes/output_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node.o src/nodes/output_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node.o src/nodes/output_node.cpp
 
 ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o: src/nodes/pardata_nodes/parallel_data_bias_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o src/nodes/pardata_nodes/parallel_data_bias_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o src/nodes/pardata_nodes/parallel_data_bias_node.cpp
 
 ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o: src/nodes/pardata_nodes/parallel_data_hidden_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o src/nodes/pardata_nodes/parallel_data_hidden_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o src/nodes/pardata_nodes/parallel_data_hidden_node.cpp
 
 ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o: src/nodes/pardata_nodes/parallel_data_input_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o src/nodes/pardata_nodes/parallel_data_input_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o src/nodes/pardata_nodes/parallel_data_input_node.cpp
 
 ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o: src/nodes/pardata_nodes/parallel_data_neural_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o src/nodes/pardata_nodes/parallel_data_neural_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o src/nodes/pardata_nodes/parallel_data_neural_node.cpp
 
 ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o: src/nodes/pardata_nodes/parallel_data_output_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o src/nodes/pardata_nodes/parallel_data_output_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o src/nodes/pardata_nodes/parallel_data_output_node.cpp
 
 ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o: src/nodes/pardata_nodes/parallel_data_sync_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes/pardata_nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o src/nodes/pardata_nodes/parallel_data_sync_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o src/nodes/pardata_nodes/parallel_data_sync_node.cpp
 
 ${OBJECTDIR}/src/nodes/sync_node.o: src/nodes/sync_node.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/nodes
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/sync_node.o src/nodes/sync_node.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/sync_node.o src/nodes/sync_node.cpp
 
 ${OBJECTDIR}/src/states/backward_train_state.o: src/states/backward_train_state.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/states
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/backward_train_state.o src/states/backward_train_state.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/backward_train_state.o src/states/backward_train_state.cpp
 
 ${OBJECTDIR}/src/states/forward_train_state.o: src/states/forward_train_state.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/states
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/forward_train_state.o src/states/forward_train_state.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/forward_train_state.o src/states/forward_train_state.cpp
 
 ${OBJECTDIR}/src/states/predict_state.o: src/states/predict_state.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/states
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/predict_state.o src/states/predict_state.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/predict_state.o src/states/predict_state.cpp
 
 ${OBJECTDIR}/src/tools/clock.o: src/tools/clock.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/clock.o src/tools/clock.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/clock.o src/tools/clock.cpp
 
 ${OBJECTDIR}/src/tools/dnn_graph.o: src/tools/dnn_graph.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/dnn_graph.o src/tools/dnn_graph.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/dnn_graph.o src/tools/dnn_graph.cpp
 
 ${OBJECTDIR}/src/tools/logging.o: src/tools/logging.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/tools
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
+	$(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging.o src/tools/logging.cpp
 
 # Subprojects
 .build-subprojects:
@@ -270,7 +270,7 @@ ${OBJECTDIR}/src/main_nomain.o: ${OBJECTDIR}/src/main.o src/main.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main_nomain.o src/main.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main_nomain.o src/main.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/main.o ${OBJECTDIR}/src/main_nomain.o;\
 	fi
@@ -283,7 +283,7 @@ ${OBJECTDIR}/src/messages/backward_propagation_message_nomain.o: ${OBJECTDIR}/sr
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/backward_propagation_message_nomain.o src/messages/backward_propagation_message.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/backward_propagation_message_nomain.o src/messages/backward_propagation_message.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/messages/backward_propagation_message.o ${OBJECTDIR}/src/messages/backward_propagation_message_nomain.o;\
 	fi
@@ -296,7 +296,7 @@ ${OBJECTDIR}/src/messages/forward_propagation_message_nomain.o: ${OBJECTDIR}/src
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message_nomain.o src/messages/forward_propagation_message.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/messages/forward_propagation_message_nomain.o src/messages/forward_propagation_message.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/messages/forward_propagation_message.o ${OBJECTDIR}/src/messages/forward_propagation_message_nomain.o;\
 	fi
@@ -309,7 +309,7 @@ ${OBJECTDIR}/src/misc/message_pool_nomain.o: ${OBJECTDIR}/src/misc/message_pool.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/message_pool_nomain.o src/misc/message_pool.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/message_pool_nomain.o src/misc/message_pool.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/misc/message_pool.o ${OBJECTDIR}/src/misc/message_pool_nomain.o;\
 	fi
@@ -322,7 +322,7 @@ ${OBJECTDIR}/src/misc/node_factory_nomain.o: ${OBJECTDIR}/src/misc/node_factory.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/node_factory_nomain.o src/misc/node_factory.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/misc/node_factory_nomain.o src/misc/node_factory.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/misc/node_factory.o ${OBJECTDIR}/src/misc/node_factory_nomain.o;\
 	fi
@@ -335,7 +335,7 @@ ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node_nomain.o: ${OBJECTDIR}/src/no
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node_nomain.o src/nodes/async_nodes/async_bias_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node_nomain.o src/nodes/async_nodes/async_bias_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node.o ${OBJECTDIR}/src/nodes/async_nodes/async_bias_node_nomain.o;\
 	fi
@@ -348,7 +348,7 @@ ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node_nomain.o: ${OBJECTDIR}/src/
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node_nomain.o src/nodes/async_nodes/async_hidden_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node_nomain.o src/nodes/async_nodes/async_hidden_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node.o ${OBJECTDIR}/src/nodes/async_nodes/async_hidden_node_nomain.o;\
 	fi
@@ -361,7 +361,7 @@ ${OBJECTDIR}/src/nodes/async_nodes/async_input_node_nomain.o: ${OBJECTDIR}/src/n
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_input_node_nomain.o src/nodes/async_nodes/async_input_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_input_node_nomain.o src/nodes/async_nodes/async_input_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/async_nodes/async_input_node.o ${OBJECTDIR}/src/nodes/async_nodes/async_input_node_nomain.o;\
 	fi
@@ -374,7 +374,7 @@ ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node_nomain.o: ${OBJECTDIR}/src/
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node_nomain.o src/nodes/async_nodes/async_neural_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node_nomain.o src/nodes/async_nodes/async_neural_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node.o ${OBJECTDIR}/src/nodes/async_nodes/async_neural_node_nomain.o;\
 	fi
@@ -387,7 +387,7 @@ ${OBJECTDIR}/src/nodes/async_nodes/async_output_node_nomain.o: ${OBJECTDIR}/src/
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_output_node_nomain.o src/nodes/async_nodes/async_output_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_output_node_nomain.o src/nodes/async_nodes/async_output_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/async_nodes/async_output_node.o ${OBJECTDIR}/src/nodes/async_nodes/async_output_node_nomain.o;\
 	fi
@@ -400,7 +400,7 @@ ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node_nomain.o: ${OBJECTDIR}/src/no
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node_nomain.o src/nodes/async_nodes/async_sync_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node_nomain.o src/nodes/async_nodes/async_sync_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node.o ${OBJECTDIR}/src/nodes/async_nodes/async_sync_node_nomain.o;\
 	fi
@@ -413,7 +413,7 @@ ${OBJECTDIR}/src/nodes/bias_node_nomain.o: ${OBJECTDIR}/src/nodes/bias_node.o sr
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node_nomain.o src/nodes/bias_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/bias_node_nomain.o src/nodes/bias_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/bias_node.o ${OBJECTDIR}/src/nodes/bias_node_nomain.o;\
 	fi
@@ -426,7 +426,7 @@ ${OBJECTDIR}/src/nodes/hidden_node_nomain.o: ${OBJECTDIR}/src/nodes/hidden_node.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/hidden_node_nomain.o src/nodes/hidden_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/hidden_node_nomain.o src/nodes/hidden_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/hidden_node.o ${OBJECTDIR}/src/nodes/hidden_node_nomain.o;\
 	fi
@@ -439,7 +439,7 @@ ${OBJECTDIR}/src/nodes/input_node_nomain.o: ${OBJECTDIR}/src/nodes/input_node.o 
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node_nomain.o src/nodes/input_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/input_node_nomain.o src/nodes/input_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/input_node.o ${OBJECTDIR}/src/nodes/input_node_nomain.o;\
 	fi
@@ -452,7 +452,7 @@ ${OBJECTDIR}/src/nodes/neural_node_nomain.o: ${OBJECTDIR}/src/nodes/neural_node.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/neural_node_nomain.o src/nodes/neural_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/neural_node_nomain.o src/nodes/neural_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/neural_node.o ${OBJECTDIR}/src/nodes/neural_node_nomain.o;\
 	fi
@@ -465,7 +465,7 @@ ${OBJECTDIR}/src/nodes/node_nomain.o: ${OBJECTDIR}/src/nodes/node.o src/nodes/no
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node_nomain.o src/nodes/node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/node_nomain.o src/nodes/node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/node.o ${OBJECTDIR}/src/nodes/node_nomain.o;\
 	fi
@@ -478,7 +478,7 @@ ${OBJECTDIR}/src/nodes/output_node_nomain.o: ${OBJECTDIR}/src/nodes/output_node.
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node_nomain.o src/nodes/output_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/output_node_nomain.o src/nodes/output_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/output_node.o ${OBJECTDIR}/src/nodes/output_node_nomain.o;\
 	fi
@@ -491,7 +491,7 @@ ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node_nomain.o: ${OBJECTD
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node_nomain.o src/nodes/pardata_nodes/parallel_data_bias_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node_nomain.o src/nodes/pardata_nodes/parallel_data_bias_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_bias_node_nomain.o;\
 	fi
@@ -504,7 +504,7 @@ ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node_nomain.o: ${OBJEC
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node_nomain.o src/nodes/pardata_nodes/parallel_data_hidden_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node_nomain.o src/nodes/pardata_nodes/parallel_data_hidden_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_hidden_node_nomain.o;\
 	fi
@@ -517,7 +517,7 @@ ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node_nomain.o: ${OBJECT
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node_nomain.o src/nodes/pardata_nodes/parallel_data_input_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node_nomain.o src/nodes/pardata_nodes/parallel_data_input_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_input_node_nomain.o;\
 	fi
@@ -530,7 +530,7 @@ ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node_nomain.o: ${OBJEC
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node_nomain.o src/nodes/pardata_nodes/parallel_data_neural_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node_nomain.o src/nodes/pardata_nodes/parallel_data_neural_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_neural_node_nomain.o;\
 	fi
@@ -543,7 +543,7 @@ ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node_nomain.o: ${OBJEC
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node_nomain.o src/nodes/pardata_nodes/parallel_data_output_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node_nomain.o src/nodes/pardata_nodes/parallel_data_output_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_output_node_nomain.o;\
 	fi
@@ -556,7 +556,7 @@ ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node_nomain.o: ${OBJECTD
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node_nomain.o src/nodes/pardata_nodes/parallel_data_sync_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node_nomain.o src/nodes/pardata_nodes/parallel_data_sync_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node.o ${OBJECTDIR}/src/nodes/pardata_nodes/parallel_data_sync_node_nomain.o;\
 	fi
@@ -569,7 +569,7 @@ ${OBJECTDIR}/src/nodes/sync_node_nomain.o: ${OBJECTDIR}/src/nodes/sync_node.o sr
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/sync_node_nomain.o src/nodes/sync_node.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/nodes/sync_node_nomain.o src/nodes/sync_node.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/nodes/sync_node.o ${OBJECTDIR}/src/nodes/sync_node_nomain.o;\
 	fi
@@ -582,7 +582,7 @@ ${OBJECTDIR}/src/states/backward_train_state_nomain.o: ${OBJECTDIR}/src/states/b
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/backward_train_state_nomain.o src/states/backward_train_state.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/backward_train_state_nomain.o src/states/backward_train_state.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/states/backward_train_state.o ${OBJECTDIR}/src/states/backward_train_state_nomain.o;\
 	fi
@@ -595,7 +595,7 @@ ${OBJECTDIR}/src/states/forward_train_state_nomain.o: ${OBJECTDIR}/src/states/fo
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/forward_train_state_nomain.o src/states/forward_train_state.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/forward_train_state_nomain.o src/states/forward_train_state.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/states/forward_train_state.o ${OBJECTDIR}/src/states/forward_train_state_nomain.o;\
 	fi
@@ -608,7 +608,7 @@ ${OBJECTDIR}/src/states/predict_state_nomain.o: ${OBJECTDIR}/src/states/predict_
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/predict_state_nomain.o src/states/predict_state.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/states/predict_state_nomain.o src/states/predict_state.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/states/predict_state.o ${OBJECTDIR}/src/states/predict_state_nomain.o;\
 	fi
@@ -621,7 +621,7 @@ ${OBJECTDIR}/src/tools/clock_nomain.o: ${OBJECTDIR}/src/tools/clock.o src/tools/
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/clock_nomain.o src/tools/clock.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/clock_nomain.o src/tools/clock.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/tools/clock.o ${OBJECTDIR}/src/tools/clock_nomain.o;\
 	fi
@@ -634,7 +634,7 @@ ${OBJECTDIR}/src/tools/dnn_graph_nomain.o: ${OBJECTDIR}/src/tools/dnn_graph.o sr
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/dnn_graph_nomain.o src/tools/dnn_graph.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/dnn_graph_nomain.o src/tools/dnn_graph.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/tools/dnn_graph.o ${OBJECTDIR}/src/tools/dnn_graph_nomain.o;\
 	fi
@@ -647,7 +647,7 @@ ${OBJECTDIR}/src/tools/logging_nomain.o: ${OBJECTDIR}/src/tools/logging.o src/to
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging_nomain.o src/tools/logging.cpp;\
+	    $(COMPILE.cc) -O3 -Iinclude -I/usr/include/eigen3 -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/tools/logging_nomain.o src/tools/logging.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/src/tools/logging.o ${OBJECTDIR}/src/tools/logging_nomain.o;\
 	fi

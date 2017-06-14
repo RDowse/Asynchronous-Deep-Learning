@@ -34,6 +34,23 @@ void usage(){
     cout << "Usage: enter yaml path for configuration\n";
 }
 
+void output(shared_ptr<DNNGraphSettings> context){
+    cout << "Final epoch: " << context->epoch << endl;
+    cout << "training error: " << context->training_error << ", accuracy: " << context->accuracy << endl;
+
+    if(testPath!=""){
+        stringstream ss;
+        ss << testPath << "/";
+        CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
+            ss.str()+"error.csv",context->error_training,context->error_validation,context->error_testing,
+            "training error, validation error, testing error \n");
+        CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
+            ss.str()+"accuracy.csv",context->accuracy_train,context->accuracy_validation,context->accuracy_testing,
+            "training accuracy, validation accuracy, testing accuracy \n");
+        CSVWriter::writeContext(ss.str()+"config.txt",context);
+    }
+}
+
 template<typename TNode>
 void simulate(shared_ptr<DNNGraphSettings> context){
     printf("Starting sim...\n\n");
@@ -72,26 +89,12 @@ void simulate(shared_ptr<DNNGraphSettings> context){
         sim.loadInput(data);
         
         // run
-        cout << "Starting run\n";
+        printf("Starting run\n\n");
         sim.run("train");
         
-        auto s = std::static_pointer_cast<DNNGraphSettings>(context);
-        cout << "Final epoch: " << s->epoch << endl;
-        cout << "training error: " << s->training_error << ", accuracy: " << s->accuracy << endl;
-        
-        if(testPath!=""){
-            stringstream ss;
-            ss << testPath << "/";
-            CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
-                ss.str()+"error.csv",context->error_training,context->error_validation,context->error_testing,
-                "training error, validation error, testing error \n");
-            CSVWriter::writeCSV<Eigen::VectorXf,Eigen::MatrixXf>(
-                ss.str()+"accuracy.csv",context->accuracy_train,context->accuracy_validation,context->accuracy_testing,
-                "training accuracy, validation accuracy, testing accuracy \n");
-            CSVWriter::writeContext(ss.str()+"config.txt",context);
-        }
-        
-        delete data;
+        output(context);
+
+        if(data) delete data;
     } else {
         cout << "Unable to open file "<< context->netPath << "\n";
         return;

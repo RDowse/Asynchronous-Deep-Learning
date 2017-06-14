@@ -45,7 +45,7 @@ bool AsyncNeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs){
             auto msg = forwardMessagePool->getMessage();
             msg->src = m_id;
             msg->dst = outgoingForwardEdges[i]->dst->getId();
-            msg->time = curr_forward_batch;
+            msg->batchNum = curr_forward_batch;
             msg->dataSetType = dataSetType;
             
             msg->activation = mat.col(i);
@@ -73,7 +73,7 @@ bool AsyncNeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->time = curr_backward_batch;
+        msg->batchNum = curr_backward_batch;
         msgs.push_back(msg);
         
         numMessagesSentBackward++;
@@ -81,7 +81,7 @@ bool AsyncNeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs){
     assert(msgs.size() == 1);
     
     curr_backward_batch++;
-    receivedFirstMessage = false;
+    ready = false;
     
     backwardSeenCount = 0;
     receivedDelta.Zero(receivedDelta.rows(),receivedDelta.cols());
@@ -99,9 +99,9 @@ void AsyncNeuralNode::BiasNode::onRecv(ForwardPropagationMessage* msg) {
     if(dataSetType==DataSetType::training) dropout->setEnabled(true);
     else dropout->setEnabled(false);
     
-    if(!dropout->unset() && msg->time > time){
-        dropout->nextStep(msg->time);
-        time = msg->time;
+    if(!dropout->unset() && msg->batchNum > batchNum){
+        dropout->nextStep(msg->batchNum);
+        batchNum = msg->batchNum;
     }
     
     forwardMessagePool->returnMessage(msg);

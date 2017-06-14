@@ -18,6 +18,9 @@ public:
     // numbered batch for debugging
     int batchIndex;
     
+    // batch count
+    int batchNum = 0;
+    
     // individual node values
     Eigen::VectorXf delta;
     Eigen::VectorXf target;
@@ -28,6 +31,8 @@ public:
     
     // send message to node
     bool dispatchTo(Node* handler) override;
+    
+    void reset() override;
 };
 
 #endif /* BACKWARD_PROPAGATION_MESSAGE_H */

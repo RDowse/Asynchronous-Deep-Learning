@@ -39,7 +39,7 @@ bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs, i
     assert(dataset!=NULL);
     
     // time step
-    time++;
+    batchNum++;
     
     auto& images = validating ? 
         dataset->validation_images : dataset->training_images;
@@ -66,7 +66,7 @@ bool ParallelDataNeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs, i
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         msg->dataSetType = validating ? DataSetType::validating : DataSetType::training;
         msg->batchIndex = stateIndex;
         
@@ -107,7 +107,7 @@ bool ParallelDataNeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs, 
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         msg->batchIndex = stateIndex;
         
         Eigen::VectorXf target(batchSize);

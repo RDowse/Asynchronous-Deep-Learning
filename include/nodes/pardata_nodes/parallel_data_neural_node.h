@@ -50,6 +50,8 @@ protected:
     
     DropoutStrategy* dropout = NULL;
     
+    int batchNum = 0;
+    
     // sorted edges
     vector<Edge*> incomingForwardEdges;
     vector<Edge*> incomingBackwardEdges;

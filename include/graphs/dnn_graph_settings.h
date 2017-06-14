@@ -69,8 +69,8 @@ public:
     int maxEpoch;         // maximum epochs for training
     
     // Error values
-    float accuracy;
-    float training_error;
+    float accuracy = 0;
+    float training_error = 0;
     
     // Activation values
     float actMax;

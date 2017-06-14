@@ -47,7 +47,7 @@ bool ParallelDataNeuralNode::BiasNode::sendForwardMsgs(vector<Message*>& msgs, i
             auto msg = forwardMessagePool->getMessage();
             msg->src = m_id;
             msg->dst = outgoingForwardEdges[i]->dst->getId();
-            msg->time = time;
+            msg->batchNum = batchNum;
             msg->dataSetType = dataSetType;
             msg->batchIndex = stateIndex;
             msg->updateNumber = updateCount;
@@ -78,7 +78,7 @@ bool ParallelDataNeuralNode::BiasNode::sendBackwardMsgs(vector<Message*>& msgs, 
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         msg->batchIndex = stateIndex;
         
         msgs.push_back(msg);

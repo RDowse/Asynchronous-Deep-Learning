@@ -20,6 +20,9 @@ public:
     int batchIndex;
     int updateNumber;
     
+    // batch count
+    int batchNum = 0;
+    
     // training/validation/testing data
     DataSetType dataSetType = DataSetType::training;
     
@@ -31,6 +34,8 @@ public:
     
     // send message to node
     bool dispatchTo(Node* handler) override;
+    
+    void reset() override;
 }; 
 
 #endif /* FORWARD_PROPAGATION_MESSAGE_H */

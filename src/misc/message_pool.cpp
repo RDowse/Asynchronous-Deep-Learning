@@ -30,18 +30,14 @@ MessagePool<TMessage>* MessagePool<TMessage>::getInstance(){
 
 template<typename TMessage>
 TMessage* MessagePool<TMessage>::getMessage(){
-    if(pool.empty()) {
-        return new TMessage();
-    } else {
-        TMessage* msg;
-        pool.try_pop(msg);
-        return msg;
-    }
+    TMessage* msg;
+    if(!pool.try_pop(msg))
+        msg = new TMessage();
+    return msg;
 }
 
 template<typename TMessage>
 void MessagePool<TMessage>::returnMessage(TMessage* msg){
-    // TODO: reset message
     pool.push(msg);
 }
 

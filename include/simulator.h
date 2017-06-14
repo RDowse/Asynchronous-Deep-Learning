@@ -137,6 +137,7 @@ private:
         for(auto p: n->outgoingEdges){
             auto e = p.second;
             if( e->msgStatus > 0 ){
+                assert(e->src->getId() == n->getId());
                 Logging::log(1, "node %u : blocked on %u->%u", n->getId(), 
                         e->src->getId(),
                         e->dst->getId());
@@ -179,13 +180,18 @@ private:
         }
         
         Logging::log(2, "stepping nodes");
-        
-        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
-            [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
-            for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
-                step_node_par(*it,active);
-            }
-        },tbb::auto_partitioner());
+        tbb::parallel_for( tbb::blocked_range<size_t>(size_t(0), size_t(m_nodes.size())), 
+                [&] (const tbb::blocked_range<size_t> range) {
+                    for (int it = range.begin(); it != range.end(); it++){
+                        step_node_par(m_nodes[it],active);
+                    }
+        });
+//        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
+//            [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
+//            for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
+//                step_node_par(*it,active);
+//            }
+//        },tbb::auto_partitioner());
         
         // global time for async
         context->incrementTime();
@@ -213,13 +219,10 @@ public:
     }
         
     ~Simulator(){
-//        for(auto it = m_nodes.begin(); it != m_nodes.end(); it++)
-//            delete (*it);
+        std::cout << "deleting sim mem\n";
         for(int i = 0; i < m_nodes.size(); i++)
             delete m_nodes[i];
         m_nodes.clear();
-//        for(auto it = m_edges.begin(); it != m_edges.end(); it++)
-//            delete (*it);
         for(int i = 0; i < m_edges.size(); i++)
             delete m_edges[i];
         m_edges.clear();
@@ -244,8 +247,8 @@ public:
         
     void addEdge(int src, int dst, int delay = 1){
         auto e = new Edge(m_nodes[src],m_nodes[dst],delay);
-        m_nodes[e->src->getId()]->addEdge(e);
-        m_nodes[e->dst->getId()]->addEdge(e);
+        m_nodes.at(e->src->getId())->addEdge(e);
+        m_nodes.at(e->dst->getId())->addEdge(e);
         m_edges.push_back(e);
     }
 

@@ -58,6 +58,8 @@ protected:
     int forwardSeenCount = 0;
     int backwardSeenCount = 0;
     
+    int batchNum = 0;
+    
     // node output/activation
     Eigen::VectorXf activation;
 public:

@@ -21,7 +21,7 @@ class MessagePool{
     static MessagePool* instance;
     MessagePool();
 public:
-    ~MessagePool();
+    virtual ~MessagePool();
     static MessagePool* getInstance();
     TMessage* getMessage();
     void returnMessage(TMessage* msg);

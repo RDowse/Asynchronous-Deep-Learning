@@ -2,15 +2,15 @@ command: run
 netType: neural
 logLevel: 0
 netPath: w/net2.graph
-#datasetTrainingPath: data/mnist_train.csv 
-#datasetTestingPath: data/mnist_test.csv 
-datasetTrainingPath: dataset/mnist_train_100.csv 
-datasetTestingPath: dataset/mnist_test_10.csv 
+datasetTrainingPath: data/mnist_train.csv 
+datasetTestingPath: data/mnist_test.csv 
+#datasetTrainingPath: dataset/mnist_train_100.csv 
+#datasetTestingPath: dataset/mnist_test_10.csv 
 dataset: mnist
 settings:
     lr: 0.1 
     alpha: 0.8 
     batchSize: 32 
-    maxEpoch: 0
-#strategy: dropoutbitset
-strategy: dropout
+    maxEpoch: 10
+strategy: dropoutbitset
+#strategy: dropout

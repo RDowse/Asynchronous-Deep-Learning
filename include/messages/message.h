@@ -19,9 +19,9 @@ class Message{
 public:
     int src = 0;
     int dst = 0;
-    int time = 0;
     // send message to node
     virtual bool dispatchTo(Node* handler)=0;
+    virtual void reset()=0;
 };
 
 #endif /* MESSAGE_H */

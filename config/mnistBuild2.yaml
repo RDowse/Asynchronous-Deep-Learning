@@ -4,6 +4,6 @@ netPath: w/net2
 netType: neural
 topology:
     nHiddenLayers: 1
-    nHidden: 101
+    nHidden: 10
     nInput: 784
     nOutput: 10

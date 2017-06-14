@@ -65,15 +65,13 @@ protected:
     int forwardSeenCount = 0;
     int backwardSeenCount = 0;
     
-    // time for receiving first message
-    int forwardTime = INT_MAX;
-    int backwardTime = INT_MAX;
-    
     // batch index
     int curr_forward_batch = 0;
     int curr_backward_batch = 0;
     
-    bool receivedFirstMessage = false;
+    bool ready = false;
+    
+    int batchNum = 0;
     
     // node output/activation
     Eigen::VectorXf activation;
@@ -131,12 +129,16 @@ public:
     bool backwardDiscardMsgCheck(BackwardPropagationMessage* msg);
     
     virtual bool readyToSendForward(){
+        if(!dropout->unset())return dropout->readyToSendForward(forwardSeenCount) || 
+            (ready && dataSetType == DataSetType::training);
         return forwardSeenCount == incomingForwardEdges.size() || 
-            (context->stepTime - forwardTime >= context->waitTime && receivedFirstMessage && dataSetType == DataSetType::training); 
+            (ready && dataSetType == DataSetType::training); 
     }
     virtual bool readyToSendBackward(){
+        if(!dropout->unset()) return dropout->readyToSendBackward(backwardSeenCount)|| 
+            (ready && dataSetType == DataSetType::training);
         return backwardSeenCount == incomingBackwardEdges.size() || 
-            (context->stepTime - backwardTime >= context->waitTime && receivedFirstMessage && dataSetType == DataSetType::training);
+            (ready && dataSetType == DataSetType::training);
     }
 protected:
     template<typename TState>

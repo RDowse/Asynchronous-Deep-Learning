@@ -38,8 +38,8 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     assert(readyToSendForward());
     assert(dataset!=NULL);
     
-    // time step
-    time++;
+    // increment batch 
+    batchNum++;
     
     MatrixXf* images = NULL;
     switch(dataSetType){
@@ -76,7 +76,7 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
         auto msg = forwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         msg->dataSetType = dataSetType;
         
         // sampling strategy
@@ -106,7 +106,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
         
         Eigen::VectorXf target(currBatchSize);
         if(outgoingBackwardEdges.size() == 1){ // binary classification

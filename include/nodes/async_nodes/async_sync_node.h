@@ -41,10 +41,6 @@ class AsyncNeuralNode::SyncNode: public AsyncNeuralNode{
     
     int currBatchSize = 0;
     
-    // countdown for receiving msgs
-    int timer = 0;
-    int maxTime = 5;
-    
     int map_index = 0;
     unordered_map<int,int> dstOutputIndex;        // map backprop index to output
     

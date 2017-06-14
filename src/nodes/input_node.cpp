@@ -53,7 +53,7 @@ bool NeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
             auto msg = forwardMessagePool->getMessage();
             msg->src = m_id;
             msg->dst = outgoingForwardEdges[i]->dst->getId();
-            msg->time = time;
+            msg->batchNum = batchNum;
             msg->dataSetType = dataSetType;
 
             msg->activation = mat.col(i);
@@ -82,7 +82,7 @@ bool NeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
         auto msg = backwardMessagePool->getMessage();
         msg->src = m_id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
-        msg->time = time;
+        msg->batchNum = batchNum;
 
         msgs.push_back(msg);
     }
@@ -101,9 +101,9 @@ void NeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     if(dataSetType==DataSetType::training) dropout->setEnabled(true);
     else dropout->setEnabled(false);
     
-    if(!dropout->unset() && msg->time > time){
-        dropout->nextStep(msg->time);
-        time = msg->time;
+    if(!dropout->unset() && msg->batchNum > batchNum){
+        dropout->nextStep(msg->batchNum);
+        batchNum = msg->batchNum;
     }
     
     forwardMessagePool->returnMessage(msg);

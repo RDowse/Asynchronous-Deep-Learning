@@ -38,6 +38,8 @@ protected:
     vector<Edge*> outgoingBackwardEdges;
     vector<Edge*> outgoingForwardEdges;
         
+    int batchNum = 0;
+    
     // seen counts
     int forwardSeenCount = 0;
     int backwardSeenCount = 0;
