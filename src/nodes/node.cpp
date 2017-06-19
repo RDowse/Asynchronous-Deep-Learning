@@ -5,8 +5,8 @@
 int Node::curr_id = 0;
 
 void Node::addEdge(Edge* e){
-    if(e->dst->getId() == m_id) incomingEdges[e->src->getId()] = e;
-    else if(e->src->getId() == m_id) outgoingEdges[e->dst->getId()] = e;
+    if(e->dst->getId() == id) incomingEdges[e->src->getId()] = e;
+    else if(e->src->getId() == id) outgoingEdges[e->dst->getId()] = e;
     else{
         throw runtime_error("this edges does not belong to this node \n");
         cout << "this edges does not belong to this node \n";  

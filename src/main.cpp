@@ -19,6 +19,7 @@
 #include "misc/node_factory.h"
 
 #include "tbb/tick_count.h"
+#include "tbb/task_scheduler_init.h"
 
 #include <map>
 #include <vector>
@@ -136,6 +137,9 @@ int main(int argc, char** argv) {
     if(argc==3){
         testPath = argv[2];
     }
+    
+    //tbb::task_scheduler_init(36);
+    cout << tbb::task_scheduler_init::default_num_threads() << endl;
     
     string yamlPath = argv[1];
     YamlReader yamlReader(yamlPath);

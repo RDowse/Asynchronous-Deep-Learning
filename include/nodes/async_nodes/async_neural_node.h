@@ -93,7 +93,7 @@ public:
     virtual string getType()=0;
     
     virtual void setWeights(const vector<float>& w){
-        cout << "setWeights not implemented for this node, " << m_id << "\n";
+        cout << "setWeights not implemented for this node, " << id << "\n";
     }
     
     void setState(State<AsyncNeuralNode>* _state){

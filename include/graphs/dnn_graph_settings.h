@@ -12,6 +12,7 @@
 #include "misc/weight_initialisers.h"
 
 #include "graphs/graph_settings.h"
+#include "tbb/atomic.h"
 
 #include <iostream>
 #include <random>
@@ -86,7 +87,7 @@ public:
     float (*deltaActivationFnc)(float);
     
     Eigen::MatrixXf (*regularizationFnc)(Eigen::MatrixXf, float);
-    float c = 2;
+    float c = 3;
     
     /*
      * Output Data, TODO refactor into separate class
@@ -112,6 +113,20 @@ public:
     int numBackwardMessagesDroppedSync = 0;
     int numBackwardMessagesSentSync = 0;
     
+    // activation histogram
+    vector<tbb::atomic<int>> hist;
+    
+    void insertHist(const Eigen::VectorXf& v){
+        for(int i = 0; i < v.size(); i++){
+            int x = std::round(v(i)*100)+100;
+            if(x>=0 && x<hist.size()){
+                hist[x]++;
+            } else {
+                cout << x << endl;
+            }
+        }
+    }
+    
     // Should be in another class, but kept here for simplicity
     int delayInitialiser() override{
         int number = -1;
@@ -129,6 +144,8 @@ public:
         
         actMax = activationFnc(5);
         actMin = activationFnc(-5);
+        
+        hist = vector<tbb::atomic<int>>(201,tbb::atomic<int>(0));
     }
     
     void setParameters(vector<int>& params) override {
@@ -140,6 +157,7 @@ public:
     }
     
     void printParameters(){
+        cout << "HIST SIZE: " << hist.size() << endl << endl;
         cout << "Hyperparameters\n"; 
         cout << "lr "    << lr;
         cout << " alpha " << alpha;

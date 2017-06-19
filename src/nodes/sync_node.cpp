@@ -10,7 +10,7 @@ std::string NeuralNode::SyncNode::m_type = "Sync";
 
 void NeuralNode::SyncNode::addEdge(Edge* e) {
     Node::addEdge(e);
-    if(e->src->getId() == m_id){
+    if(e->src->getId() == id){
         if(e->dst->getType() == "Output"){
             outgoingBackwardEdges.push_back(e);
             dstOutputIndex[e->dst->getId()] = map_index++;
@@ -21,7 +21,7 @@ void NeuralNode::SyncNode::addEdge(Edge* e) {
             cout << "Unknown type " << e->dst->getType() << "\n";
             assert(0);
         }
-    } else if(e->dst->getId() == m_id){
+    } else if(e->dst->getId() == id){
         if(e->src->getType() == "Output"){
             incomingForwardEdges.push_back(e);
         } else if(e->src->getType() == "Input"
@@ -74,7 +74,7 @@ bool NeuralNode::SyncNode::sendForwardMsgs(vector<Message*>& msgs){
     for(unsigned i = 0, j = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
         auto msg = forwardMessagePool->getMessage();
-        msg->src = m_id;
+        msg->src = id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->batchNum = batchNum;
         msg->dataSetType = dataSetType;
@@ -104,7 +104,7 @@ bool NeuralNode::SyncNode::sendBackwardMsgs(vector<Message*>& msgs){
     msgs.reserve(outgoingBackwardEdges.size());
     for(int i = 0; i < outgoingBackwardEdges.size(); ++i){
         auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id;
+        msg->src = id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->batchNum = batchNum;
         

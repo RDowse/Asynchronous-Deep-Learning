@@ -10,7 +10,7 @@ void AsyncNeuralNode::InputNode::addEdge(Edge* e) {
      // add to original edge sets
      Node::addEdge(e);
      // check edge belongs to this node
-     if(e->src->getId() == m_id){
+     if(e->src->getId() == id){
          if(e->dst->getType() == "Sync"){
              outgoingBackwardEdges.push_back(e);
          } else if(e->dst->getType() == "Hidden"
@@ -21,7 +21,7 @@ void AsyncNeuralNode::InputNode::addEdge(Edge* e) {
              cout << "Unknown type " << e->dst->getType() << "\n";
              assert(0);
          }
-     } else if(e->dst->getId() == m_id){
+     } else if(e->dst->getId() == id){
          if(e->src->getType() == "Sync"){
              incomingForwardEdges.push_back(e);
          } else if(e->src->getType() == "Hidden"
@@ -51,11 +51,13 @@ bool AsyncNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
         if(dropout->isNextLayerNodeActive(i)){
             assert( 0 == outgoingForwardEdges[i]->msgStatus );
             auto msg = forwardMessagePool->getMessage();
-            msg->src = m_id;
+            msg->src = id;
             msg->dst = outgoingForwardEdges[i]->dst->getId();
             msg->batchNum = curr_forward_batch;
             msg->dataSetType = dataSetType;
 
+            //if(context->epoch==context->maxEpoch && dataSetType == DataSetType::testing) context->insertHist(mat.col(i));
+            
             msg->activation = mat.col(i);
             msgs.push_back(msg);
             
@@ -63,7 +65,7 @@ bool AsyncNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
         }
     }
     
-    curr_forward_batch++;
+    if(DataSetType::training == dataSetType) curr_forward_batch++;
     
     forwardSeenCount = 0;
     
@@ -78,12 +80,13 @@ bool AsyncNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
     deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights;
     
     weights -= deltaWeights;
+    weights = context->regularizationFnc(weights, context->c);
     
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         assert( 0 == outgoingBackwardEdges[i]->msgStatus );
         auto msg = backwardMessagePool->getMessage();
-        msg->src = m_id;
+        msg->src = id;
         msg->dst = outgoingBackwardEdges[i]->dst->getId();
         msg->batchNum = curr_backward_batch;
 
@@ -104,18 +107,20 @@ bool AsyncNeuralNode::InputNode::sendBackwardMsgs(vector<Message*>& msgs){
 
 void AsyncNeuralNode::InputNode::onRecv(ForwardPropagationMessage* msg){
     activation = msg->activation;
-    forwardSeenCount++;
     
     dataSetType = msg->dataSetType;
     
     if(dataSetType==DataSetType::training) dropout->setEnabled(true);
     else dropout->setEnabled(false);
     
-    if(!dropout->unset() && msg->batchNum > batchNum){
+    if(!dropout->unset() && msg->batchNum > batchNum && dataSetType==DataSetType::training){
         dropout->nextStep(msg->batchNum);
         batchNum = msg->batchNum;
+        curr_forward_batch = msg->batchNum;
+        curr_backward_batch = msg->batchNum;
     }
     
+    forwardSeenCount++;
     forwardMessagePool->returnMessage(msg);
 } 
 
@@ -124,9 +129,9 @@ void AsyncNeuralNode::InputNode::onRecv(BackwardPropagationMessage* msg) {
     
     if(backwardDiscardMsgCheck(msg)) return;
     
-    backwardSeenCount++;
     int index = dstWeightIndex[msg->src];
     receivedDelta.row(index) = msg->delta;
     
+    backwardSeenCount++;
     backwardMessagePool->returnMessage(msg);
 }

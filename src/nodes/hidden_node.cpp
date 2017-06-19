@@ -8,15 +8,15 @@ std::string NeuralNode::HiddenNode::m_type = "Hidden";
 void NeuralNode::HiddenNode::addEdge(Edge* e) {
     // add to original edge sets
     Node::addEdge(e);
-    if(e->src->getId() == m_id){
-        if(e->dst->getId() > m_id){ // change based on type of edge.
+    if(e->src->getId() == id){
+        if(e->dst->getId() > id){ // change based on type of edge.
             outgoingForwardEdges.push_back(e);
             dstWeightIndex[e->dst->getId()] = map_index++;
         } else {
             outgoingBackwardEdges.push_back(e);
         }
-    } else if(e->dst->getId() == m_id){
-        if(e->src->getId() < m_id){ // change based on type of edge.
+    } else if(e->dst->getId() == id){
+        if(e->src->getId() < id){ // change based on type of edge.
             incomingForwardEdges.push_back(e);
         } else {
             incomingBackwardEdges.push_back(e);
@@ -44,11 +44,13 @@ bool NeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
         if(dropout->isNextLayerNodeActive(i) || dataSetType != DataSetType::training){
             assert( 0 == outgoingForwardEdges[i]->msgStatus );
             auto msg = forwardMessagePool->getMessage();
-            msg->src = m_id;
+            msg->src = id;
             msg->dst = outgoingForwardEdges[i]->dst->getId();
             msg->batchNum = batchNum;
             msg->dataSetType = dataSetType;
-
+            
+            //if(context->epoch==context->maxEpoch-1) context->insertHist(mat.col(i));
+            
             msg->activation = mat.col(i);
             msgs.push_back(msg);
         }
@@ -79,7 +81,7 @@ bool NeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
         if(dropout->isPrevLayerNodeActive(i)){
             assert( 0 == outgoingBackwardEdges[i]->msgStatus );
             auto msg = backwardMessagePool->getMessage();
-            msg->src = m_id;
+            msg->src = id;
             msg->dst = outgoingBackwardEdges[i]->dst->getId();
             msg->batchNum = batchNum;
 

@@ -31,6 +31,7 @@
 #include "tbb/concurrent_queue.h"
 #include "tbb/tick_count.h"
 #include "tbb/concurrent_vector.h"
+#include "tbb/task_scheduler_init.h"
 
 #include <algorithm>
 #include <list>
@@ -49,12 +50,16 @@ private:
     friend class Loader;
     
     typedef typename TNode::SyncNode SyncNode;
+    typedef typename TNode::HiddenNode HiddenNode;
+    typedef typename TNode::InputNode InputNode;
+    typedef typename TNode::OutputNode OutputNode;
+    typedef typename TNode::BiasNode BiasNode;
     
     shared_ptr<GraphSettings> context; 
     vector<Edge*> m_edges;
     vector<Node*> m_nodes;
     multimap<string, Node*> m_node_map;
-    
+
     list<Edge*> activeEdges;
     
     std::ostream& m_statsDst;
@@ -178,20 +183,22 @@ private:
         for(auto& e: m_edges){
             active = step_edge(e) || active;
         }
-        
-        Logging::log(2, "stepping nodes");
-        tbb::parallel_for( tbb::blocked_range<size_t>(size_t(0), size_t(m_nodes.size())), 
-                [&] (const tbb::blocked_range<size_t> range) {
-                    for (int it = range.begin(); it != range.end(); it++){
-                        step_node_par(m_nodes[it],active);
-                    }
-        });
 //        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
 //            [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
 //            for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
-//                step_node_par(*it,active);
+//                for(auto pair: (*it)->incomingEdges)
+//                    if(step_edge(pair.second)) active = true;
 //            }
 //        },tbb::auto_partitioner());
+        
+        Logging::log(2, "stepping nodes");
+        
+        tbb::parallel_for(tbb::blocked_range<std::vector<Node*>::iterator>(m_nodes.begin(),m_nodes.end()),
+            [&] (tbb::blocked_range<std::vector<Node*>::iterator> node) {
+            for (std::vector<Node*>::iterator it = node.begin(); it != node.end(); it++) {
+                step_node_par(*it,active);
+            }
+        },tbb::auto_partitioner());
         
         // global time for async
         context->incrementTime();
@@ -278,7 +285,8 @@ public:
     }
     
     // For results gathering, specific to the node type
-    void postProcessing(shared_ptr<GraphSettings> _context){}
+    void postProcessing(shared_ptr<GraphSettings> _context){
+    }
     
     void run(const string& command){
         Logging::log(1, "begin run");
@@ -299,7 +307,7 @@ public:
             active = step_all_parallel();
             
             // adjust the delay of edges
-            if(context->enableVariableEdgeDelay && (context->stepTime % 25 == 0) ) modifyEdgeDelay();
+            if(context->enableVariableEdgeDelay && (context->stepTime % 50 == 0) ) modifyEdgeDelay();
         }
         tbb::tick_count t1 = tbb::tick_count::now();
         cout << "Total run time: " << (t1-t0).seconds() - edgeModTimeTotal << endl;
@@ -308,6 +316,12 @@ public:
         cout << "Total steps: " << context->stepTime << endl;
         
         postProcessing(context);
+        
+//        auto tmp = std::static_pointer_cast<DNNGraphSettings>(context);
+//        cout << "Printing hist\n"<<endl;
+//        for(auto x: tmp->hist){
+//            cout << x << endl;
+//        }
     }
 };
 

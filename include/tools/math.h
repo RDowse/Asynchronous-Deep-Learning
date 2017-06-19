@@ -49,6 +49,14 @@ namespace math{
         return 0.5;
     }
     
+//    inline Eigen::VectorXf softMax(Eigen::VectorXf z){
+//        Eigen::VectorXf z_exp = z;
+//        z_exp.unaryExpr(exp);
+//        float sum = z_exp.sum();
+//        auto softmax = z_exp/sum;
+//        return softmax;
+//    }
+    
     inline Eigen::MatrixXf maxNormRegularization(Eigen::MatrixXf mat, float c){
         if(mat.norm() > c)
             mat = c/mat.norm() * mat;

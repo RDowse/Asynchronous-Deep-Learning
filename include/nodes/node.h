@@ -34,15 +34,18 @@ class BackwardPropagationMessage;
 class Node{
     static int curr_id;
 protected:
-    int m_id;
+    int id;
 public:
-    unordered_map<int, Edge*> incomingEdges;  // map of edges indexed by their src
-    unordered_map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
+//    unordered_map<int, Edge*> incomingEdges;  // map of edges indexed by their src
+//    unordered_map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
     
-    Node(shared_ptr<GraphSettings> settings){m_id = curr_id++;}
+    map<int, Edge*> incomingEdges;  // map of edges indexed by their src
+    map<int, Edge*> outgoingEdges;  // map of edges indexed by their dst
+    
+    Node(shared_ptr<GraphSettings> settings){id = curr_id++;}
     virtual ~Node(){}
     
-    int getId() const{ return m_id;}
+    int getId() const{ return id;}
     virtual string getType()=0;
     
     // check if the node is ready

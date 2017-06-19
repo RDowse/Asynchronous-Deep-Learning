@@ -9,8 +9,8 @@ datasetTestingPath: data/mnist_test.csv
 dataset: mnist
 settings:
     lr: 0.1 
-    alpha: 0.8 
-    batchSize: 32 
-    maxEpoch: 10
-strategy: dropoutbitset
+    alpha: 0.9 
+    batchSize: 64
+    maxEpoch: 1
+#strategy: dropoutbitset
 #strategy: dropout

@@ -9,6 +9,8 @@ MessagePool<BackwardPropagationMessage>* AsyncNeuralNode::backwardMessagePool
         = MessagePool<BackwardPropagationMessage>::getInstance();
 
 bool AsyncNeuralNode::forwardDiscardMsgCheck(ForwardPropagationMessage* msg){
+    if(DataSetType::training != dataSetType) return false;
+    
     if(curr_forward_batch > msg->batchNum){
         discardedForwardMessageCount++;
         forwardMessagePool->returnMessage(msg);

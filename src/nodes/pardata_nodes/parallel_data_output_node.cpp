@@ -11,7 +11,7 @@ void ParallelDataNeuralNode::OutputNode::addEdge(Edge* e) {
     // add to original edge sets
     Node::addEdge(e);
     // check edge belongs to this node
-    if(e->src->getId() == m_id){
+    if(e->src->getId() == id){
         if(e->dst->getType() == "Hidden" ||
             e->dst->getType() == "Input" ||
             e->dst->getType() == "Bias"){
@@ -22,7 +22,7 @@ void ParallelDataNeuralNode::OutputNode::addEdge(Edge* e) {
             cout << "Unknown type " << e->dst->getType() << "\n";
             assert(0);
         }
-    } else if(e->dst->getId() == m_id){
+    } else if(e->dst->getId() == id){
         if(e->src->getType() == "Hidden" ||
             e->src->getType() == "Input" ||
             e->src->getType() == "Bias"){
@@ -46,7 +46,7 @@ bool ParallelDataNeuralNode::OutputNode::sendForwardMsgs(vector<Message*>& msgs,
     for(unsigned i = 0; i < outgoingForwardEdges.size(); i++){
         assert( 0 == outgoingForwardEdges[i]->msgStatus );
         auto msg = forwardMessagePool->getMessage();
-        msg->src = m_id;
+        msg->src = id;
         msg->dst = outgoingForwardEdges[i]->dst->getId();
         msg->batchNum = batchNum;
         msg->batchIndex = stateIndex;
@@ -73,7 +73,7 @@ bool ParallelDataNeuralNode::OutputNode::sendBackwardMsgs(vector<Message*>& msgs
         if(dropout->isPrevLayerNodeActive(i)){
             assert( 0 == outgoingBackwardEdges[i]->msgStatus );
             auto msg = backwardMessagePool->getMessage();
-            msg->src = m_id; 
+            msg->src = id; 
             msg->dst = outgoingBackwardEdges[i]->dst->getId();
             msg->batchNum = batchNum;
             msg->batchIndex = stateIndex;

@@ -8,15 +8,15 @@ std::string AsyncNeuralNode::HiddenNode::m_type = "Hidden";
 void AsyncNeuralNode::HiddenNode::addEdge(Edge* e) {
     // add to original edge sets
     Node::addEdge(e);
-    if(e->src->getId() == m_id){
-        if(e->dst->getId() > m_id){ // change based on type of edge.
+    if(e->src->getId() == id){
+        if(e->dst->getId() > id){ // change based on type of edge.
             outgoingForwardEdges.push_back(e);
             dstWeightIndex[e->dst->getId()] = map_index++;
         } else {
             outgoingBackwardEdges.push_back(e);
         }
-    } else if(e->dst->getId() == m_id){
-        if(e->src->getId() < m_id){ // change based on type of edge.
+    } else if(e->dst->getId() == id){
+        if(e->src->getId() < id){ // change based on type of edge.
             incomingForwardEdges.push_back(e);
         } else {
             incomingBackwardEdges.push_back(e);
@@ -33,9 +33,6 @@ bool AsyncNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
     // calulate output activation
     activation = input.unaryExpr(context->activationFnc);
     
-    //Eigen::MatrixXf mat;
-    //mat = activation*weights.transpose();
-    
     Eigen::MatrixXf mat;
     if(dataSetType != DataSetType::training && !dropout->unset() && dropout->isEnabled())
         mat = 0.5*activation*weights.transpose(); // for dropout based on probability, TODO correct for prime (adjustable probability)
@@ -48,10 +45,12 @@ bool AsyncNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
         if(dropout->isNextLayerNodeActive(i)){
             assert( 0 == outgoingForwardEdges[i]->msgStatus );
             auto msg = forwardMessagePool->getMessage();
-            msg->src = m_id;
+            msg->src = id;
             msg->dst = outgoingForwardEdges[i]->dst->getId();
             msg->batchNum = curr_forward_batch;
             msg->dataSetType = dataSetType;
+
+            //if(context->epoch==context->maxEpoch-1) context->insertHist(mat.col(i));
 
             msg->activation = mat.col(i);
             msgs.push_back(msg);
@@ -60,7 +59,7 @@ bool AsyncNeuralNode::HiddenNode::sendForwardMsgs(vector<Message*>& msgs) {
         }
     }
     
-    curr_forward_batch++;
+    if(DataSetType::training == dataSetType) curr_forward_batch++;
     ready = false;
     
     // reset
@@ -73,22 +72,23 @@ bool AsyncNeuralNode::HiddenNode::sendBackwardMsgs(vector<Message*>& msgs){
     
     int batchSize = receivedDelta.cols();
     deltaWeights = context->lr*(receivedDelta * activation)/batchSize + context->alpha*deltaWeights; // with momentum
-
-    weights -= deltaWeights; // update step 
     
     // Calculate next delta value
     Eigen::VectorXf tmp = weights.transpose()*receivedDelta;
     Eigen::VectorXf delta2 = tmp.array() * activation.unaryExpr(context->deltaActivationFnc).array();
+    
+    weights -= deltaWeights; // update step 
+    weights = context->regularizationFnc(weights, context->c);
 
     msgs.reserve(outgoingBackwardEdges.size());
     for(unsigned i = 0; i < outgoingBackwardEdges.size(); i++){
         if(dropout->isPrevLayerNodeActive(i)){
             assert( 0 == outgoingBackwardEdges[i]->msgStatus );
             auto msg = backwardMessagePool->getMessage();
-            msg->src = m_id;
+            msg->src = id;
             msg->dst = outgoingBackwardEdges[i]->dst->getId();
             msg->batchNum = curr_backward_batch;
-
+            
             msg->delta = delta2; 
             msgs.push_back(msg);
             
@@ -111,27 +111,27 @@ void AsyncNeuralNode::HiddenNode::onRecv(ForwardPropagationMessage* msg) {
     
     if(forwardDiscardMsgCheck(msg)) return;
             
-    forwardSeenCount++;    
     input += msg->activation;
     dataSetType = msg->dataSetType;
     
     if(dataSetType==DataSetType::training) dropout->setEnabled(true);
     else dropout->setEnabled(false);
     
-    if(!dropout->unset() && msg->batchNum > batchNum){
+    if(!dropout->unset() && msg->batchNum > batchNum && dataSetType==DataSetType::training){
         dropout->nextStep(msg->batchNum);
         batchNum = msg->batchNum;
         curr_forward_batch = msg->batchNum;
         curr_backward_batch = msg->batchNum;
     }
-    
+
+    forwardSeenCount++;        
     forwardMessagePool->returnMessage(msg);
 }
 
 void AsyncNeuralNode::HiddenNode::onRecv(BackwardPropagationMessage* msg) {
     assert(!dropout->isEnabled() || dropout->isActive());
     if(receivedDelta.cols() != msg->delta.size()) receivedDelta = Eigen::MatrixXf::Zero(weights.size(),msg->delta.size());
-
+    
     if(backwardDiscardMsgCheck(msg)) return;
             
     int index = dstWeightIndex[msg->src];
