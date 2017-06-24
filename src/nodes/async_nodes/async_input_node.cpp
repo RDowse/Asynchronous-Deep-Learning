@@ -56,7 +56,7 @@ bool AsyncNeuralNode::InputNode::sendForwardMsgs(vector<Message*>& msgs){
             msg->batchNum = curr_forward_batch;
             msg->dataSetType = dataSetType;
 
-            if(context->epoch==context->maxEpoch && dataSetType == DataSetType::testing) context->insertHist(mat.col(i));
+            //if(context->epoch==context->maxEpoch && dataSetType == DataSetType::testing) context->insertHist(mat.col(i));
             
             msg->activation = mat.col(i);
             msgs.push_back(msg);

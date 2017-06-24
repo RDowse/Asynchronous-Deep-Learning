@@ -317,11 +317,11 @@ public:
         
         postProcessing(context);
         
-        auto tmp = std::static_pointer_cast<DNNGraphSettings>(context);
-        cout << "Printing hist\n"<<endl;
-        for(auto x: tmp->hist){
-            cout << x << endl;
-        }
+//        auto tmp = std::static_pointer_cast<DNNGraphSettings>(context);
+//        cout << "Printing hist\n"<<endl;
+//        for(auto x: tmp->hist){
+//            cout << x << endl;
+//        }
     }
 };
 
