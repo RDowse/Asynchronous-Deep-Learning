@@ -130,7 +130,7 @@ public:
     // Should be in another class, but kept here for simplicity
     int delayInitialiser() override{
         int number = -1;
-        while( (number < 1) || (number>10.0) )
+        while( (number < 1) || (number>100.0) )
             number = (int)distribution(generator);
         return number;
     }

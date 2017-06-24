@@ -161,6 +161,8 @@ void ParallelDataNeuralNode::SyncNode::onRecv(BackwardPropagationMessage* msg){
             context->accuracy = accuracy/nTrainingSamples;
             context->training_error = training_error/nTrainingSamples;
             
+            context->accuracy_train(context->epoch-1) = accuracy/nTrainingSamples;
+            
             Logging::log(0,"ACCURACY: %f\n",context->accuracy);
             Logging::log(0,"AVERAGE ERROR: %f\n",context->training_error);
             Logging::log(0,"EPOCH: %d\n",context->epoch);       

@@ -117,11 +117,18 @@ public:
     // Durstenfeld implementation of Fisher-Yates shuffle
     template<size_t size>
     void shuffle(std::mt19937& rng, std::bitset<size>& b, int n){
-        for(int i = n-1; i > 0; i--){
+//        for(int i = n-1; i > 0; i--){
+//            int index = rng() % i;
+//            if(b[i] != b[index]){
+//                b[index].flip();
+//                b[i].flip();
+//            }
+//        }
+        for(int i = n; i > 0; i--){
             int index = rng() % i;
-            if(b[i] != b[index]){
+            if(b[i-1] != b[index]){
                 b[index].flip();
-                b[i].flip();
+                b[i-1].flip();
             }
         }
     }
